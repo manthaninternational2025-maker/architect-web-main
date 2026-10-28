@@ -95,19 +95,7 @@ export function Sidebar() {
       </div>
 
       {/* -------------------------------------------------------------
-          CARD 4: PLAGIARISM REMOVAL SERVICES (Exact Reference Box)
-         ------------------------------------------------------------- */}
-      <div className="bg-white border border-[#CCCCCC] p-3 text-center transition-colors hover:bg-gray-50">
-        <Link
-          href="/plagiarism"
-          className="block text-[#700070] hover:text-[#550055] font-bold text-sm sm:text-base tracking-wide"
-        >
-          Plagiarism Removal Services
-        </Link>
-      </div>
-
-      {/* -------------------------------------------------------------
-          CARD 5: CREATIVE COMMONS LICENSE (Exact Reference Box)
+          CARD 4: CREATIVE COMMONS LICENSE (Exact Reference Box)
          ------------------------------------------------------------- */}
       <div className="bg-white border border-[#CCCCCC] p-3 text-left">
         {/* CC Badge Icons */}
@@ -145,18 +133,6 @@ export function Sidebar() {
             https://impulseresearchwork.com/
           </a>.
         </p>
-      </div>
-
-      {/* -------------------------------------------------------------
-          CARD 6: PLAGIARISM REMOVER ONLINE (Exact Reference Box)
-         ------------------------------------------------------------- */}
-      <div className="bg-white border border-[#CCCCCC] p-2.5 text-center transition-colors hover:bg-gray-50">
-        <Link
-          href="/plagiarism"
-          className="block text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-sm tracking-wide"
-        >
-          Plagiarism Remover Online
-        </Link>
       </div>
 
       {/* -------------------------------------------------------------
