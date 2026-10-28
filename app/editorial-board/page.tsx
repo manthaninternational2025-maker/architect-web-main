@@ -1,13 +1,40 @@
 import React from "react";
+import { companyInfo } from "@/data/companyInfo";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { Mail } from "lucide-react";
 
 export const metadata = {
-  title: "Editorial Board | Impulse Research Work",
-  description: "Editorial Advisory Board and Reviewers of Impulse Research Work.",
+  title: "Editorial Board | Manthan Journal",
+  description: "Editorial Advisory Board and Reviewers of Manthan: International Multidisciplinary Journal of Social Inquiry.",
 };
 
+interface BoardMember {
+  name: string;
+  designation: string;
+  affiliation: string;
+  location: string;
+  email?: string;
+}
+
+interface BoardSection {
+  role: string;
+  members: BoardMember[];
+}
+
 export default function EditorialBoardPage() {
-  const board = [
+  const board: BoardSection[] = [
+    {
+      role: "Editor-in-Chief",
+      members: [
+        {
+          name: "Dr. Deepak Setia",
+          designation: "Editor-in-Chief",
+          affiliation: "Manthan: International Multidisciplinary Journal of Social Inquiry",
+          location: "India",
+          email: "manthaninternational2025@gmail.com"
+        },
+      ],
+    },
     {
       role: "Associate Editors & Senior Methodologists",
       members: [
@@ -72,19 +99,32 @@ export default function EditorialBoardPage() {
                 </h2>
                 <div className="space-y-3">
                   {section.members.map((member, mIdx) => (
-                    <div key={mIdx} className="text-xs bg-gray-50/50 p-2.5 border border-gray-200">
+                    <div key={mIdx} className="text-xs bg-gray-50/50 p-3 border border-gray-200">
                       <div className="font-bold text-gray-900 text-sm">
                         {member.name}
                       </div>
-                      <div className="text-gray-700 font-medium">{member.designation}</div>
+                      <div className="text-[#700070] font-semibold">{member.designation}</div>
                       <div className="text-gray-500 italic mt-0.5">
                         {member.affiliation}, {member.location}
                       </div>
+                      {member.email && (
+                        <div className="mt-1.5 flex items-center gap-1 text-gray-600 font-mono text-[11px]">
+                          <Mail className="w-3.5 h-3.5 text-[#700070]" />
+                          <a href={`mailto:${member.email}`} className="text-[#700070] hover:underline">
+                            {member.email}
+                          </a>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="p-4 bg-purple-50 border border-purple-200 text-xs text-gray-700">
+            <strong className="text-[#700070] block mb-1">Join the Editorial Board / Review Panel:</strong>
+            Academicians, university professors, and senior researchers interested in joining the peer review panel or editorial board are invited to send their curriculum vitae to <a href={`mailto:${companyInfo.email}`} className="font-mono text-[#700070] hover:underline font-bold">{companyInfo.email}</a>.
           </div>
         </div>
 

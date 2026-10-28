@@ -33,13 +33,13 @@ export function Footer() {
         {/* Brand Licensing & Copyright */}
         <div className="text-center text-[11px] text-gray-600 leading-relaxed space-y-1">
           <p>
-            <strong>{companyInfo.name}</strong> • ISSN: 3139-695X (Online)
+            <strong>{companyInfo.journalTitle}</strong> • (ISSN: {companyInfo.issn})
           </p>
           <p>
-            Licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+            Published by <strong>{companyInfo.publisher}</strong> • Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
           </p>
           <p className="font-semibold text-gray-800 pt-1">
-            Copyright &copy; 2026 All Rights Reserved, {companyInfo.name}
+            Copyright &copy; 2026 {companyInfo.shortTitle} — All Rights Reserved.
           </p>
         </div>
       </div>

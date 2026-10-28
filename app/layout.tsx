@@ -19,9 +19,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Impulse Research Work | Professional Academic & Research Support",
-  description: "Supporting researchers from proposal to final submission. Rigorous academic editing, thesis review, statistical analysis, similarity diagnosis, and journal preparation.",
-  keywords: "Impulse Research Work, academic consultancy, PhD thesis support, research proposal, SPSS data analysis, similarity review, academic editing, journal submission support",
+  title: "Manthan: International Multidisciplinary Journal of Social Inquiry (ISSN: XXXX-XXXX)",
+  description: "Manthan: International Multidisciplinary Journal of Social Inquiry (IMJSI) — An Open Access Peer Reviewed Refereed Journal published by Impulse Publication Works.",
+  keywords: "Manthan Journal, IMJSI, multidisciplinary social inquiry, peer reviewed journal, open access, Impulse Publication Works, call for papers, Dr Deepak Setia",
 };
 
 export default function RootLayout({

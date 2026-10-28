@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { companyInfo } from "@/data/companyInfo";
 
 export function Sidebar() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -54,22 +55,22 @@ export function Sidebar() {
           CARD 2: JOURNAL COVER BOX (Solid Purple Box with White Frame)
          ------------------------------------------------------------- */}
       <div className="bg-[#700070] border-2 border-white p-4 text-center text-white shadow-xs">
-        <div className="border border-white/60 p-4 flex flex-col items-center justify-center min-h-[240px]">
+        <div className="border border-white/60 p-4 flex flex-col items-center justify-center min-h-[250px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/impulse-logo.png"
-            alt="Impulse Research Work Cover"
+            alt="Impulse Publication Works"
             className="w-24 h-auto object-contain mx-auto mb-3 invert brightness-200"
           />
-          <h3 className="font-editorial italic font-bold text-xl leading-snug">
-            Journal<br />
-            of<br />
-            Academic &amp;<br />
+          <h3 className="font-editorial italic font-bold text-lg leading-snug">
+            Manthan<br />
+            International<br />
             Multidisciplinary<br />
-            Research
+            Journal of<br />
+            Social Inquiry
           </h3>
           <p className="font-editorial font-bold text-xs mt-2 tracking-wider">
-            (ISSN:3139-695X)
+            (ISSN: {companyInfo.issn})
           </p>
           <div className="w-full border-t border-white/40 my-3" />
           <Link
@@ -126,8 +127,8 @@ export function Sidebar() {
         </div>
 
         <p className="text-[10px] sm:text-[11px] text-gray-700 leading-snug">
-          <strong>Journal of Academic &amp; Multidisciplinary Research</strong> by{" "}
-          <strong className="text-[#700070]">Impulse Research Work</strong> is licensed under a{" "}
+          <strong>{companyInfo.journalTitle}</strong> by{" "}
+          <strong className="text-[#700070]">{companyInfo.publisher}</strong> is licensed under a{" "}
           <span className="text-[#700070] font-semibold">
             Creative Commons Attribution-Non Commercial-Share Alike 4.0 International License
           </span>.

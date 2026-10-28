@@ -1,18 +1,21 @@
 import React from "react";
+import { companyInfo } from "@/data/companyInfo";
 
 export function SpecTable() {
   const specs = [
-    { label: "Title", value: "Journal of Academic & Multidisciplinary Research" },
-    { label: "Frequency", value: "Quarterly" },
-    { label: "ISSN:", value: "3139-695X (Online)" },
-    { label: "Publisher:", value: "Impulse Research Work" },
-    { label: "Starting Year:", value: "2025" },
-    { label: "Subject:", value: "Social Sciences, Humanities, Management, Commerce, Education & Multidisciplinary Research" },
-    { label: "Language:", value: "Multiple Language (English, Hindi & Multilingual)" },
-    { label: "Publication Format:", value: "Online" },
-    { label: "Website:", value: "https://impulseresearchwork.com", isLink: true },
-    { label: "Address:", value: "Impulse Research Work, New Delhi, India" },
-    { label: "Plagiarism", value: "PlagiarismCheckerX / Turnitin / Drillbit" },
+    { label: "Title", value: companyInfo.journalTitle },
+    { label: "Chief Editor", value: companyInfo.editorInChief },
+    { label: "Frequency", value: companyInfo.frequency },
+    { label: "E-ISSN", value: `${companyInfo.issn} (Applied)` },
+    { label: "Publisher", value: companyInfo.publisher },
+    { label: "Starting Year", value: companyInfo.startingYear },
+    { label: "Subject", value: "Humanities, Social Sciences, Economics, Political Science, History, Philosophy, Commerce, Law, Management & Multidisciplinary Studies" },
+    { label: "Language", value: "English / Multilingual" },
+    { label: "Publication Format", value: "Online" },
+    { label: "Email id", value: companyInfo.email, isEmail: true },
+    { label: "Website", value: "https://impulseresearchwork.com", isLink: true },
+    { label: "Address", value: companyInfo.address },
+    { label: "Plagiarism Tool", value: companyInfo.plagiarismTool },
   ];
 
   return (
@@ -34,6 +37,10 @@ export function SpecTable() {
                 <td className="py-2 px-3 text-gray-800 bg-white">
                   {item.isLink ? (
                     <a href={item.value} className="text-[#700070] hover:underline">
+                      {item.value}
+                    </a>
+                  ) : item.isEmail ? (
+                    <a href={`mailto:${item.value}`} className="text-[#700070] hover:underline font-mono">
                       {item.value}
                     </a>
                   ) : (
