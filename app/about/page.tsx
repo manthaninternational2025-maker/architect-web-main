@@ -13,10 +13,10 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="academic-container py-8 lg:py-10">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+    <div className="w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Main Content */}
-        <div className="lg:col-span-8 space-y-10">
+        <div className="lg:col-span-8 space-y-6">
           <section className="bg-white rounded border border-sand-200 p-6 sm:p-8 shadow-sm">
             <SectionHeader
               title="About Impulse Research Work"

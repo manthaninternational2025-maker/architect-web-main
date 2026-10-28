@@ -1,125 +1,195 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { companyInfo } from "@/data/companyInfo";
-import { MessageSquare, FileText, Lock } from "lucide-react";
 
 export function Sidebar() {
-  const keywords = [
-    "achievement motivation",
-    "sports psychology",
-    "organizational behavior",
-    "intrinsic motivation",
-    "extrinsic motivation",
-    "mental toughness",
-    "self-determination theory",
-    "goal-setting theory",
-    "stress management",
-    "emotional control",
-    "friendship quality",
-    "psychological well-being",
-    "positive psychology",
-    "ai-enhanced elt",
-    "second language acquisition",
-    "spSS statistical modeling",
-    "pls-sem analysis",
-    "turnitin diagnostics",
-  ];
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/archives?q=${encodeURIComponent(searchQuery.trim())}`;
+    }
+  };
 
   return (
-    <aside className="space-y-6">
-      {/* Block 1: Make a Submission (Exact OJS style) */}
-      <div className="bg-white border border-sand-200 p-4 rounded shadow-xs">
-        <Link
-          href="/submit"
-          className="w-full inline-block py-3 px-4 text-center font-bold text-xs uppercase tracking-wider rounded bg-navy-950 hover:bg-orange-600 text-white transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
-        >
-          Make a Submission
-        </Link>
-        <div className="mt-2 text-center">
-          <a
-            href={companyInfo.whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[11px] text-orange-600 hover:underline font-semibold inline-flex items-center gap-1"
+    <aside className="space-y-3.5 w-full">
+      {/* -------------------------------------------------------------
+          CARD 1: EDITORIAL POLICIES (Exact Reference Layout)
+         ------------------------------------------------------------- */}
+      <div className="bg-white border border-[#CCCCCC] p-3.5 text-center">
+        <h2 className="text-base font-bold text-[#111111] mb-2.5 text-left border-b border-gray-200 pb-1">
+          Editorial Policies
+        </h2>
+        <div className="flex flex-col space-y-2 py-1">
+          <Link
+            href="/academic-integrity"
+            className="text-[#700070] hover:text-[#550055] font-bold text-sm tracking-wide transition-colors"
           >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>WhatsApp Quick Desk ({companyInfo.phone})</span>
-          </a>
+            Publication Ethics
+          </Link>
+          <Link
+            href="/peer-review-policy"
+            className="text-[#700070] hover:text-[#550055] font-bold text-sm tracking-wide transition-colors"
+          >
+            Peer Review Process
+          </Link>
+          <Link
+            href="/about"
+            className="text-[#700070] hover:text-[#550055] font-bold text-sm tracking-wide transition-colors"
+          >
+            Open Access Policy
+          </Link>
+          <Link
+            href="/plagiarism"
+            className="text-[#700070] hover:text-[#550055] font-bold text-sm tracking-wide transition-colors"
+          >
+            Plagiarism
+          </Link>
         </div>
       </div>
 
-      {/* Block 2: Information (Exact OJS style) */}
-      <div className="bg-white border border-sand-200 p-4 rounded shadow-xs">
-        <h2 className="font-editorial text-base font-bold text-navy-950 border-b border-sand-200 pb-2 mb-3">
-          Information
-        </h2>
-        <ul className="space-y-2 text-xs">
-          <li>
-            <Link
-              href="/resources"
-              className="text-navy-950 hover:text-orange-600 transition-colors"
-            >
-              For Readers
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/instructions-to-authors"
-              className="text-navy-950 hover:text-orange-600 transition-colors"
-            >
-              For Authors
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/editorial-board"
-              className="text-navy-950 hover:text-orange-600 transition-colors"
-            >
-              For Librarians &amp; Scholars
-            </Link>
-          </li>
-        </ul>
-      </div>
-
-      {/* Block 3: Journal Cover & Scholarly Scroll (Exact OJS customblock-cover-image) */}
-      <div className="bg-white border border-sand-200 p-4 rounded shadow-xs text-center">
-        <h2 className="font-editorial text-xs font-bold text-academic-muted uppercase tracking-wider mb-2">
-          Current Issue Cover
-        </h2>
-        <div className="p-4 bg-sand-50 rounded border border-sand-200 flex flex-col items-center">
+      {/* -------------------------------------------------------------
+          CARD 2: JOURNAL COVER BOX (Solid Purple Box with White Frame)
+         ------------------------------------------------------------- */}
+      <div className="bg-[#700070] border-2 border-white p-4 text-center text-white shadow-xs">
+        <div className="border border-white/60 p-4 flex flex-col items-center justify-center min-h-[240px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/impulse-logo.png"
             alt="Impulse Research Work Cover"
-            className="w-32 h-auto object-contain mx-auto mb-2"
+            className="w-24 h-auto object-contain mx-auto mb-3 invert brightness-200"
           />
-          <div className="text-[11px] font-mono text-navy-950 font-bold">
-            Vol. 1 No. 1 (2026)
-          </div>
-          <div className="text-[10px] text-academic-muted">
-            ISSN: 3139-695X (Online)
-          </div>
+          <h3 className="font-editorial italic font-bold text-xl leading-snug">
+            Journal<br />
+            of<br />
+            Academic &amp;<br />
+            Multidisciplinary<br />
+            Research
+          </h3>
+          <p className="font-editorial font-bold text-xs mt-2 tracking-wider">
+            (ISSN:3139-695X)
+          </p>
+          <div className="w-full border-t border-white/40 my-3" />
+          <Link
+            href="/"
+            className="text-[11px] italic font-serif text-white hover:underline tracking-wider"
+          >
+            https://impulseresearchwork.com/
+          </Link>
         </div>
       </div>
 
-      {/* Block 4: Keywords Cloud (Exact OJS style) */}
-      <div className="bg-white border border-sand-200 p-4 rounded shadow-xs">
-        <h2 className="font-editorial text-base font-bold text-navy-950 border-b border-sand-200 pb-2 mb-3">
-          Keywords
-        </h2>
-        <div className="flex flex-wrap gap-1.5">
-          {keywords.map((kw, idx) => (
-            <Link
-              key={idx}
-              href={`/archives?q=${encodeURIComponent(kw)}`}
-              className="keyword-pill text-[11px] px-2 py-0.5 rounded bg-sand-50 hover:bg-orange-500 hover:text-white text-navy-950 border border-sand-200 cursor-pointer"
-            >
-              {kw}
-            </Link>
-          ))}
+      {/* -------------------------------------------------------------
+          CARD 3: MANUSCRIPT STATUS (Exact Reference Box)
+         ------------------------------------------------------------- */}
+      <div className="bg-white border border-[#CCCCCC] p-3 text-center transition-colors hover:bg-gray-50">
+        <Link
+          href="/submit"
+          className="block text-[#700070] hover:text-[#550055] font-bold text-sm sm:text-base tracking-wide"
+        >
+          Manuscript Status
+        </Link>
+      </div>
+
+      {/* -------------------------------------------------------------
+          CARD 4: PLAGIARISM REMOVAL SERVICES (Exact Reference Box)
+         ------------------------------------------------------------- */}
+      <div className="bg-white border border-[#CCCCCC] p-3 text-center transition-colors hover:bg-gray-50">
+        <Link
+          href="/plagiarism"
+          className="block text-[#700070] hover:text-[#550055] font-bold text-sm sm:text-base tracking-wide"
+        >
+          Plagiarism Removal Services
+        </Link>
+      </div>
+
+      {/* -------------------------------------------------------------
+          CARD 5: CREATIVE COMMONS LICENSE (Exact Reference Box)
+         ------------------------------------------------------------- */}
+      <div className="bg-white border border-[#CCCCCC] p-3 text-left">
+        {/* CC Badge Icons */}
+        <div className="flex items-center gap-1 mb-2">
+          <div className="inline-flex items-center justify-center px-1.5 py-0.5 border border-gray-400 rounded text-[10px] font-bold bg-gray-100 text-gray-700">
+            CC
+          </div>
+          <div className="inline-flex items-center justify-center px-1 py-0.5 border border-gray-400 rounded text-[10px] font-bold bg-gray-100 text-gray-700">
+            BY
+          </div>
+          <div className="inline-flex items-center justify-center px-1 py-0.5 border border-gray-400 rounded text-[10px] font-bold bg-gray-100 text-gray-700">
+            NC
+          </div>
+          <div className="inline-flex items-center justify-center px-1 py-0.5 border border-gray-400 rounded text-[10px] font-bold bg-gray-100 text-gray-700">
+            SA
+          </div>
         </div>
+
+        <p className="text-[10px] sm:text-[11px] text-gray-700 leading-snug">
+          <strong>Journal of Academic &amp; Multidisciplinary Research</strong> by{" "}
+          <strong className="text-[#700070]">Impulse Research Work</strong> is licensed under a{" "}
+          <span className="text-[#700070] font-semibold">
+            Creative Commons Attribution-Non Commercial-Share Alike 4.0 International License
+          </span>.
+        </p>
+        <p className="text-[10px] text-gray-600 mt-1">
+          Based on a work at{" "}
+          <a href="https://impulseresearchwork.com/" className="text-[#700070] hover:underline">
+            https://impulseresearchwork.com/
+          </a>.
+        </p>
+        <p className="text-[10px] text-gray-600 mt-0.5">
+          Permissions beyond the scope of this license may be available at{" "}
+          <a href="https://impulseresearchwork.com/" className="text-[#700070] hover:underline">
+            https://impulseresearchwork.com/
+          </a>.
+        </p>
+      </div>
+
+      {/* -------------------------------------------------------------
+          CARD 6: PLAGIARISM REMOVER ONLINE (Exact Reference Box)
+         ------------------------------------------------------------- */}
+      <div className="bg-white border border-[#CCCCCC] p-2.5 text-center transition-colors hover:bg-gray-50">
+        <Link
+          href="/plagiarism"
+          className="block text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-sm tracking-wide"
+        >
+          Plagiarism Remover Online
+        </Link>
+      </div>
+
+      {/* -------------------------------------------------------------
+          CARD 7: IMPACT FACTOR: 6.345* (Exact Reference Box)
+         ------------------------------------------------------------- */}
+      <div className="bg-white border border-[#CCCCCC] p-2 text-center">
+        <span className="text-[#700070] font-bold text-xs sm:text-sm">
+          Impact Factor: 6.345*
+        </span>
+      </div>
+
+      {/* -------------------------------------------------------------
+          CARD 8: SEARCH WIDGET (Exact Reference Box)
+         ------------------------------------------------------------- */}
+      <div className="bg-white border border-[#CCCCCC] p-3 text-left">
+        <label htmlFor="sidebar-search" className="block text-xs font-semibold text-gray-700 mb-1">
+          Search
+        </label>
+        <form onSubmit={handleSearch} className="flex items-center gap-1.5">
+          <input
+            id="sidebar-search"
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 px-2 py-1 text-xs border border-gray-400 focus:outline-none focus:border-[#700070] bg-white text-gray-900 rounded-none"
+            placeholder=""
+          />
+          <button
+            type="submit"
+            className="px-3.5 py-1 text-xs font-bold text-white bg-[#333333] hover:bg-black transition-colors rounded-none"
+          >
+            Search
+          </button>
+        </form>
       </div>
     </aside>
   );

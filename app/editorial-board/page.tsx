@@ -57,27 +57,27 @@ export default function EditorialBoardPage() {
   ];
 
   return (
-    <div className="academic-container py-6 sm:py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-white border border-sand-200 p-6 sm:p-8 rounded shadow-xs">
-          <h1 className="text-xl sm:text-2xl font-editorial font-bold text-navy-950 border-b border-sand-200 pb-2 mb-6">
+    <div className="w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-8 space-y-6">
+          <h1 className="text-xl sm:text-2xl font-editorial font-bold text-[#111111] border-b border-gray-200 pb-2">
             Editorial Board
           </h1>
 
-          <div className="space-y-8">
+          <div className="space-y-6">
             {board.map((section, idx) => (
               <div key={idx} className="space-y-3">
-                <h2 className="text-base font-editorial font-bold text-navy-950 border-b border-sand-100 pb-1.5 uppercase tracking-wide text-xs">
+                <h2 className="text-sm font-editorial font-bold text-[#700070] border-b border-gray-200 pb-1 uppercase tracking-wide">
                   {section.role}
                 </h2>
                 <div className="space-y-3">
                   {section.members.map((member, mIdx) => (
-                    <div key={mIdx} className="text-xs">
-                      <div className="font-bold text-navy-950 text-sm">
+                    <div key={mIdx} className="text-xs bg-gray-50/50 p-2.5 border border-gray-200">
+                      <div className="font-bold text-gray-900 text-sm">
                         {member.name}
                       </div>
-                      <div className="text-academic-muted">{member.designation}</div>
-                      <div className="text-gray-500 italic">
+                      <div className="text-gray-700 font-medium">{member.designation}</div>
+                      <div className="text-gray-500 italic mt-0.5">
                         {member.affiliation}, {member.location}
                       </div>
                     </div>

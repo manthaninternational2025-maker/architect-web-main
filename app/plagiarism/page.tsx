@@ -11,39 +11,39 @@ export const metadata = {
 
 export default function PlagiarismPage() {
   return (
-    <div className="academic-container py-6 sm:py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-white border border-sand-200 p-6 sm:p-8 rounded shadow-xs text-xs sm:text-sm text-academic-text space-y-6 leading-relaxed">
-          <h1 className="text-xl sm:text-2xl font-editorial font-bold text-navy-950 border-b border-sand-200 pb-2">
+    <div className="w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-8 text-xs sm:text-sm text-gray-800 space-y-6 leading-relaxed">
+          <h1 className="text-xl sm:text-2xl font-editorial font-bold text-[#111111] border-b border-gray-200 pb-2">
             Plagiarism &amp; Academic Originality Policy
           </h1>
 
-          <div className="p-4 bg-sand-50 rounded border border-sand-200 flex items-start gap-3">
-            <ShieldCheck className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
+          <div className="p-4 bg-gray-50 border border-gray-300 flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-[#700070] shrink-0 mt-0.5" />
             <div>
-              <strong className="text-navy-950 block mb-1">
+              <strong className="text-gray-900 block mb-1">
                 Zero Tolerance for Academic Dishonesty
               </strong>
-              <p className="text-academic-muted">
-                Impulse Research Work strictly adheres to international anti-plagiarism guidelines. All submitted manuscripts are screened using licensed academic software (Drillbit / Turnitin) prior to peer review.
+              <p className="text-gray-700">
+                Impulse Research Work strictly adheres to international anti-plagiarism guidelines. All submitted manuscripts are screened using licensed academic software (Drillbit / Turnitin / PlagiarismCheckerX) prior to peer review.
               </p>
             </div>
           </div>
 
           <section className="space-y-2">
-            <h2 className="font-editorial text-base font-bold text-navy-950">
+            <h2 className="font-editorial text-sm sm:text-base font-bold text-[#700070]">
               1. Plagiarism Screening Software
             </h2>
-            <p className="text-academic-muted">
+            <p className="text-gray-700">
               We employ <strong>{companyInfo.plagiarismTool}</strong> for comprehensive diagnostic screening against billions of web pages, institutional dissertations, and academic publisher databases.
             </p>
           </section>
 
           <section className="space-y-2">
-            <h2 className="font-editorial text-base font-bold text-navy-950">
+            <h2 className="font-editorial text-sm sm:text-base font-bold text-[#700070]">
               2. Acceptable Similarity Threshold
             </h2>
-            <ul className="list-disc pl-5 space-y-1 text-academic-muted">
+            <ul className="list-disc pl-5 space-y-1 text-gray-700">
               <li><strong>Overall Similarity Index:</strong> Must not exceed <strong>10%</strong> (excluding standard references, bibliography, and statutory quotes).</li>
               <li><strong>Single-Source Limit:</strong> No individual source match should exceed <strong>2%</strong>.</li>
               <li>Direct verbatim quotations must be enclosed in quotation marks and cited with exact page numbers.</li>
@@ -51,10 +51,10 @@ export default function PlagiarismPage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="font-editorial text-base font-bold text-navy-950">
+            <h2 className="font-editorial text-sm sm:text-base font-bold text-[#700070]">
               3. Types of Plagiarism Screened
             </h2>
-            <ul className="list-disc pl-5 space-y-1 text-academic-muted">
+            <ul className="list-disc pl-5 space-y-1 text-gray-700">
               <li><strong>Direct / Verbatim Plagiarism:</strong> Transcribing portions of another work without quotation or attribution.</li>
               <li><strong>Paraphrasing Without Citation:</strong> Restating another author&apos;s thoughts without citing the original source.</li>
               <li><strong>Patchwriting:</strong> Superficial synonym replacement while retaining original sentence structures.</li>
@@ -62,12 +62,12 @@ export default function PlagiarismPage() {
             </ul>
           </section>
 
-          <div className="pt-4 border-t border-sand-200 flex items-center gap-4">
+          <div className="pt-4 border-t border-gray-200 flex items-center gap-4">
             <Link
-              href="/services/similarity-review"
-              className="text-xs font-bold text-orange-600 hover:underline uppercase tracking-wider"
+              href="/submit"
+              className="text-xs font-bold text-[#700070] hover:underline uppercase tracking-wider"
             >
-              Explore Our Similarity Review Service →
+              Submit Your Paper for Screening &rarr;
             </Link>
           </div>
         </div>

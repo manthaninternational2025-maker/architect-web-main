@@ -34,29 +34,32 @@ export default function RootLayout({
       lang="en"
       className={`${sourceSerif.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-sand-50 text-academic-text font-sans selection:bg-orange-500 selection:text-white">
-        {/* Skip to Content for Academic Accessibility (modeled on OJS skip links) */}
+      <body className="min-h-full bg-[#700070] text-[#222222] font-sans antialiased selection:bg-[#700070] selection:text-white">
+        {/* Skip to Content for Academic Accessibility */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-orange-500 focus:text-white focus:font-semibold focus:rounded"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#700070] focus:text-white focus:font-semibold focus:rounded"
         >
           Skip to main academic content
         </a>
 
-        {/* Global Academic Header Banner Hierarchy */}
-        <header className="w-full flex flex-col">
-          <TopUtilityBar />
-          <Masthead />
-          <Navbar />
-        </header>
+        {/* Central White Journal Sheet Frame (Exact OJS / JISSIS Architecture) */}
+        <div className="max-w-[1000px] mx-auto bg-white border-x border-[#333333] shadow-2xl min-h-screen flex flex-col">
+          {/* Global Academic Header Banner Hierarchy */}
+          <header className="w-full flex flex-col">
+            <TopUtilityBar />
+            <Masthead />
+            <Navbar />
+          </header>
 
-        {/* Main Content Area */}
-        <main id="main-content" className="flex-1 w-full">
-          {children}
-        </main>
+          {/* Main Content Area */}
+          <main id="main-content" className="flex-1 w-full bg-white px-3 sm:px-6 py-4">
+            {children}
+          </main>
 
-        {/* Global Academic Footer */}
-        <Footer />
+          {/* Global Academic Footer */}
+          <Footer />
+        </div>
       </body>
     </html>
   );
