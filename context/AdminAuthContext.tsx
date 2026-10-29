@@ -22,6 +22,8 @@ interface AdminAuthContextType {
   login: (identifier: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (data: { name: string; username: string; email: string; password: string }) => Promise<{ success: boolean; error?: string }>;
   forgotPassword: (email: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  updateAdminProfile: (data: Partial<AdminUser>) => boolean;
+  updateAdminPassword: (newPassword: string) => boolean;
   logout: () => void;
 }
 
@@ -29,6 +31,7 @@ const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefin
 
 const STORAGE_KEY = "manthan_admin_user";
 const REGISTERED_USERS_KEY = "manthan_registered_admins";
+const CUSTOM_PASSWORD_KEY = "manthan_admin_custom_password";
 
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -69,15 +72,50 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: "Please enter your username/email and password." };
     }
 
-    // Default admin accounts
-    const isDefaultAdmin =
+    // Check if user set a custom password in Profile
+    let customPassword = "";
+    try {
+      customPassword = localStorage.getItem(CUSTOM_PASSWORD_KEY) || "";
+    } catch {}
+
+    // Primary Impulse Credentials
+    const isImpulseAdmin =
+      (trimmedId === "impulse_admin" ||
+        trimmedId === "impulse" ||
+        trimmedId === "impulse@manthanjournal.com" ||
+        trimmedId === "admin@impulseresearchwork.com" ||
+        trimmedId === "editor@impulseresearchwork.com") &&
+      (trimmedPass === "Impulse@2026#Admin" ||
+        trimmedPass === "impulse2026" ||
+        (customPassword && trimmedPass === customPassword));
+
+    if (isImpulseAdmin) {
+      const user: AdminUser = {
+        name: "Impulse Editorial Board",
+        username: "impulse_admin",
+        email: "editor@impulseresearchwork.com",
+        role: "Chief Managing Editor & Publisher",
+      };
+      setAdminUser(user);
+      setIsAuthenticated(true);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      } catch {}
+      return { success: true };
+    }
+
+    // Fallback standard admin account
+    const isFallbackAdmin =
       (trimmedId === "admin" ||
         trimmedId === "admin@manthanjournal.com" ||
-        trimmedId === "admin@impulseresearchwork.com" ||
         trimmedId === "editor") &&
-      (trimmedPass === "admin123" || trimmedPass === "admin" || trimmedPass === "password");
+      (trimmedPass === "admin123" ||
+        trimmedPass === "admin" ||
+        trimmedPass === "Impulse@2026#Admin" ||
+        trimmedPass === "impulse2026" ||
+        (customPassword && trimmedPass === customPassword));
 
-    if (isDefaultAdmin) {
+    if (isFallbackAdmin) {
       const user: AdminUser = {
         name: "Journal Administrator",
         username: "admin",
@@ -119,8 +157,30 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
     return {
       success: false,
-      error: "Invalid username/email or password. (Hint: use admin / admin123)",
+      error: "Invalid Admin ID or Password. Please check your credentials.",
     };
+  };
+
+  const updateAdminProfile = (data: Partial<AdminUser>): boolean => {
+    if (!adminUser) return false;
+    const updated: AdminUser = { ...adminUser, ...data };
+    setAdminUser(updated);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateAdminPassword = (newPassword: string): boolean => {
+    if (!newPassword || newPassword.length < 5) return false;
+    try {
+      localStorage.setItem(CUSTOM_PASSWORD_KEY, newPassword.trim());
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const signup = async (data: {
@@ -133,35 +193,18 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: "All fields are required." };
     }
 
-    if (data.password.length < 5) {
-      return { success: false, error: "Password must be at least 5 characters long." };
-    }
-
     try {
       const existingStr = localStorage.getItem(REGISTERED_USERS_KEY);
       const existing = existingStr ? JSON.parse(existingStr) : [];
-
-      if (
-        existing.some(
-          (u: any) =>
-            u.username.toLowerCase() === data.username.toLowerCase() ||
-            u.email.toLowerCase() === data.email.toLowerCase()
-        )
-      ) {
-        return { success: false, error: "An administrator with this username or email already exists." };
-      }
-
       const newUser = {
         name: data.name.trim(),
         username: data.username.trim(),
         email: data.email.trim(),
         password: data.password.trim(),
       };
-
       existing.push(newUser);
       localStorage.setItem(REGISTERED_USERS_KEY, JSON.stringify(existing));
 
-      // Auto sign in the new admin
       const loggedUser: AdminUser = {
         name: newUser.name,
         username: newUser.username,
@@ -171,7 +214,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       setAdminUser(loggedUser);
       setIsAuthenticated(true);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(loggedUser));
-
       return { success: true };
     } catch {
       return { success: false, error: "Failed to save registration data." };
@@ -182,10 +224,9 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     if (!email.trim()) {
       return { success: false, error: "Please enter your registered email address." };
     }
-
     return {
       success: true,
-      message: `Password reset instructions and security token have been dispatched to ${email.trim()}. Please verify your inbox.`,
+      message: `Password reset instructions have been dispatched to ${email.trim()}.`,
     };
   };
 
@@ -210,6 +251,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         login,
         signup,
         forgotPassword,
+        updateAdminProfile,
+        updateAdminPassword,
         logout,
       }}
     >
