@@ -42,12 +42,6 @@ export function Sidebar() {
           >
             Open Access Policy
           </Link>
-          <Link
-            href="/plagiarism"
-            className="text-[#700070] hover:text-[#550055] font-bold text-sm tracking-wide transition-colors"
-          >
-            Plagiarism
-          </Link>
         </div>
       </div>
 

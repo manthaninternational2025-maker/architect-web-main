@@ -11,7 +11,6 @@ export function Footer() {
     { label: "Submit Manuscript", href: "/submit" },
     { label: "Publication Ethics", href: "/academic-integrity" },
     { label: "Peer Review Process", href: "/peer-review-policy" },
-    { label: "Plagiarism Policy", href: "/plagiarism" },
     { label: "Contact Us", href: "/contact" },
   ];
 
