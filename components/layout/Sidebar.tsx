@@ -50,13 +50,7 @@ export function Sidebar() {
          ------------------------------------------------------------- */}
       <div className="bg-[#700070] border-2 border-white p-4 text-center text-white shadow-xs">
         <div className="border border-white/60 p-4 flex flex-col items-center justify-center min-h-[250px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/impulse-logo.png"
-            alt="Impulse Publication Works"
-            className="w-24 h-auto object-contain mx-auto mb-3 invert brightness-200"
-          />
-          <h3 className="font-editorial italic font-bold text-lg leading-snug">
+          <h3 className="font-editorial not-italic font-bold text-lg leading-snug">
             Manthan<br />
             International<br />
             Multidisciplinary<br />

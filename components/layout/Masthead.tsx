@@ -9,16 +9,10 @@ export function Masthead() {
     <div className="bg-white py-5 sm:py-7 px-4 text-center border-b border-gray-200">
       <Link href="/" className="inline-block group">
         <div className="flex flex-col items-center justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/impulse-logo.png"
-            alt="Impulse Publication Works"
-            className="h-10 sm:h-12 w-auto object-contain mb-2"
-          />
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-editorial italic font-bold text-[#700070] tracking-tight leading-tight max-w-4xl">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-editorial not-italic font-bold text-[#700070] tracking-tight leading-tight max-w-4xl">
             {companyInfo.journalTitle}
           </h1>
-          <p className="text-base sm:text-xl font-editorial font-bold text-[#700070] mt-1.5">
+          <p className="text-base sm:text-xl font-editorial not-italic font-bold text-[#700070] mt-1.5">
             (ISSN: {companyInfo.issn})
           </p>
           <p className="text-[11px] font-sans text-gray-500 uppercase tracking-widest mt-1">
