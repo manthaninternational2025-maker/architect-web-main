@@ -59,6 +59,7 @@ export default function AdminPage() {
   const { isAuthenticated, adminUser, openAuthModal, logout } = useAdminAuth();
 
   const [activeTab, setActiveTab] = useState<NavTab>("dashboard");
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -345,18 +346,40 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* Mobile Drawer Overlay */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 md:hidden animate-in fade-in duration-200"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
       {/* -------------------------------------------------------------------
           LEFT SIDEBAR: Exact layout from screenshot with Royal Navy/Purple theme
          ------------------------------------------------------------------- */}
-      <aside className="w-64 bg-[#1e3a5f] bg-gradient-to-b from-[#1b2a47] to-[#152238] text-white flex flex-col shrink-0 border-r border-[#152238] shadow-lg select-none">
+      <aside
+        className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-[#1e3a5f] bg-gradient-to-b from-[#1b2a47] to-[#152238] text-white flex flex-col shrink-0 border-r border-[#152238] shadow-2xl md:shadow-lg select-none transform transition-transform duration-200 ease-in-out ${
+          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
         {/* Brand / Heading */}
-        <div className="p-5 border-b border-white/10 flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between">
           <h1 className="font-editorial italic font-bold text-2xl tracking-wide text-white">
             Admin Panel
           </h1>
-          <span className="text-[10px] font-mono uppercase bg-white/15 px-2 py-0.5 rounded text-[#FFD700] tracking-wider">
-            v1.0
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-mono uppercase bg-white/15 px-2 py-0.5 rounded text-[#FFD700] tracking-wider">
+              v1.0
+            </span>
+            <button
+              type="button"
+              onClick={() => setMobileSidebarOpen(false)}
+              className="md:hidden p-1 text-slate-300 hover:text-white"
+              aria-label="Close sidebar"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+          </div>
         </div>
         {/* Navigation Items */}
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5 text-sm custom-scrollbar">
@@ -367,7 +390,10 @@ export default function AdminPage() {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setActiveTab(item.id as NavTab)}
+                onClick={() => {
+                  setActiveTab(item.id as NavTab);
+                  setMobileSidebarOpen(false);
+                }}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-md text-xs font-medium transition-all ${
                   isActive
                     ? "bg-[#2563eb] text-white shadow-xs font-semibold"
@@ -428,20 +454,28 @@ export default function AdminPage() {
          ------------------------------------------------------------------- */}
       <main className="flex-1 flex flex-col overflow-y-auto bg-[#f8fafc]">
         {/* Top Operational Header */}
-        <header className="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shadow-xs">
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-semibold text-[#700070] bg-purple-50 border border-purple-200 px-2.5 py-1 rounded">
+        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shadow-xs gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <button
+              type="button"
+              onClick={() => setMobileSidebarOpen(true)}
+              className="md:hidden p-1.5 rounded text-slate-700 hover:bg-slate-100 transition-colors shrink-0"
+              aria-label="Open navigation sidebar"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <span className="text-[11px] sm:text-xs font-semibold text-[#700070] bg-purple-50 border border-purple-200 px-2 sm:px-2.5 py-1 rounded truncate">
               {companyInfo.journalTitle} (ISSN: {companyInfo.issn})
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               href="/"
-              className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-[#700070] hover:text-white px-3 py-1.5 rounded transition-colors"
+              className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-[#700070] hover:text-white px-2.5 sm:px-3 py-1.5 rounded transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5 text-[#700070] group-hover:text-white" />
-              <span>Back to HOME</span>
+              <span className="hidden sm:inline">Back to</span> HOME
             </Link>
           </div>
         </header>

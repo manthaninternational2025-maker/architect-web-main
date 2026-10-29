@@ -142,7 +142,7 @@ export function AdminAuthModal() {
       onClick={closeAuthModal}
     >
       <div
-        className="relative w-full max-w-md bg-white border-2 border-[#700070] shadow-2xl rounded-sm overflow-hidden"
+        className="relative w-full max-w-md bg-white border-2 border-[#700070] shadow-2xl rounded-sm overflow-hidden max-h-[92vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Top Header (Royal Purple Theme) */}
