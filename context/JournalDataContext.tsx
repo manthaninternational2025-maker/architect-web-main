@@ -53,6 +53,13 @@ export interface ArticleItem {
   abstract: string;
   views: number;
   downloads: number;
+  pages?: string;
+  keywords?: string;
+  category?: string;
+  fileName?: string;
+  fileSize?: string;
+  fileData?: string;
+  pdfUrl?: string;
 }
 
 export interface IssueItem {

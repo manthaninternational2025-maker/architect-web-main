@@ -43,6 +43,10 @@ import {
   ToggleRight,
   Send,
   ExternalLink,
+  UploadCloud,
+  Paperclip,
+  X,
+  FileUp,
 } from "lucide-react";
 
 type NavTab =
@@ -140,11 +144,19 @@ export default function AdminPage() {
   const [newArticleForm, setNewArticleForm] = useState({
     title: "",
     authors: "",
-    volume: "Vol. 1",
+    volume: "Volume 1",
     issue: "Issue 1",
     doi: `10.5281/imjsi.2026.01.${articlesList.length + 1}`,
     abstract: "",
     status: "Published",
+    pages: "pp. 1-12",
+    keywords: "",
+    category: "Social Sciences",
+    date: "August 2026",
+    fileName: "",
+    fileSize: "",
+    fileData: "",
+    pdfUrl: "",
   });
 
   const [newIssueModal, setNewIssueModal] = useState(false);
@@ -232,31 +244,119 @@ export default function AdminPage() {
     }
   };
 
+  const handleFileUpload = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    isEdit: boolean = false
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check size limit: 15MB
+    if (file.size > 15 * 1024 * 1024) {
+      showToast("File is too large! Maximum allowed size is 15MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Data = reader.result as string;
+      const formattedSize =
+        file.size > 1024 * 1024
+          ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+          : `${Math.round(file.size / 1024)} KB`;
+
+      if (isEdit) {
+        setEditingArticle((prev: any) =>
+          prev
+            ? {
+                ...prev,
+                fileName: file.name,
+                fileSize: formattedSize,
+                fileData: base64Data,
+              }
+            : prev
+        );
+      } else {
+        setNewArticleForm((prev) => ({
+          ...prev,
+          fileName: file.name,
+          fileSize: formattedSize,
+          fileData: base64Data,
+        }));
+      }
+      showToast(`Document "${file.name}" attached successfully!`);
+    };
+    reader.onerror = () => {
+      showToast("Failed to read document file.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveFile = (isEdit: boolean = false) => {
+    if (isEdit) {
+      setEditingArticle((prev: any) =>
+        prev
+          ? {
+              ...prev,
+              fileName: "",
+              fileSize: "",
+              fileData: "",
+              pdfUrl: "",
+            }
+          : prev
+      );
+    } else {
+      setNewArticleForm((prev) => ({
+        ...prev,
+        fileName: "",
+        fileSize: "",
+        fileData: "",
+        pdfUrl: "",
+      }));
+    }
+    showToast("Attached document removed.");
+  };
+
   const handleAddArticle = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newArticleForm.title || !newArticleForm.authors) return;
     const newArt = {
       title: newArticleForm.title,
       authors: newArticleForm.authors,
-      volume: newArticleForm.volume,
-      issue: newArticleForm.issue,
-      date: "August 2026",
-      status: newArticleForm.status,
+      volume: newArticleForm.volume || "Volume 1",
+      issue: newArticleForm.issue || "Issue 1",
+      date: newArticleForm.date || "August 2026",
+      status: newArticleForm.status || "Published",
       doi: newArticleForm.doi,
       abstract: newArticleForm.abstract || "Abstract submitted.",
+      pages: newArticleForm.pages,
+      keywords: newArticleForm.keywords,
+      category: newArticleForm.category,
+      fileName: newArticleForm.fileName,
+      fileSize: newArticleForm.fileSize,
+      fileData: newArticleForm.fileData,
+      pdfUrl: newArticleForm.pdfUrl,
     };
     addArticle(newArt);
     setNewArticleModal(false);
     setNewArticleForm({
       title: "",
       authors: "",
-      volume: "Vol. 1",
+      volume: "Volume 1",
       issue: "Issue 1",
       doi: `10.5281/imjsi.2026.01.${articlesList.length + 2}`,
       abstract: "",
       status: "Published",
+      pages: "pp. 1-12",
+      keywords: "",
+      category: "Social Sciences",
+      date: "August 2026",
+      fileName: "",
+      fileSize: "",
+      fileData: "",
+      pdfUrl: "",
     });
-    showToast("Article added to journal database and live on website!");
+    showToast("Article published with attached document and live on website!");
   };
 
   const handleSaveEditedArticle = (e: React.FormEvent) => {
@@ -1042,9 +1142,29 @@ export default function AdminPage() {
                             {art.id}
                           </td>
                           <td className="py-2.5 px-3 font-medium text-slate-800 max-w-sm">
-                            <div className="line-clamp-2 leading-snug">{art.title}</div>
-                            <div className="text-[10px] text-slate-400 font-mono mt-0.5">
-                              DOI: {art.doi}
+                            <div className="line-clamp-2 leading-snug font-semibold">{art.title}</div>
+                            <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-500 font-mono mt-1">
+                              <span>DOI: {art.doi}</span>
+                              {art.pages && <span>• {art.pages}</span>}
+                              {art.category && (
+                                <span className="bg-slate-100 text-slate-700 px-1.5 py-0.2 rounded font-sans font-medium">
+                                  {art.category}
+                                </span>
+                              )}
+                              {(art.fileData || art.pdfUrl) && (
+                                <a
+                                  href={art.fileData || art.pdfUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download={art.fileName || undefined}
+                                  className="inline-flex items-center gap-1 text-[#700070] bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded font-sans font-bold hover:bg-[#700070] hover:text-white transition-colors"
+                                  title="Download / View Attached Document"
+                                >
+                                  <Paperclip className="w-2.5 h-2.5" />
+                                  <span>{art.fileName || "View Document"}</span>
+                                  {art.fileSize && <span className="text-[9px] opacity-75">({art.fileSize})</span>}
+                                </a>
+                              )}
                             </div>
                           </td>
                           <td className="py-2.5 px-3 text-slate-600 font-medium">
@@ -2184,60 +2304,139 @@ export default function AdminPage() {
       </main>
 
       {/* -------------------------------------------------------------
-          ADD ARTICLE MODAL
+          ADD ARTICLE MODAL (CLICKABLE VOLUME/ISSUE + DOCUMENT UPLOAD)
          ------------------------------------------------------------- */}
       {newArticleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs max-h-[90vh] overflow-y-auto">
-            <h3 className="font-editorial italic font-bold text-xl text-slate-900">
-              Add New Research Manuscript
-            </h3>
+          <div className="bg-white rounded-xl border border-slate-200 max-w-2xl w-full p-6 shadow-2xl space-y-4 text-xs max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="font-editorial italic font-bold text-xl text-slate-900">
+                  Add New Research Manuscript
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  Upload PDF/DOC manuscripts, assign volume &amp; issue, and publish live to journal.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNewArticleModal(false)}
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-md"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-            <form onSubmit={handleAddArticle} className="space-y-3">
+            <form onSubmit={handleAddArticle} className="space-y-4">
+              {/* Title */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Article Title
+                  Article Title <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Socio-Economic Impact of Renewable Energy..."
+                  placeholder="e.g. Socio-Economic Impact of Renewable Energy Transitions in Developing Economies"
                   value={newArticleForm.title}
                   onChange={(e) =>
                     setNewArticleForm({ ...newArticleForm, title: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
                 />
               </div>
 
+              {/* Authors */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Author Names &amp; Affiliations
+                  Author Names &amp; Institutional Affiliations <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Dr. Ramesh Kumar & Dr. Suman Sen"
+                  placeholder="e.g. Dr. Ramesh Kumar (Delhi University) & Dr. Suman Sen (JNU)"
                   value={newArticleForm.authors}
                   onChange={(e) =>
                     setNewArticleForm({ ...newArticleForm, authors: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070] text-xs"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    Volume &amp; Issue
-                  </label>
-                  <input
-                    type="text"
-                    value={`${newArticleForm.volume}, ${newArticleForm.issue}`}
-                    disabled
-                    className="w-full px-3 py-2 border border-slate-200 bg-slate-50 text-slate-500 rounded"
-                  />
+              {/* Volume & Issue Controls (FULLY CLICKABLE & EDITABLE) */}
+              <div className="p-3 bg-purple-50/60 border border-purple-100 rounded-lg space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-purple-900 text-xs flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-[#700070]" />
+                    <span>Volume &amp; Issue Assignment</span>
+                  </span>
+                  <span className="text-[10px] text-purple-700 font-medium">
+                    (Click or type to edit freely)
+                  </span>
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1 text-[11px]">
+                      Quick Select Issue
+                    </label>
+                    <select
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (!val) return;
+                        const [vol, iss] = val.split("|");
+                        setNewArticleForm({
+                          ...newArticleForm,
+                          volume: vol || newArticleForm.volume,
+                          issue: iss || newArticleForm.issue,
+                        });
+                      }}
+                      className="w-full px-2.5 py-1.5 border border-purple-200 bg-white rounded text-xs text-slate-700 focus:border-[#700070]"
+                    >
+                      <option value="">-- Choose Existing Issue --</option>
+                      {issuesList.map((iss) => (
+                        <option key={iss.id} value={`${iss.volume}|${iss.issue}`}>
+                          {iss.volume}, {iss.issue} ({iss.period})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1 text-[11px]">
+                      Volume Name / No.
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Volume 1"
+                      value={newArticleForm.volume}
+                      onChange={(e) =>
+                        setNewArticleForm({ ...newArticleForm, volume: e.target.value })
+                      }
+                      className="w-full px-2.5 py-1.5 border border-purple-300 bg-white rounded text-xs text-slate-800 font-medium focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1 text-[11px]">
+                      Issue Number
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Issue 1"
+                      value={newArticleForm.issue}
+                      onChange={(e) =>
+                        setNewArticleForm({ ...newArticleForm, issue: e.target.value })
+                      }
+                      className="w-full px-2.5 py-1.5 border border-purple-300 bg-white rounded text-xs text-slate-800 font-medium focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Research Metadata: DOI, Status, Pages, Category */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
                     DOI Identifier
@@ -2248,37 +2447,210 @@ export default function AdminPage() {
                     onChange={(e) =>
                       setNewArticleForm({ ...newArticleForm, doi: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] font-mono text-[11px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Publication Status
+                  </label>
+                  <select
+                    value={newArticleForm.status}
+                    onChange={(e) =>
+                      setNewArticleForm({ ...newArticleForm, status: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
+                  >
+                    <option value="Published">Published</option>
+                    <option value="In Review">In Review</option>
+                    <option value="Accepted">Accepted</option>
+                    <option value="Draft">Draft</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Page Numbers
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. pp. 1-14"
+                    value={newArticleForm.pages}
+                    onChange={(e) =>
+                      setNewArticleForm({ ...newArticleForm, pages: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Subject / Area
+                  </label>
+                  <select
+                    value={newArticleForm.category}
+                    onChange={(e) =>
+                      setNewArticleForm({ ...newArticleForm, category: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
+                  >
+                    <option value="Social Sciences">Social Sciences</option>
+                    <option value="Humanities & Literature">Humanities &amp; Literature</option>
+                    <option value="Economics & Commerce">Economics &amp; Commerce</option>
+                    <option value="Law & Legal Studies">Law &amp; Legal Studies</option>
+                    <option value="Education & Pedagogy">Education &amp; Pedagogy</option>
+                    <option value="Management Studies">Management Studies</option>
+                    <option value="Multidisciplinary">Multidisciplinary</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Publication Date & Keywords */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Publication Date / Month
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. August 2026"
+                    value={newArticleForm.date}
+                    onChange={(e) =>
+                      setNewArticleForm({ ...newArticleForm, date: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Keywords (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Social Policy, India, Economic Survey, Governance"
+                    value={newArticleForm.keywords}
+                    onChange={(e) =>
+                      setNewArticleForm({ ...newArticleForm, keywords: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
                   />
                 </div>
               </div>
 
+              {/* DOCUMENT UPLOAD SECTION (PDF, DOC, DOCX) */}
+              <div className="border border-dashed border-[#700070]/40 bg-purple-50/30 p-4 rounded-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <UploadCloud className="w-4 h-4 text-[#700070]" />
+                    <span className="font-bold text-slate-900 text-xs">
+                      Upload Manuscript Document (.pdf, .doc, .docx)
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    Max size: 15MB
+                  </span>
+                </div>
+
+                {newArticleForm.fileName || newArticleForm.fileData ? (
+                  <div className="flex items-center justify-between bg-white border border-purple-200 p-2.5 rounded-md shadow-xs">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <Paperclip className="w-4 h-4 text-[#700070] shrink-0" />
+                      <div className="truncate">
+                        <p className="font-bold text-slate-800 text-xs truncate">
+                          {newArticleForm.fileName || "Uploaded Document"}
+                        </p>
+                        <p className="text-[10px] text-slate-400 font-mono">
+                          {newArticleForm.fileSize || "Ready for download"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {newArticleForm.fileData && (
+                        <a
+                          href={newArticleForm.fileData}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download={newArticleForm.fileName || "manuscript.pdf"}
+                          className="px-2 py-1 text-[11px] font-bold text-[#700070] bg-purple-50 hover:bg-purple-100 rounded border border-purple-200"
+                        >
+                          Preview
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFile(false)}
+                        className="p-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded"
+                        title="Remove Document"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-purple-200 rounded-md bg-white hover:bg-purple-50/50 cursor-pointer transition-colors text-center group">
+                    <FileUp className="w-6 h-6 text-[#700070] group-hover:scale-110 transition-transform mb-1" />
+                    <span className="text-xs font-bold text-slate-700">
+                      Click to choose or drag &amp; drop manuscript file
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">
+                      Supports PDF, DOC, DOCX files
+                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      onChange={(e) => handleFileUpload(e, false)}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+
+                {/* Optional external PDF URL */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                    Or Enter Direct Document / PDF URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://example.com/papers/manuscript-sample.pdf"
+                    value={newArticleForm.pdfUrl}
+                    onChange={(e) =>
+                      setNewArticleForm({ ...newArticleForm, pdfUrl: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Abstract */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Abstract
+                  Manuscript Abstract
                 </label>
                 <textarea
-                  rows={3}
-                  placeholder="Paste manuscript abstract here..."
+                  rows={4}
+                  placeholder="Paste manuscript abstract here summarizing the methodology, findings, and conclusion..."
                   value={newArticleForm.abstract}
                   onChange={(e) =>
                     setNewArticleForm({ ...newArticleForm, abstract: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070] text-xs"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3">
+              {/* Buttons */}
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setNewArticleModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 rounded text-slate-600 hover:bg-slate-50 cursor-pointer font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded cursor-pointer"
+                  className="px-5 py-2 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded cursor-pointer shadow-sm transition-all"
                 >
                   Publish Article
                 </button>
@@ -2289,19 +2661,34 @@ export default function AdminPage() {
       )}
 
       {/* -------------------------------------------------------------
-          EDIT ARTICLE MODAL
+          EDIT ARTICLE MODAL (CLICKABLE VOLUME/ISSUE + DOCUMENT UPLOAD)
          ------------------------------------------------------------- */}
       {editingArticle && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs max-h-[90vh] overflow-y-auto">
-            <h3 className="font-editorial italic font-bold text-xl text-slate-900">
-              Edit Article #{editingArticle.id}
-            </h3>
+          <div className="bg-white rounded-xl border border-slate-200 max-w-2xl w-full p-6 shadow-2xl space-y-4 text-xs max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="font-editorial italic font-bold text-xl text-slate-900">
+                  Edit Article #{editingArticle.id}
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  Update article title, authors, volume, issue, documents, and research metadata.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingArticle(null)}
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-md"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-            <form onSubmit={handleSaveEditedArticle} className="space-y-3">
+            <form onSubmit={handleSaveEditedArticle} className="space-y-4">
+              {/* Title */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Article Title
+                  Article Title <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -2310,13 +2697,14 @@ export default function AdminPage() {
                   onChange={(e) =>
                     setEditingArticle({ ...editingArticle, title: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
                 />
               </div>
 
+              {/* Authors */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Authors
+                  Author Names &amp; Affiliations <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -2325,11 +2713,97 @@ export default function AdminPage() {
                   onChange={(e) =>
                     setEditingArticle({ ...editingArticle, authors: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070] text-xs"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              {/* Volume & Issue Controls (FULLY CLICKABLE & EDITABLE) */}
+              <div className="p-3 bg-purple-50/60 border border-purple-100 rounded-lg space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-purple-900 text-xs flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-[#700070]" />
+                    <span>Volume &amp; Issue Assignment</span>
+                  </span>
+                  <span className="text-[10px] text-purple-700 font-medium">
+                    (Editable &amp; selectable)
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1 text-[11px]">
+                      Quick Select Issue
+                    </label>
+                    <select
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (!val) return;
+                        const [vol, iss] = val.split("|");
+                        setEditingArticle({
+                          ...editingArticle,
+                          volume: vol || editingArticle.volume,
+                          issue: iss || editingArticle.issue,
+                        });
+                      }}
+                      className="w-full px-2.5 py-1.5 border border-purple-200 bg-white rounded text-xs text-slate-700 focus:border-[#700070]"
+                    >
+                      <option value="">-- Choose Existing Issue --</option>
+                      {issuesList.map((iss) => (
+                        <option key={iss.id} value={`${iss.volume}|${iss.issue}`}>
+                          {iss.volume}, {iss.issue} ({iss.period})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1 text-[11px]">
+                      Volume Name / No.
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editingArticle.volume || "Volume 1"}
+                      onChange={(e) =>
+                        setEditingArticle({ ...editingArticle, volume: e.target.value })
+                      }
+                      className="w-full px-2.5 py-1.5 border border-purple-300 bg-white rounded text-xs text-slate-800 font-medium focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1 text-[11px]">
+                      Issue Number
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editingArticle.issue || "Issue 1"}
+                      onChange={(e) =>
+                        setEditingArticle({ ...editingArticle, issue: e.target.value })
+                      }
+                      className="w-full px-2.5 py-1.5 border border-purple-300 bg-white rounded text-xs text-slate-800 font-medium focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Research Metadata: DOI, Status, Pages, Category */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    DOI Identifier
+                  </label>
+                  <input
+                    type="text"
+                    value={editingArticle.doi}
+                    onChange={(e) =>
+                      setEditingArticle({ ...editingArticle, doi: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] font-mono text-[11px]"
+                  />
+                </div>
+
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
                     Status
@@ -2339,28 +2813,170 @@ export default function AdminPage() {
                     onChange={(e) =>
                       setEditingArticle({ ...editingArticle, status: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
                   >
                     <option value="Published">Published</option>
                     <option value="In Review">In Review</option>
+                    <option value="Accepted">Accepted</option>
                     <option value="Draft">Draft</option>
                   </select>
                 </div>
+
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
-                    DOI
+                    Pages
                   </label>
                   <input
                     type="text"
-                    value={editingArticle.doi}
+                    placeholder="e.g. pp. 1-14"
+                    value={editingArticle.pages || ""}
                     onChange={(e) =>
-                      setEditingArticle({ ...editingArticle, doi: e.target.value })
+                      setEditingArticle({ ...editingArticle, pages: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Category / Area
+                  </label>
+                  <select
+                    value={editingArticle.category || "Social Sciences"}
+                    onChange={(e) =>
+                      setEditingArticle({ ...editingArticle, category: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
+                  >
+                    <option value="Social Sciences">Social Sciences</option>
+                    <option value="Humanities & Literature">Humanities &amp; Literature</option>
+                    <option value="Economics & Commerce">Economics &amp; Commerce</option>
+                    <option value="Law & Legal Studies">Law &amp; Legal Studies</option>
+                    <option value="Education & Pedagogy">Education &amp; Pedagogy</option>
+                    <option value="Management Studies">Management Studies</option>
+                    <option value="Multidisciplinary">Multidisciplinary</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Publication Date & Keywords */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Publication Date / Period
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. August 2026"
+                    value={editingArticle.date || ""}
+                    onChange={(e) =>
+                      setEditingArticle({ ...editingArticle, date: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Keywords
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Social, Economy, Policy"
+                    value={editingArticle.keywords || ""}
+                    onChange={(e) =>
+                      setEditingArticle({ ...editingArticle, keywords: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
                   />
                 </div>
               </div>
 
+              {/* DOCUMENT UPLOAD SECTION (PDF, DOC, DOCX) */}
+              <div className="border border-dashed border-[#700070]/40 bg-purple-50/30 p-4 rounded-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <UploadCloud className="w-4 h-4 text-[#700070]" />
+                    <span className="font-bold text-slate-900 text-xs">
+                      Manuscript Document (.pdf, .doc, .docx)
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    Max size: 15MB
+                  </span>
+                </div>
+
+                {editingArticle.fileName || editingArticle.fileData ? (
+                  <div className="flex items-center justify-between bg-white border border-purple-200 p-2.5 rounded-md shadow-xs">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <Paperclip className="w-4 h-4 text-[#700070] shrink-0" />
+                      <div className="truncate">
+                        <p className="font-bold text-slate-800 text-xs truncate">
+                          {editingArticle.fileName || "Attached Manuscript"}
+                        </p>
+                        <p className="text-[10px] text-slate-400 font-mono">
+                          {editingArticle.fileSize || "Ready for download"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {editingArticle.fileData && (
+                        <a
+                          href={editingArticle.fileData}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download={editingArticle.fileName || "manuscript.pdf"}
+                          className="px-2 py-1 text-[11px] font-bold text-[#700070] bg-purple-50 hover:bg-purple-100 rounded border border-purple-200"
+                        >
+                          Preview
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFile(true)}
+                        className="p-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded"
+                        title="Remove Document"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-purple-200 rounded-md bg-white hover:bg-purple-50/50 cursor-pointer transition-colors text-center group">
+                    <FileUp className="w-6 h-6 text-[#700070] group-hover:scale-110 transition-transform mb-1" />
+                    <span className="text-xs font-bold text-slate-700">
+                      Click to choose or drag &amp; drop manuscript file
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">
+                      Supports PDF, DOC, DOCX files
+                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      onChange={(e) => handleFileUpload(e, true)}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+
+                {/* Optional external PDF URL */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                    Or External Document URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://example.com/papers/sample.pdf"
+                    value={editingArticle.pdfUrl || ""}
+                    onChange={(e) =>
+                      setEditingArticle({ ...editingArticle, pdfUrl: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Abstract */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
                   Abstract
@@ -2371,21 +2987,22 @@ export default function AdminPage() {
                   onChange={(e) =>
                     setEditingArticle({ ...editingArticle, abstract: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070] text-xs"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3">
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setEditingArticle(null)}
-                  className="px-4 py-2 border border-slate-300 rounded text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 rounded text-slate-600 hover:bg-slate-50 cursor-pointer font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded cursor-pointer"
+                  className="px-5 py-2 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded cursor-pointer shadow-sm transition-all"
                 >
                   Save Changes
                 </button>

@@ -35,25 +35,6 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Call for papers highlighted box (if active in homepage settings) */}
-      {homepage.callForPapersActive && (
-        <div className="bg-[#700070]/5 border-l-4 border-[#700070] p-3 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <span className="font-bold text-[#700070] block sm:inline mr-2">
-              {homepage.callForPapersHeadline}
-            </span>
-            <span className="text-gray-700 font-mono text-[11px]">
-              Submission Deadline: {homepage.callForPapersDeadline}
-            </span>
-          </div>
-          <a
-            href={`mailto:${homepage.callForPapersEmail || settings.email}`}
-            className="text-[#700070] font-bold hover:underline shrink-0"
-          >
-            Submit via {homepage.callForPapersEmail || settings.email}
-          </a>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* -------------------------------------------------------------
@@ -170,11 +151,15 @@ export default function HomePage() {
                         Abstract
                       </Link>
                       <a
-                        href="/archives"
+                        href={art.fileData || art.pdfUrl || "/archives"}
+                        target={art.fileData || art.pdfUrl ? "_blank" : undefined}
+                        rel={art.fileData || art.pdfUrl ? "noopener noreferrer" : undefined}
+                        download={art.fileName || undefined}
                         className="px-2 py-0.5 border border-[#700070] text-[#700070] hover:bg-[#700070] hover:text-white text-[11px] font-mono font-bold tracking-wider transition-all inline-flex items-center gap-1"
+                        title={art.fileName ? `Download ${art.fileName}` : "View PDF Document"}
                       >
                         <FileText className="w-3 h-3 text-[#700070] group-hover:text-white" />
-                        <span>PDF</span>
+                        <span>{art.fileName ? "PDF / DOC" : "PDF"}</span>
                       </a>
                     </div>
                   </div>
