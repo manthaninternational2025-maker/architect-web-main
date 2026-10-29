@@ -358,18 +358,6 @@ export default function AdminPage() {
             v1.0
           </span>
         </div>
-
-        {/* Back to HOME Button */}
-        <div className="px-3 pt-3 pb-1">
-          <Link
-            href="/"
-            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-md text-xs font-bold bg-[#700070] hover:bg-[#880088] text-white border border-[#FFD700]/50 shadow-sm transition-all tracking-wide group"
-          >
-            <ArrowLeft className="w-4 h-4 text-[#FFD700] group-hover:-translate-x-1 transition-transform" />
-            <span>Back to HOME</span>
-          </Link>
-        </div>
-
         {/* Navigation Items */}
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5 text-sm custom-scrollbar">
           {navItems.map((item) => {
