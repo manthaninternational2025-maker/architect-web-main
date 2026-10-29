@@ -1,21 +1,25 @@
+"use client";
+
 import React from "react";
-import { companyInfo } from "@/data/companyInfo";
+import { useJournalData } from "@/context/JournalDataContext";
 
 export function SpecTable() {
+  const { settings } = useJournalData();
+
   const specs = [
-    { label: "Title", value: companyInfo.journalTitle },
-    { label: "Chief Editor", value: companyInfo.editorInChief },
-    { label: "Frequency", value: companyInfo.frequency },
-    { label: "E-ISSN", value: `${companyInfo.issn} (Applied)` },
-    { label: "Publisher", value: companyInfo.publisher },
-    { label: "Starting Year", value: companyInfo.startingYear },
-    { label: "Subject", value: "Humanities, Social Sciences, Economics, Political Science, History, Philosophy, Commerce, Law, Management & Multidisciplinary Studies" },
-    { label: "Language", value: "English / Multilingual" },
+    { label: "Title", value: settings.journalTitle },
+    { label: "Chief Editor", value: settings.editorInChief },
+    { label: "Frequency", value: settings.frequency },
+    { label: "E-ISSN", value: `${settings.issn} (Applied)` },
+    { label: "Publisher", value: settings.publisher },
+    { label: "Starting Year", value: settings.startingYear },
+    { label: "Subject", value: settings.subject },
+    { label: "Language", value: settings.language },
     { label: "Publication Format", value: "Online" },
-    { label: "Email id", value: companyInfo.email, isEmail: true },
-    { label: "Website", value: "https://impulseresearchwork.com", isLink: true },
-    { label: "Address", value: companyInfo.address },
-    { label: "Plagiarism Tool", value: companyInfo.plagiarismTool },
+    { label: "Email id", value: settings.email, isEmail: true },
+    { label: "Website", value: settings.website, isLink: true },
+    { label: "Address", value: settings.address },
+    { label: "Plagiarism Tool", value: settings.plagiarismTool },
   ];
 
   return (

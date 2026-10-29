@@ -3,6 +3,7 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 import { AdminAuthProvider } from "@/context/AdminAuthContext";
+import { JournalDataProvider } from "@/context/JournalDataContext";
 import { AdminAuthModal } from "@/components/auth/AdminAuthModal";
 import { TopUtilityBar } from "@/components/layout/TopUtilityBar";
 import { Masthead } from "@/components/layout/Masthead";
@@ -15,7 +16,8 @@ export function JournalLayoutShell({ children }: { children: React.ReactNode }) 
 
   return (
     <AdminAuthProvider>
-      {isAdminRoute ? (
+      <JournalDataProvider>
+        {isAdminRoute ? (
         // Full width container for Admin Panel Dashboard
         <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans antialiased">
           {children}
@@ -48,6 +50,7 @@ export function JournalLayoutShell({ children }: { children: React.ReactNode }) 
           <AdminAuthModal />
         </div>
       )}
+      </JournalDataProvider>
     </AdminAuthProvider>
   );
 }

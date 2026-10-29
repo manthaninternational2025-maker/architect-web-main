@@ -2,9 +2,11 @@
 
 import React, { useState } from "react";
 import { companyInfo } from "@/data/companyInfo";
+import { useJournalData } from "@/context/JournalDataContext";
 import { Send, CheckCircle, AlertCircle, MessageSquare } from "lucide-react";
 
 export function ContactForm() {
+  const { addMessage } = useJournalData();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -32,6 +34,12 @@ export function ContactForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
+      addMessage({
+        sender: formData.name,
+        email: formData.email,
+        subject: formData.subject || "Scholar Consultation Inquiry",
+        content: `Phone: ${formData.phone}\n\n${formData.message}`,
+      });
       setSubmitted(true);
     }
   };

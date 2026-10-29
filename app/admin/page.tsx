@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { useJournalData } from "@/context/JournalDataContext";
 import { companyInfo } from "@/data/companyInfo";
 import { resources } from "@/data/resources";
 import {
@@ -81,164 +82,61 @@ export default function AdminPage() {
   };
 
   // -------------------------------------------------------------
-  // 1. JOURNAL SETTINGS STATE
+  // PERSISTENT LIVE JOURNAL DATA CONTEXT
   // -------------------------------------------------------------
-  const [settingsForm, setSettingsForm] = useState({
-    journalTitle: companyInfo.journalTitle,
-    shortTitle: companyInfo.shortTitle,
-    issn: companyInfo.issn,
-    publisher: companyInfo.publisher,
-    frequency: companyInfo.frequency,
-    editorInChief: companyInfo.editorInChief,
-    email: companyInfo.email,
-    address: companyInfo.address,
-    website: "https://impulseresearchwork.com",
-    impactFactor: "xxxx*",
-    subject: "Humanities, Social Sciences, Economics, Political Science, History, Philosophy, Commerce, Law, Management & Multidisciplinary Studies",
-    language: "English / Multilingual",
-    startingYear: "2026",
-    plagiarismTool: "PlagiarismCheckerX / Turnitin / Drillbit",
-  });
+  const {
+    settings,
+    updateSettings,
+    announcement,
+    updateAnnouncement,
+    homepage,
+    updateHomepage,
+    articles: articlesList,
+    addArticle,
+    updateArticle,
+    deleteArticle,
+    issues: issuesList,
+    addIssue,
+    updateIssue,
+    deleteIssue,
+    members: editorialMembers,
+    addMember,
+    updateMember,
+    deleteMember,
+    instructions,
+    updateInstructions,
+    ethics,
+    updateEthics,
+    contact,
+    updateContact,
+    sidebarConfig,
+    updateSidebarConfig,
+    messages: messagesList,
+    addMessage,
+    toggleMessageRead,
+    deleteMessage,
+    resetToDefaults,
+  } = useJournalData();
 
-  // -------------------------------------------------------------
-  // 2. HOMEPAGE SECTIONS STATE
-  // -------------------------------------------------------------
-  const [homepageState, setHomepageState] = useState({
-    callForPapersHeadline: "Call for Papers: Volume 1, Issue 2 (August 2026)",
-    callForPapersDeadline: "15 August 2026",
-    callForPapersEmail: companyInfo.email,
-    callForPapersActive: true,
-    introP1: `${companyInfo.journalTitle} (ISSN: ${companyInfo.issn}) is an open access peer reviewed refereed journal.`,
-    introP2: `The aim of ${companyInfo.journalTitle} (ISSN: ${companyInfo.issn}) is to encourage scientists, academicians and students to publish their experimental and theoretical details. It provides an advanced knowledge platform for the Social Sciences, Humanities, Management, Commerce, Education & Multidisciplinary Research professionals.`,
-    aboutText: `${companyInfo.journalTitle}, refereed, peer reviewed, open access journal. Researches in the field of humanities, social science, Community and Consumer Sciences, Economics, Political Science, Geography, Philosophy, History, Humanity and Languages concerning with social science, Anthropological, Behavioral Sciences, Sociology, Journalism and Role of Media in social science. Educational Sciences: For School Students, Women, Village and Society, Commerce, Law and Management related with humanities and social science.`,
-    policyText: "The journal publishes original research papers, review articles, case studies, and book reviews adhering to rigorous peer-review and ethical publishing standards. Authors must ensure work is original and properly cited.",
-  });
+  // Local form states synced with persistent JournalDataContext
+  const [settingsForm, setSettingsForm] = useState(settings);
+  const [homepageState, setHomepageState] = useState(homepage);
+  const [announcementState, setAnnouncementState] = useState(announcement);
+  const [instructionsState, setInstructionsState] = useState(instructions);
+  const [ethicsState, setEthicsState] = useState(ethics);
+  const [contactState, setContactState] = useState(contact);
+  const [sidebarMenuState, setSidebarMenuState] = useState(sidebarConfig);
 
-  // -------------------------------------------------------------
-  // 3. ANNOUNCEMENT BAR STATE
-  // -------------------------------------------------------------
-  const [announcementState, setAnnouncementState] = useState({
-    active: true,
-    text: "Volume 1, Issue 1 (August 2026) has been published online. Submissions open for next regular issue. Deadline: 15 August 2026.",
-    badge: "Call for Papers",
-    deadline: "15 August 2026",
-    contactEmail: companyInfo.email,
-  });
+  useEffect(() => { setSettingsForm(settings); }, [settings]);
+  useEffect(() => { setHomepageState(homepage); }, [homepage]);
+  useEffect(() => { setAnnouncementState(announcement); }, [announcement]);
+  useEffect(() => { setInstructionsState(instructions); }, [instructions]);
+  useEffect(() => { setEthicsState(ethics); }, [ethics]);
+  useEffect(() => { setContactState(contact); }, [contact]);
+  useEffect(() => { setSidebarMenuState(sidebarConfig); }, [sidebarConfig]);
 
-  // -------------------------------------------------------------
-  // 4. ARTICLES STATE & EDIT MODALS
-  // -------------------------------------------------------------
-  const initialArticles = [
-    ...resources.map((r, i) => ({
-      id: i + 1,
-      title: r.title,
-      authors: r.author,
-      volume: r.volume || "Vol. 1",
-      issue: r.issue || "Issue 1",
-      date: r.publishedDate || "August 2026",
-      status: "Published",
-      doi: r.doi || `10.5281/imjsi.2026.01.0${i + 1}`,
-      abstract: r.sections?.[0]?.content || "Abstract content registered.",
-      views: 142 + i * 27,
-      downloads: Math.max(1, 5 - i),
-    })),
-    {
-      id: 7,
-      title: "Reforming Human Nature: Xunzi’s Ethical and Political Philosophy",
-      authors: "Dr. Sakshi Sharma",
-      volume: "Vol. 1",
-      issue: "Issue 1",
-      date: "August 2026",
-      status: "Published",
-      doi: "10.5281/imjsi.2026.01.07",
-      abstract: "An exploration of Xunzi's moral philosophy concerning ritual norms and governance.",
-      views: 198,
-      downloads: 4,
-    },
-    {
-      id: 8,
-      title: "A Critical Analysis of Legal and Human Rights of Undertrial Female Prisoners in India",
-      authors: "Rahul Sharma",
-      volume: "Vol. 1",
-      issue: "Issue 1",
-      date: "August 2026",
-      status: "Published",
-      doi: "10.5281/imjsi.2026.01.08",
-      abstract: "Empirical socio-legal inquiry into undertrial conditions and institutional reform.",
-      views: 220,
-      downloads: 6,
-    },
-    {
-      id: 9,
-      title: "Decline and Fall: Factors Contributing to the Downfall of the Mughal Empire",
-      authors: "Aastha Rani",
-      volume: "Vol. 1",
-      issue: "Issue 1",
-      date: "August 2026",
-      status: "Published",
-      doi: "10.5281/imjsi.2026.01.09",
-      abstract: "Historiographical reassessment of agrarian crises and administrative decay.",
-      views: 165,
-      downloads: 3,
-    },
-    {
-      id: 10,
-      title: "The Dynamics of Indian Nationalism: A Historical Analysis Age",
-      authors: "Geetanshu",
-      volume: "Vol. 1",
-      issue: "Issue 1",
-      date: "August 2026",
-      status: "Published",
-      doi: "10.5281/imjsi.2026.01.10",
-      abstract: "Investigation of regional consciousness and mass mobilization.",
-      views: 184,
-      downloads: 2,
-    },
-    {
-      id: 11,
-      title: "Digital Financial Inclusion and Rural Empowerment: A Socio-Economic Study",
-      authors: "Dr. Neha Verma & Prof. V. K. Rao",
-      volume: "Vol. 1",
-      issue: "Issue 1",
-      date: "August 2026",
-      status: "Published",
-      doi: "10.5281/imjsi.2026.01.11",
-      abstract: "Socio-economic evaluation of digital credit and microfinance initiatives.",
-      views: 110,
-      downloads: 1,
-    },
-    {
-      id: 12,
-      title: "Interdisciplinary Approaches to Sustainable Development in Developing Nations",
-      authors: "Dr. Deepak Setia & Research Fellows",
-      volume: "Vol. 1",
-      issue: "Issue 1",
-      date: "August 2026",
-      status: "Published",
-      doi: "10.5281/imjsi.2026.01.12",
-      abstract: "Integrated frameworks harmonizing environmental resilience and economic policy.",
-      views: 245,
-      downloads: 8,
-    },
-    {
-      id: 13,
-      title: "Pedagogical Evolution: Integrating AI and Blended Learning in Higher Education",
-      authors: "Pooja Malhotra",
-      volume: "Vol. 1",
-      issue: "Issue 1",
-      date: "August 2026",
-      status: "Published",
-      doi: "10.5281/imjsi.2026.01.13",
-      abstract: "Curricular paradigms and ethical considerations in automated higher education.",
-      views: 190,
-      downloads: 5,
-    },
-  ];
-
-  const [articlesList, setArticlesList] = useState(initialArticles);
   const [newArticleModal, setNewArticleModal] = useState(false);
   const [editingArticle, setEditingArticle] = useState<any | null>(null);
-
   const [newArticleForm, setNewArticleForm] = useState({
     title: "",
     authors: "",
@@ -249,33 +147,6 @@ export default function AdminPage() {
     status: "Published",
   });
 
-  // -------------------------------------------------------------
-  // 5. ARCHIVES & ISSUES STATE
-  // -------------------------------------------------------------
-  const [issuesList, setIssuesList] = useState([
-    {
-      id: 1,
-      volume: "Volume 1",
-      issue: "Issue 1",
-      period: "August 2026",
-      publicationDate: "2026-08-01",
-      status: "Published",
-      articlesCount: 13,
-      theme: "Inaugural Multidisciplinary Social Inquiry Issue",
-      pdfUrl: "/archives/vol1-iss1.pdf",
-    },
-    {
-      id: 2,
-      volume: "Volume 1",
-      issue: "Issue 2",
-      period: "September 2026",
-      publicationDate: "2026-09-01",
-      status: "Open for Submissions",
-      articlesCount: 0,
-      theme: "Contemporary Perspectives in Social Governance & Economics",
-      pdfUrl: "",
-    },
-  ]);
   const [newIssueModal, setNewIssueModal] = useState(false);
   const [newIssueForm, setNewIssueForm] = useState({
     volume: "Volume 1",
@@ -286,67 +157,6 @@ export default function AdminPage() {
     status: "Open for Submissions",
   });
 
-  // -------------------------------------------------------------
-  // 6. EDITORIAL BOARD STATE
-  // -------------------------------------------------------------
-  const [editorialMembers, setEditorialMembers] = useState([
-    {
-      id: 1,
-      name: "Dr. Deepak Setia",
-      role: "Editor-in-Chief",
-      affiliation: "Impulse Publication Works",
-      email: "manthaninternational2025@gmail.com",
-      specialization: "Social Sciences & Interdisciplinary Inquiry",
-    },
-    {
-      id: 2,
-      name: "Dr. S. K. Mukherjee",
-      role: "Associate Editor",
-      affiliation: "Department of Social Sciences, Delhi",
-      email: "associate.editor1@manthanjournal.com",
-      specialization: "Economics & Public Policy",
-    },
-    {
-      id: 3,
-      name: "Prof. Priya Nair",
-      role: "Senior Editorial Advisor",
-      affiliation: "Center for Advanced Humanities",
-      email: "advisor.sociology@manthanjournal.com",
-      specialization: "Sociology & Gender Studies",
-    },
-    {
-      id: 4,
-      name: "Dr. Rajeshwar Sharma",
-      role: "Editorial Board Member",
-      affiliation: "Faculty of Law",
-      email: "editorial.law@manthanjournal.com",
-      specialization: "Law & Jurisprudence",
-    },
-    {
-      id: 5,
-      name: "Dr. Ananya Roy",
-      role: "Executive Reviewer",
-      affiliation: "Institute of Social Inquiry",
-      email: "reviewer.roy@manthanjournal.com",
-      specialization: "Political Science & International Relations",
-    },
-    {
-      id: 6,
-      name: "Prof. Michael H. Adams",
-      role: "International Advisory Board",
-      affiliation: "School of Global Cultural Studies",
-      email: "adams.intl@manthanjournal.com",
-      specialization: "Comparative Philosophy",
-    },
-    {
-      id: 7,
-      name: "Dr. Tarun Sen",
-      role: "Managing Editorial Secretary",
-      affiliation: "Impulse Publication Works",
-      email: "editorial.desk@impulseresearchwork.com",
-      specialization: "Editorial Management & Scholarly Communications",
-    },
-  ]);
   const [editingMember, setEditingMember] = useState<any | null>(null);
   const [newMemberModal, setNewMemberModal] = useState(false);
   const [newMemberForm, setNewMemberForm] = useState({
@@ -356,103 +166,6 @@ export default function AdminPage() {
     email: "",
     specialization: "",
   });
-
-  // -------------------------------------------------------------
-  // 7. AUTHOR INSTRUCTIONS STATE
-  // -------------------------------------------------------------
-  const [instructionsState, setInstructionsState] = useState({
-    manuscriptScope: "Submissions are welcomed in Humanities, Social Sciences, Commerce, Law, Management, Philosophy, Education, and Multidisciplinary Studies.",
-    abstractWordLimit: "200 - 250 words",
-    keywordsLimit: "4 to 6 keywords separated by semicolons",
-    formattingFont: "Times New Roman / Calibri, 12pt font size, 1.5 line spacing, 1-inch margins on all sides.",
-    citationStyle: "APA 7th Edition (American Psychological Association) with active DOIs for all reference items.",
-    plagiarismThreshold: "Strictly under 10% (excluding references and standard quotations).",
-    apcPolicy: "Open Access publication is subsidized. Free submission and processing for Volume 1.",
-    checklistItems: [
-      "Manuscript is original and has not been published elsewhere.",
-      "Title page contains all author affiliations and corresponding email.",
-      "Abstract is structured within 250 words with 4-6 keywords.",
-      "All references adhere strictly to APA 7th Edition style.",
-      "Plagiarism similarity index is verified below 10%.",
-      "Figures and tables are numbered with explicit captions and source credits.",
-    ],
-  });
-
-  // -------------------------------------------------------------
-  // 8. PUBLICATION ETHICS STATE
-  // -------------------------------------------------------------
-  const [ethicsState, setEthicsState] = useState({
-    authorshipCriteria: "Authorship must reflect substantial contributions to conception, design, acquisition of data, analysis, drafting, and final approval.",
-    peerReviewPolicy: "Double-blind peer review system ensuring impartial critique by at least two independent subject matter referees within 2-3 weeks.",
-    plagiarismProtocol: "All submissions undergo rigorous similarity screening prior to editorial assessment using licensed software. Plagiarized texts face immediate rejection.",
-    conflictOfInterest: "Authors, editors, and reviewers must disclose any financial, professional, or personal competing interests upon submission.",
-    retractionPolicy: "In cases of academic misconduct, data falsification, or copyright violation, articles will be promptly retracted with formal notice.",
-    humanEthics: "Research involving human participants must provide institutional ethical review board clearance and informed consent statements.",
-  });
-
-  // -------------------------------------------------------------
-  // 9. CONTACT STATE
-  // -------------------------------------------------------------
-  const [contactState, setContactState] = useState({
-    officeAddress: companyInfo.address,
-    editorialEmail: companyInfo.email,
-    publisherEmail: "editor@impulseresearchwork.com",
-    helplinePhone: "+91 8527231973 (WhatsApp Consultation Available)",
-    officeHours: "Monday to Saturday: 9:00 AM – 6:00 PM IST",
-    responseTime: "Editorial replies provided within 24 to 48 working hours.",
-  });
-
-  // -------------------------------------------------------------
-  // 10. SIDEBAR MENU WIDGETS CONFIG STATE
-  // -------------------------------------------------------------
-  const [sidebarMenuState, setSidebarMenuState] = useState({
-    showEditorialPolicies: true,
-    showCoverBox: true,
-    coverBoxTitle: "Manthan: International Multidisciplinary Journal of Social Inquiry",
-    coverBoxIssn: companyInfo.issn,
-    coverBoxUrl: "https://impulseresearchwork.com/",
-    showManuscriptStatus: true,
-    manuscriptStatusText: "Check Manuscript Status",
-    manuscriptStatusLink: "/submit",
-    showCreativeCommons: true,
-    ccLicenseText: "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.",
-    showImpactFactor: true,
-    impactFactorValue: "Impact Factor: xxxx*",
-    showSearchBar: true,
-  });
-
-  // -------------------------------------------------------------
-  // 11. MESSAGES STATE
-  // -------------------------------------------------------------
-  const [messagesList, setMessagesList] = useState([
-    {
-      id: 1,
-      sender: "Prof. Arindam Das",
-      email: "arindam.das@univ.edu",
-      subject: "Manuscript Status Query: IMJSI-2026-088",
-      date: "28 Oct 2026",
-      isRead: true,
-      content: "Respected Editor, I have submitted our empirical paper on rural credit unions. Could you confirm the completion of initial peer review?",
-    },
-    {
-      id: 2,
-      sender: "Dr. Kavita Menon",
-      email: "kavita.m@researchinst.org",
-      subject: "Inquiry regarding Special Issue on Gender & Society",
-      date: "25 Oct 2026",
-      isRead: true,
-      content: "Greetings. Our department is interested in organizing a themed issue with Manthan IMJSI in early 2027. Please share guest editorial guidelines.",
-    },
-    {
-      id: 3,
-      sender: "Rahul Sen (Research Scholar)",
-      email: "rahul.sen@scholar.ac.in",
-      subject: "Author Proof Corrections for Volume 1 Issue 1",
-      date: "24 Oct 2026",
-      isRead: false,
-      content: "Dear Editorial Team, please find attached minor typographical corrections on page 24 of our accepted manuscript. Kindly update the online proof.",
-    },
-  ]);
 
   // -------------------------------------------------------------
   // 12. PROFILE & PASSWORD FORM STATE
@@ -523,7 +236,6 @@ export default function AdminPage() {
     e.preventDefault();
     if (!newArticleForm.title || !newArticleForm.authors) return;
     const newArt = {
-      id: articlesList.length + 1,
       title: newArticleForm.title,
       authors: newArticleForm.authors,
       volume: newArticleForm.volume,
@@ -532,10 +244,8 @@ export default function AdminPage() {
       status: newArticleForm.status,
       doi: newArticleForm.doi,
       abstract: newArticleForm.abstract || "Abstract submitted.",
-      views: 0,
-      downloads: 0,
     };
-    setArticlesList([newArt, ...articlesList]);
+    addArticle(newArt);
     setNewArticleModal(false);
     setNewArticleForm({
       title: "",
@@ -546,49 +256,44 @@ export default function AdminPage() {
       abstract: "",
       status: "Published",
     });
-    showToast("Article added to journal database!");
+    showToast("Article added to journal database and live on website!");
   };
 
   const handleSaveEditedArticle = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingArticle) return;
-    setArticlesList(
-      articlesList.map((a) => (a.id === editingArticle.id ? editingArticle : a))
-    );
+    updateArticle(editingArticle);
     setEditingArticle(null);
-    showToast(`Article #${editingArticle.id} updated successfully!`);
+    showToast(`Article #${editingArticle.id} updated and saved live!`);
   };
 
   const handleAddIssue = (e: React.FormEvent) => {
     e.preventDefault();
     const newIss = {
-      id: issuesList.length + 1,
       volume: newIssueForm.volume,
       issue: newIssueForm.issue,
       period: newIssueForm.period,
       publicationDate: newIssueForm.publicationDate,
       status: newIssueForm.status,
-      articlesCount: 0,
       theme: newIssueForm.theme,
       pdfUrl: "",
     };
-    setIssuesList([...issuesList, newIss]);
+    addIssue(newIss);
     setNewIssueModal(false);
-    showToast("New issue created in archive index!");
+    showToast("New issue created in archive index and live on website!");
   };
 
   const handleAddMember = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMemberForm.name) return;
     const newM = {
-      id: editorialMembers.length + 1,
       name: newMemberForm.name,
       role: newMemberForm.role,
       affiliation: newMemberForm.affiliation,
       email: newMemberForm.email,
       specialization: newMemberForm.specialization,
     };
-    setEditorialMembers([...editorialMembers, newM]);
+    addMember(newM);
     setNewMemberModal(false);
     setNewMemberForm({
       name: "",
@@ -597,17 +302,15 @@ export default function AdminPage() {
       email: "",
       specialization: "",
     });
-    showToast("New editorial member added!");
+    showToast("New editorial member added and live on board!");
   };
 
   const handleSaveEditedMember = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingMember) return;
-    setEditorialMembers(
-      editorialMembers.map((m) => (m.id === editingMember.id ? editingMember : m))
-    );
+    updateMember(editingMember);
     setEditingMember(null);
-    showToast("Editorial member updated!");
+    showToast("Editorial member updated and saved live!");
   };
 
   // Sidebar navigation configuration
@@ -927,7 +630,8 @@ export default function AdminPage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  showToast("Journal settings updated successfully!");
+                  updateSettings(settingsForm);
+                  showToast("Journal settings updated and saved live!");
                 }}
                 className="space-y-4 text-xs"
               >
@@ -1101,13 +805,28 @@ export default function AdminPage() {
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded flex items-center gap-2 transition-colors cursor-pointer"
-                >
-                  <Save className="w-4 h-4" />
-                  <span>Save Journal Settings</span>
-                </button>
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Save Journal Settings</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm("Reset all journal data, articles, and settings to original defaults?")) {
+                        resetToDefaults();
+                        showToast("Journal data restored to default system state.");
+                      }
+                    }}
+                    className="px-4 py-2.5 border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold rounded text-xs transition-colors cursor-pointer"
+                  >
+                    Reset All to System Defaults
+                  </button>
+                </div>
               </form>
             </div>
           )}
@@ -1129,6 +848,7 @@ export default function AdminPage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
+                  updateHomepage(homepageState);
                   showToast("Homepage content saved and live on website!");
                 }}
                 className="space-y-4 text-xs"
@@ -1356,7 +1076,7 @@ export default function AdminPage() {
                             <button
                               type="button"
                               onClick={() => {
-                                setArticlesList(articlesList.filter((a) => a.id !== art.id));
+                                deleteArticle(art.id);
                                 showToast(`Article #${art.id} deleted.`);
                               }}
                               className="text-rose-500 hover:text-rose-700 p-1 cursor-pointer"
@@ -1431,11 +1151,7 @@ export default function AdminPage() {
                         onClick={() => {
                           const newStatus =
                             issue.status === "Published" ? "Open for Submissions" : "Published";
-                          setIssuesList(
-                            issuesList.map((i) =>
-                              i.id === issue.id ? { ...i, status: newStatus } : i
-                            )
-                          );
+                          updateIssue({ ...issue, status: newStatus });
                           showToast(`Issue status changed to ${newStatus}`);
                         }}
                         className="text-purple-700 hover:underline font-semibold cursor-pointer"
@@ -1514,7 +1230,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => {
-                          setEditorialMembers(editorialMembers.filter((item) => item.id !== m.id));
+                          deleteMember(m.id);
                           showToast(`Removed ${m.name}`);
                         }}
                         className="text-rose-500 hover:underline cursor-pointer"
@@ -1545,7 +1261,8 @@ export default function AdminPage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  showToast("Author instructions updated successfully!");
+                  updateInstructions(instructionsState);
+                  showToast("Author instructions updated and saved live!");
                 }}
                 className="space-y-4 text-xs"
               >
@@ -1694,7 +1411,8 @@ export default function AdminPage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  showToast("Publication ethics policies updated!");
+                  updateEthics(ethicsState);
+                  showToast("Publication ethics policies updated and saved live!");
                 }}
                 className="space-y-4 text-xs"
               >
@@ -1796,7 +1514,8 @@ export default function AdminPage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  showToast("Contact information updated successfully!");
+                  updateContact(contactState);
+                  showToast("Contact information updated and saved live!");
                 }}
                 className="space-y-4 text-xs"
               >
@@ -1915,15 +1634,12 @@ export default function AdminPage() {
                   type="button"
                   onClick={() => {
                     const sample = {
-                      id: messagesList.length + 1,
                       sender: "Dr. Ankit Srivastava",
                       email: "ankit.s@university.ac.in",
                       subject: "Submission Confirmation for Review Issue",
-                      date: "Just now",
-                      isRead: false,
                       content: "Inquiry regarding publication timelines for multidisciplinary manuscripts.",
                     };
-                    setMessagesList([sample, ...messagesList]);
+                    addMessage(sample);
                     showToast("New inquiry logged.");
                   }}
                   className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded transition-colors"
@@ -1976,13 +1692,7 @@ export default function AdminPage() {
                       </a>
                       <button
                         type="button"
-                        onClick={() => {
-                          setMessagesList(
-                            messagesList.map((m) =>
-                              m.id === msg.id ? { ...m, isRead: !m.isRead } : m
-                            )
-                          );
-                        }}
+                        onClick={() => toggleMessageRead(msg.id)}
                         className="text-slate-600 hover:text-slate-900"
                       >
                         {msg.isRead ? "Mark Unread" : "Mark Read"}
@@ -1990,7 +1700,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => {
-                          setMessagesList(messagesList.filter((m) => m.id !== msg.id));
+                          deleteMessage(msg.id);
                           showToast("Message deleted.");
                         }}
                         className="text-rose-500 hover:text-rose-700"
@@ -2021,7 +1731,8 @@ export default function AdminPage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  showToast("Sidebar widget configurations saved!");
+                  updateSidebarConfig(sidebarMenuState);
+                  showToast("Sidebar widget configurations saved live!");
                 }}
                 className="space-y-4 text-xs"
               >
@@ -2235,6 +1946,7 @@ export default function AdminPage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
+                  updateAnnouncement(announcementState);
                   showToast("Announcement ticker updated live on public site!");
                 }}
                 className="space-y-4 text-xs"

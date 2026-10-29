@@ -2,12 +2,13 @@
 
 import React from "react";
 import Link from "next/link";
-import { companyInfo } from "@/data/companyInfo";
+import { useJournalData } from "@/context/JournalDataContext";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { LogIn, LogOut, UserCheck } from "lucide-react";
 
 export function TopUtilityBar() {
   const { isAuthenticated, openAuthModal, logout } = useAdminAuth();
+  const { settings } = useJournalData();
 
   return (
     <aside aria-label="Journal Top Banner" className="bg-[#111111] text-white border-b border-black">
@@ -15,7 +16,7 @@ export function TopUtilityBar() {
         {/* Left Side: Journal Title, Tagline, ISSN (Cleanly Aligned & Responsive) */}
         <div className="flex items-center min-w-0 overflow-hidden text-[10.5px] sm:text-[11px] text-gray-300 font-sans leading-tight">
           <span className="font-bold text-[#FFCC00] tracking-wide whitespace-nowrap shrink-0">
-            {companyInfo.journalTitle}
+            {settings.journalTitle}
           </span>
           <span className="hidden xl:inline text-gray-500 mx-1.5 shrink-0">|</span>
           <span className="hidden xl:inline text-gray-200 whitespace-nowrap shrink-0">
@@ -23,7 +24,7 @@ export function TopUtilityBar() {
           </span>
           <span className="text-gray-500 mx-1.5 shrink-0">|</span>
           <span className="text-[#FFCC00] font-mono font-medium whitespace-nowrap shrink-0">
-            (ISSN: {companyInfo.issn})
+            (ISSN: {settings.issn})
           </span>
           <span className="text-gray-500 ml-1.5 shrink-0 hidden sm:inline">|</span>
         </div>

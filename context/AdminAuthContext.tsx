@@ -29,9 +29,17 @@ interface AdminAuthContextType {
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
-const STORAGE_KEY = "manthan_admin_user";
-const REGISTERED_USERS_KEY = "manthan_registered_admins";
-const CUSTOM_PASSWORD_KEY = "manthan_admin_custom_password";
+const SESSION_KEY = "manthan_admin_session";
+const CREDENTIALS_KEY = "manthan_admin_credentials_store";
+
+// Default credentials
+const DEFAULT_ADMIN = {
+  name: "Impulse Editorial Board",
+  username: "impulse_admin",
+  email: "editor@impulseresearchwork.com",
+  password: "Impulse@2026#Admin",
+  role: "Chief Managing Editor & Publisher",
+};
 
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -42,9 +50,14 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   // Load session from localStorage on mount
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
+      // Ensure default credentials exist in storage
+      if (!localStorage.getItem(CREDENTIALS_KEY)) {
+        localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(DEFAULT_ADMIN));
+      }
+
+      const storedSession = localStorage.getItem(SESSION_KEY);
+      if (storedSession) {
+        const parsed = JSON.parse(storedSession);
         if (parsed && parsed.username) {
           setAdminUser(parsed);
           setIsAuthenticated(true);
@@ -72,88 +85,60 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: "Please enter your username/email and password." };
     }
 
-    // Check if user set a custom password in Profile
-    let customPassword = "";
+    // 1. Check current configured credentials in localStorage
+    let storedAdmin = DEFAULT_ADMIN;
     try {
-      customPassword = localStorage.getItem(CUSTOM_PASSWORD_KEY) || "";
-    } catch {}
-
-    // Primary Impulse Credentials
-    const isImpulseAdmin =
-      (trimmedId === "impulse_admin" ||
-        trimmedId === "impulse" ||
-        trimmedId === "impulse@manthanjournal.com" ||
-        trimmedId === "admin@impulseresearchwork.com" ||
-        trimmedId === "editor@impulseresearchwork.com") &&
-      (trimmedPass === "Impulse@2026#Admin" ||
-        trimmedPass === "impulse2026" ||
-        (customPassword && trimmedPass === customPassword));
-
-    if (isImpulseAdmin) {
-      const user: AdminUser = {
-        name: "Impulse Editorial Board",
-        username: "impulse_admin",
-        email: "editor@impulseresearchwork.com",
-        role: "Chief Managing Editor & Publisher",
-      };
-      setAdminUser(user);
-      setIsAuthenticated(true);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-      } catch {}
-      return { success: true };
-    }
-
-    // Fallback standard admin account
-    const isFallbackAdmin =
-      (trimmedId === "admin" ||
-        trimmedId === "admin@manthanjournal.com" ||
-        trimmedId === "editor") &&
-      (trimmedPass === "admin123" ||
-        trimmedPass === "admin" ||
-        trimmedPass === "Impulse@2026#Admin" ||
-        trimmedPass === "impulse2026" ||
-        (customPassword && trimmedPass === customPassword));
-
-    if (isFallbackAdmin) {
-      const user: AdminUser = {
-        name: "Journal Administrator",
-        username: "admin",
-        email: "admin@manthanjournal.com",
-        role: "Chief Managing Editor",
-      };
-      setAdminUser(user);
-      setIsAuthenticated(true);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-      } catch {}
-      return { success: true };
-    }
-
-    // Check custom registered users
-    try {
-      const registered = localStorage.getItem(REGISTERED_USERS_KEY);
-      if (registered) {
-        const users = JSON.parse(registered);
-        const match = users.find(
-          (u: any) =>
-            (u.username.toLowerCase() === trimmedId || u.email.toLowerCase() === trimmedId) &&
-            u.password === trimmedPass
-        );
-        if (match) {
-          const user: AdminUser = {
-            name: match.name,
-            username: match.username,
-            email: match.email,
-            role: "Editorial Administrator",
-          };
-          setAdminUser(user);
-          setIsAuthenticated(true);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-          return { success: true };
-        }
+      const raw = localStorage.getItem(CREDENTIALS_KEY);
+      if (raw) {
+        storedAdmin = JSON.parse(raw);
       }
     } catch {}
+
+    const isCustomized =
+      storedAdmin.password !== DEFAULT_ADMIN.password ||
+      storedAdmin.username !== DEFAULT_ADMIN.username;
+
+    // Check against active stored credentials
+    const matchesStored =
+      (storedAdmin.username.toLowerCase() === trimmedId ||
+        storedAdmin.email.toLowerCase() === trimmedId) &&
+      storedAdmin.password === trimmedPass;
+
+    // Also allow impulse aliases if password matches the current stored password
+    const matchesCurrentPasswordWithAlias =
+      (trimmedId === "impulse" ||
+        trimmedId === "impulse_admin" ||
+        trimmedId === "editor@impulseresearchwork.com" ||
+        trimmedId === "manthaninternational2025@gmail.com" ||
+        trimmedId === "admin" ||
+        trimmedId === "admin@manthanjournal.com") &&
+      trimmedPass === storedAdmin.password;
+
+    // Fallback default support (only if credentials haven't been customized)
+    const matchesInitialDefaults =
+      !isCustomized &&
+      (((trimmedId === "impulse" ||
+        trimmedId === "impulse_admin" ||
+        trimmedId === "editor@impulseresearchwork.com" ||
+        trimmedId === "manthaninternational2025@gmail.com") &&
+        (trimmedPass === "Impulse@2026#Admin" || trimmedPass === "impulse2026")) ||
+        ((trimmedId === "admin" || trimmedId === "admin@manthanjournal.com") &&
+          (trimmedPass === "admin123" || trimmedPass === "admin")));
+
+    if (matchesStored || matchesCurrentPasswordWithAlias || matchesInitialDefaults) {
+      const user: AdminUser = {
+        name: storedAdmin.name || "Impulse Editorial Board",
+        username: storedAdmin.username || "impulse_admin",
+        email: storedAdmin.email || "editor@impulseresearchwork.com",
+        role: storedAdmin.role || "Chief Managing Editor & Publisher",
+      };
+      setAdminUser(user);
+      setIsAuthenticated(true);
+      try {
+        localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+      } catch {}
+      return { success: true };
+    }
 
     return {
       success: false,
@@ -162,11 +147,22 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateAdminProfile = (data: Partial<AdminUser>): boolean => {
-    if (!adminUser) return false;
-    const updated: AdminUser = { ...adminUser, ...data };
-    setAdminUser(updated);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      let storedAdmin = DEFAULT_ADMIN;
+      const raw = localStorage.getItem(CREDENTIALS_KEY);
+      if (raw) storedAdmin = JSON.parse(raw);
+
+      const updatedCreds = { ...storedAdmin, ...data };
+      localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(updatedCreds));
+
+      const updatedUser: AdminUser = {
+        name: updatedCreds.name,
+        username: updatedCreds.username,
+        email: updatedCreds.email,
+        role: updatedCreds.role,
+      };
+      setAdminUser(updatedUser);
+      localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
       return true;
     } catch {
       return false;
@@ -176,7 +172,12 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const updateAdminPassword = (newPassword: string): boolean => {
     if (!newPassword || newPassword.length < 5) return false;
     try {
-      localStorage.setItem(CUSTOM_PASSWORD_KEY, newPassword.trim());
+      let storedAdmin = DEFAULT_ADMIN;
+      const raw = localStorage.getItem(CREDENTIALS_KEY);
+      if (raw) storedAdmin = JSON.parse(raw);
+
+      storedAdmin.password = newPassword.trim();
+      localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(storedAdmin));
       return true;
     } catch {
       return false;
@@ -192,28 +193,24 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     if (!data.name.trim() || !data.username.trim() || !data.email.trim() || !data.password.trim()) {
       return { success: false, error: "All fields are required." };
     }
-
+    const newUser = {
+      name: data.name.trim(),
+      username: data.username.trim(),
+      email: data.email.trim(),
+      password: data.password.trim(),
+      role: "Editorial Administrator",
+    };
     try {
-      const existingStr = localStorage.getItem(REGISTERED_USERS_KEY);
-      const existing = existingStr ? JSON.parse(existingStr) : [];
-      const newUser = {
-        name: data.name.trim(),
-        username: data.username.trim(),
-        email: data.email.trim(),
-        password: data.password.trim(),
-      };
-      existing.push(newUser);
-      localStorage.setItem(REGISTERED_USERS_KEY, JSON.stringify(existing));
-
+      localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(newUser));
       const loggedUser: AdminUser = {
         name: newUser.name,
         username: newUser.username,
         email: newUser.email,
-        role: "Editorial Administrator",
+        role: newUser.role,
       };
       setAdminUser(loggedUser);
       setIsAuthenticated(true);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(loggedUser));
+      localStorage.setItem(SESSION_KEY, JSON.stringify(loggedUser));
       return { success: true };
     } catch {
       return { success: false, error: "Failed to save registration data." };
@@ -221,9 +218,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const forgotPassword = async (email: string): Promise<{ success: boolean; message?: string; error?: string }> => {
-    if (!email.trim()) {
-      return { success: false, error: "Please enter your registered email address." };
-    }
     return {
       success: true,
       message: `Password reset instructions have been dispatched to ${email.trim()}.`,
@@ -234,7 +228,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     setAdminUser(null);
     setIsAuthenticated(false);
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(SESSION_KEY);
     } catch {}
   };
 
