@@ -5,9 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import {
   Lock,
-  Mail,
   User,
-  KeyRound,
   X,
   ShieldCheck,
   ArrowRight,
@@ -22,27 +20,13 @@ export function AdminAuthModal() {
   const {
     isAuthModalOpen,
     closeAuthModal,
-    authModalView,
-    setAuthModalView,
     login,
-    signup,
-    forgotPassword,
   } = useAdminAuth();
 
   // Login Form State
   const [loginIdentifier, setLoginIdentifier] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  // Signup Form State
-  const [signupName, setSignupName] = useState("");
-  const [signupUsername, setSignupUsername] = useState("");
-  const [signupEmail, setSignupEmail] = useState("");
-  const [signupPassword, setSignupPassword] = useState("");
-  const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
-
-  // Forgot Password State
-  const [forgotEmail, setForgotEmail] = useState("");
 
   // Feedback State
   const [loading, setLoading] = useState(false);
@@ -69,57 +53,11 @@ export function AdminAuthModal() {
       setTimeout(() => {
         closeAuthModal();
         router.push("/admin");
-      }, 700);
+      }, 600);
     } else {
       setErrorMsg(res.error || "Login failed. Please check your credentials.");
     }
   };
-
-  const handleSignupSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    resetFeedback();
-
-    if (signupPassword !== signupConfirmPassword) {
-      setErrorMsg("Passwords do not match.");
-      return;
-    }
-
-    setLoading(true);
-    const res = await signup({
-      name: signupName,
-      username: signupUsername,
-      email: signupEmail,
-      password: signupPassword,
-    });
-    setLoading(false);
-
-    if (res.success) {
-      setSuccessMsg("Admin account registered successfully! Entering dashboard...");
-      setTimeout(() => {
-        closeAuthModal();
-        router.push("/admin");
-      }, 800);
-    } else {
-      setErrorMsg(res.error || "Signup failed.");
-    }
-  };
-
-  const handleForgotSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    resetFeedback();
-    setLoading(true);
-
-    const res = await forgotPassword(forgotEmail);
-    setLoading(false);
-
-    if (res.success) {
-      setSuccessMsg(res.message || "Reset link sent.");
-    } else {
-      setErrorMsg(res.error || "Failed to process request.");
-    }
-  };
-
-
 
   return (
     <div
@@ -137,7 +75,7 @@ export function AdminAuthModal() {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-editorial italic font-bold text-lg text-white leading-tight">
+              <h3 className="font-editorial not-italic font-bold text-lg text-white leading-tight">
                 Editorial Admin Portal
               </h3>
               <p className="text-[11px] text-[#FFD700] tracking-wide font-sans">
@@ -154,56 +92,8 @@ export function AdminAuthModal() {
           </button>
         </div>
 
-        {/* Navigation Tabs (Login / Sign Up / Forgot) */}
-        <div className="flex border-b border-gray-200 bg-gray-50 text-xs font-semibold">
-          <button
-            type="button"
-            onClick={() => {
-              setAuthModalView("login");
-              resetFeedback();
-            }}
-            className={`flex-1 py-2.5 text-center transition-colors border-b-2 ${
-              authModalView === "login"
-                ? "border-[#700070] text-[#700070] bg-white font-bold"
-                : "border-transparent text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            Admin Login
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setAuthModalView("signup");
-              resetFeedback();
-            }}
-            className={`flex-1 py-2.5 text-center transition-colors border-b-2 ${
-              authModalView === "signup"
-                ? "border-[#700070] text-[#700070] bg-white font-bold"
-                : "border-transparent text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            Admin Sign Up
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setAuthModalView("forgot");
-              resetFeedback();
-            }}
-            className={`flex-1 py-2.5 text-center transition-colors border-b-2 ${
-              authModalView === "forgot"
-                ? "border-[#700070] text-[#700070] bg-white font-bold"
-                : "border-transparent text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            Forgot Password
-          </button>
-        </div>
-
-        {/* Modal Body */}
+        {/* Modal Body: Only Admin Login */}
         <div className="p-5 sm:p-6 space-y-4">
-
-
           {/* Feedback Alerts */}
           {errorMsg && (
             <div className="p-2.5 bg-red-50 border border-red-200 rounded flex items-start gap-2 text-red-700 text-xs">
@@ -219,249 +109,68 @@ export function AdminAuthModal() {
             </div>
           )}
 
-          {/* ----------------- TAB 1: LOGIN ----------------- */}
-          {authModalView === "login" && (
-            <form onSubmit={handleLoginSubmit} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  Admin ID / Email / Username
-                </label>
-                <div className="relative">
-                  <User className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
-                  <input
-                    type="text"
-                    required
-                    value={loginIdentifier}
-                    onChange={(e) => setLoginIdentifier(e.target.value)}
-                    placeholder="e.g. admin or editor@manthanjournal.com"
-                    className="w-full pl-9 pr-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
-                  />
-                </div>
+          <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">
+                Admin ID / Email / Username
+              </label>
+              <div className="relative">
+                <User className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                <input
+                  type="text"
+                  required
+                  value={loginIdentifier}
+                  onChange={(e) => setLoginIdentifier(e.target.value)}
+                  placeholder="Enter admin ID or email"
+                  className="w-full pl-9 pr-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
+                />
               </div>
+            </div>
 
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-bold text-gray-700">
-                    Password
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthModalView("forgot");
-                      resetFeedback();
-                    }}
-                    className="text-[11px] text-[#700070] hover:underline"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="Enter admin password"
-                    className="w-full pl-9 pr-9 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between text-xs pt-1">
-                <label className="flex items-center gap-1.5 text-gray-600 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    defaultChecked
-                    className="rounded text-[#700070] focus:ring-[#700070]"
-                  />
-                  <span>Remember session</span>
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2.5 bg-[#700070] hover:bg-[#550055] text-white text-xs font-bold rounded uppercase tracking-wider flex items-center justify-center gap-2 transition-colors disabled:opacity-50 cursor-pointer"
-              >
-                {loading ? "Authenticating..." : "Sign In to Admin Panel"}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-
-              <div className="text-center pt-2 text-[11px] text-gray-500">
-                Need an administrator profile?{" "}
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="Enter admin password"
+                  className="w-full pl-9 pr-9 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
+                />
                 <button
                   type="button"
-                  onClick={() => {
-                    setAuthModalView("signup");
-                    resetFeedback();
-                  }}
-                  className="text-[#700070] font-bold hover:underline"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
                 >
-                  Create Admin Account
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-            </form>
-          )}
+            </div>
 
-          {/* ----------------- TAB 2: SIGN UP ----------------- */}
-          {authModalView === "signup" && (
-            <form onSubmit={handleSignupSubmit} className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
-                  <input
-                    type="text"
-                    required
-                    value={signupName}
-                    onChange={(e) => setSignupName(e.target.value)}
-                    placeholder="Dr. Deepak Setia / Editorial Manager"
-                    className="w-full pl-9 pr-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
-                  />
-                </div>
-              </div>
+            <div className="flex items-center justify-between text-xs pt-0.5">
+              <label className="flex items-center gap-1.5 text-gray-600 cursor-pointer">
+                <input
+                  type="checkbox"
+                  defaultChecked
+                  className="rounded text-[#700070] focus:ring-[#700070]"
+                />
+                <span>Remember session</span>
+              </label>
+            </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={signupUsername}
-                    onChange={(e) => setSignupUsername(e.target.value)}
-                    placeholder="editor_admin"
-                    className="w-full px-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Official Email
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={signupEmail}
-                    onChange={(e) => setSignupEmail(e.target.value)}
-                    placeholder="admin@manthanjournal.com"
-                    className="w-full px-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={signupPassword}
-                    onChange={(e) => setSignupPassword(e.target.value)}
-                    placeholder="Min 5 chars"
-                    className="w-full px-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={signupConfirmPassword}
-                    onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                    placeholder="Re-enter"
-                    className="w-full px-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2.5 bg-[#700070] hover:bg-[#550055] text-white text-xs font-bold rounded uppercase tracking-wider flex items-center justify-center gap-2 transition-colors disabled:opacity-50 cursor-pointer mt-2"
-              >
-                {loading ? "Registering..." : "Create Admin Account"}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-
-              <div className="text-center pt-2 text-[11px] text-gray-500">
-                Already registered?{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAuthModalView("login");
-                    resetFeedback();
-                  }}
-                  className="text-[#700070] font-bold hover:underline"
-                >
-                  Sign In instead
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* ----------------- TAB 3: FORGOT PASSWORD ----------------- */}
-          {authModalView === "forgot" && (
-            <form onSubmit={handleForgotSubmit} className="space-y-3.5">
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Enter your registered journal administrator email address. We will transmit an encrypted recovery token and instructions to reset your password.
-              </p>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  Registered Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
-                  <input
-                    type="email"
-                    required
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                    placeholder="admin@manthanjournal.com"
-                    className="w-full pl-9 pr-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-[#700070] focus:ring-1 focus:ring-[#700070]"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2.5 bg-[#700070] hover:bg-[#550055] text-white text-xs font-bold rounded uppercase tracking-wider flex items-center justify-center gap-2 transition-colors disabled:opacity-50 cursor-pointer"
-              >
-                {loading ? "Transmitting..." : "Send Reset Instructions"}
-                <KeyRound className="w-4 h-4" />
-              </button>
-
-              <div className="text-center pt-2 text-[11px] text-gray-500">
-                Remember your password?{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAuthModalView("login");
-                    resetFeedback();
-                  }}
-                  className="text-[#700070] font-bold hover:underline"
-                >
-                  Back to Sign In
-                </button>
-              </div>
-            </form>
-          )}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2.5 bg-[#700070] hover:bg-[#550055] text-white text-xs font-bold rounded uppercase tracking-wider flex items-center justify-center gap-2 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+            >
+              {loading ? "Authenticating..." : "Sign In to Admin Panel"}
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
         </div>
 
         {/* Modal Footer */}

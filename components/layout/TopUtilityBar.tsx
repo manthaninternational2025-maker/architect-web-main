@@ -52,7 +52,7 @@ export function TopUtilityBar() {
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center">
               <button
                 type="button"
                 onClick={() => openAuthModal("login")}
@@ -60,14 +60,6 @@ export function TopUtilityBar() {
               >
                 <LogIn className="w-3.5 h-3.5 text-[#FFCC00]" />
                 <span>Admin Login</span>
-              </button>
-              <span className="text-gray-600">|</span>
-              <button
-                type="button"
-                onClick={() => openAuthModal("signup")}
-                className="text-gray-300 hover:text-[#FFCC00] text-[10.5px] sm:text-[11px] font-medium transition-colors cursor-pointer"
-              >
-                Sign Up
               </button>
             </div>
           )}
