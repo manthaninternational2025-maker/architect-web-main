@@ -74,7 +74,7 @@ export default function AdminPage() {
     email: companyInfo.email,
     address: companyInfo.address,
     website: "https://impulseresearchwork.com",
-    impactFactor: "6.345*",
+    impactFactor: "xxxx*",
   });
 
   // Announcement Bar Form State

@@ -15,7 +15,6 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
-  Sparkles,
 } from "lucide-react";
 
 export function AdminAuthModal() {
@@ -31,8 +30,8 @@ export function AdminAuthModal() {
   } = useAdminAuth();
 
   // Login Form State
-  const [loginIdentifier, setLoginIdentifier] = useState("admin");
-  const [loginPassword, setLoginPassword] = useState("admin123");
+  const [loginIdentifier, setLoginIdentifier] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   // Signup Form State
@@ -120,21 +119,7 @@ export function AdminAuthModal() {
     }
   };
 
-  const handleQuickDemo = async () => {
-    setLoginIdentifier("admin");
-    setLoginPassword("admin123");
-    resetFeedback();
-    setLoading(true);
-    const res = await login("admin", "admin123");
-    setLoading(false);
-    if (res.success) {
-      setSuccessMsg("Demo credentials accepted! Entering Admin Panel...");
-      setTimeout(() => {
-        closeAuthModal();
-        router.push("/admin");
-      }, 600);
-    }
-  };
+
 
   return (
     <div
@@ -217,24 +202,7 @@ export function AdminAuthModal() {
 
         {/* Modal Body */}
         <div className="p-5 sm:p-6 space-y-4">
-          {/* Quick Demo Helper Banner */}
-          {authModalView === "login" && (
-            <div className="bg-purple-50 border border-purple-200 rounded p-2.5 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5 text-purple-900">
-                <Sparkles className="w-4 h-4 text-[#700070] shrink-0" />
-                <span>
-                  Demo Credentials: <strong className="font-mono text-[#700070]">admin</strong> / <strong className="font-mono text-[#700070]">admin123</strong>
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={handleQuickDemo}
-                className="bg-[#700070] hover:bg-[#550055] text-white text-[11px] font-bold px-2 py-1 rounded transition-colors shrink-0"
-              >
-                1-Click Login
-              </button>
-            </div>
-          )}
+
 
           {/* Feedback Alerts */}
           {errorMsg && (

@@ -128,7 +128,7 @@ export function Sidebar() {
          ------------------------------------------------------------- */}
       <div className="bg-white border border-[#CCCCCC] p-2 text-center">
         <span className="text-[#700070] font-bold text-xs sm:text-sm">
-          Impact Factor: 6.345*
+          Impact Factor: xxxx*
         </span>
       </div>
 
