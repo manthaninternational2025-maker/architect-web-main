@@ -160,6 +160,7 @@ export default function AdminPage() {
   });
 
   const [newIssueModal, setNewIssueModal] = useState(false);
+  const [editingIssue, setEditingIssue] = useState<any | null>(null);
   const [newIssueForm, setNewIssueForm] = useState({
     volume: "Volume 1",
     issue: "Issue 2",
@@ -381,6 +382,14 @@ export default function AdminPage() {
     addIssue(newIss);
     setNewIssueModal(false);
     showToast("New issue created in archive index and live on website!");
+  };
+
+  const handleSaveEditedIssue = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingIssue) return;
+    updateIssue(editingIssue);
+    setEditingIssue(null);
+    showToast(`Issue "${editingIssue.volume}, ${editingIssue.issue}" updated live!`);
   };
 
   const handleAddMember = (e: React.FormEvent) => {
@@ -1265,28 +1274,56 @@ export default function AdminPage() {
                     <p className="text-xs text-slate-600 mb-2">
                       Theme: <strong>{issue.theme}</strong> • Publication Date: {issue.publicationDate}
                     </p>
-                    <div className="flex items-center gap-3 pt-2 border-t border-slate-200 text-xs">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newStatus =
-                            issue.status === "Published" ? "Open for Submissions" : "Published";
-                          updateIssue({ ...issue, status: newStatus });
-                          showToast(`Issue status changed to ${newStatus}`);
-                        }}
-                        className="text-purple-700 hover:underline font-semibold cursor-pointer"
-                      >
-                        Toggle Status
-                      </button>
-                      <span className="text-slate-300">|</span>
-                      <Link
-                        href="/archives"
-                        target="_blank"
-                        className="text-slate-600 hover:text-slate-900 flex items-center gap-1"
-                      >
-                        <span>View Public Archive</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </Link>
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-slate-200 text-xs">
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newStatus =
+                              issue.status === "Published" ? "Open for Submissions" : "Published";
+                            updateIssue({ ...issue, status: newStatus });
+                            showToast(`Issue status changed to "${newStatus}"`);
+                          }}
+                          className="text-[#700070] hover:underline font-semibold cursor-pointer"
+                        >
+                          Toggle Status
+                        </button>
+                        <span className="text-slate-300">|</span>
+                        <Link
+                          href="/archives"
+                          target="_blank"
+                          className="text-slate-600 hover:text-slate-900 flex items-center gap-1 hover:underline"
+                        >
+                          <span>View Public Archive</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingIssue({ ...issue })}
+                          className="px-2.5 py-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 border border-blue-200 rounded font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                          title="Edit Issue Details"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm(`Are you sure you want to delete ${issue.volume}, ${issue.issue} (${issue.period})? This cannot be undone.`)) {
+                              deleteIssue(issue.id);
+                              showToast(`Issue "${issue.volume}, ${issue.issue}" deleted successfully.`);
+                            }
+                          }}
+                          className="px-2.5 py-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 border border-rose-200 rounded font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                          title="Delete this Issue from Archive"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span>Delete</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -3081,6 +3118,134 @@ export default function AdminPage() {
                 >
                   Create Issue
                 </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* -------------------------------------------------------------
+          EDIT ISSUE MODAL (EDIT VOLUME, ISSUE, PERIOD, THEME, STATUS)
+         ------------------------------------------------------------- */}
+      {editingIssue && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <h3 className="font-editorial italic font-bold text-xl text-slate-900">
+                Edit Issue #{editingIssue.id}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setEditingIssue(null)}
+                className="text-slate-400 hover:text-slate-700 p-1 rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditedIssue} className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Volume</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingIssue.volume}
+                    onChange={(e) => setEditingIssue({ ...editingIssue, volume: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Issue</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingIssue.issue}
+                    onChange={(e) => setEditingIssue({ ...editingIssue, issue: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Period (Month/Year)</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. September 2026"
+                    value={editingIssue.period}
+                    onChange={(e) => setEditingIssue({ ...editingIssue, period: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Publication Date</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 2026-09-15"
+                    value={editingIssue.publicationDate || ""}
+                    onChange={(e) => setEditingIssue({ ...editingIssue, publicationDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Publication Status</label>
+                <select
+                  value={editingIssue.status}
+                  onChange={(e) => setEditingIssue({ ...editingIssue, status: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                >
+                  <option value="Published">Published</option>
+                  <option value="Open for Submissions">Open for Submissions</option>
+                  <option value="In Press">In Press</option>
+                  <option value="Archived">Archived</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Theme / Focus Title</label>
+                <input
+                  type="text"
+                  value={editingIssue.theme}
+                  onChange={(e) => setEditingIssue({ ...editingIssue, theme: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                />
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm(`Are you sure you want to delete ${editingIssue.volume}, ${editingIssue.issue}?`)) {
+                      deleteIssue(editingIssue.id);
+                      setEditingIssue(null);
+                      showToast(`Issue "${editingIssue.volume}, ${editingIssue.issue}" deleted.`);
+                    }
+                  }}
+                  className="px-3 py-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 border border-rose-200 rounded font-semibold cursor-pointer flex items-center gap-1"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete Issue</span>
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingIssue(null)}
+                    className="px-3 py-1.5 border border-slate-300 rounded text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-1.5 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded cursor-pointer"
+                  >
+                    Save Changes
+                  </button>
+                </div>
               </div>
             </form>
           </div>
