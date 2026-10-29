@@ -81,6 +81,11 @@ export interface EditorialMember {
   affiliation: string;
   email: string;
   specialization?: string;
+  photoUrl?: string;
+  photoData?: string;
+  bio?: string;
+  orcid?: string;
+  phone?: string;
 }
 
 export interface AuthorInstructionsData {

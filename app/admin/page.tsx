@@ -47,6 +47,8 @@ import {
   Paperclip,
   X,
   FileUp,
+  Camera,
+  Image as ImageIcon,
 } from "lucide-react";
 
 type NavTab =
@@ -178,6 +180,11 @@ export default function AdminPage() {
     affiliation: "",
     email: "",
     specialization: "",
+    photoUrl: "",
+    photoData: "",
+    bio: "",
+    orcid: "",
+    phone: "",
   });
 
   // -------------------------------------------------------------
@@ -392,6 +399,54 @@ export default function AdminPage() {
     showToast(`Issue "${editingIssue.volume}, ${editingIssue.issue}" updated live!`);
   };
 
+  const handleMemberPhotoUpload = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    isEdit: boolean = false
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast("Photo is too large! Maximum allowed size is 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Data = reader.result as string;
+      if (isEdit) {
+        setEditingMember((prev: any) =>
+          prev ? { ...prev, photoData: base64Data } : prev
+        );
+      } else {
+        setNewMemberForm((prev) => ({
+          ...prev,
+          photoData: base64Data,
+        }));
+      }
+      showToast("Member profile photo attached successfully!");
+    };
+    reader.onerror = () => {
+      showToast("Failed to read image file.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveMemberPhoto = (isEdit: boolean = false) => {
+    if (isEdit) {
+      setEditingMember((prev: any) =>
+        prev ? { ...prev, photoData: "", photoUrl: "" } : prev
+      );
+    } else {
+      setNewMemberForm((prev) => ({
+        ...prev,
+        photoData: "",
+        photoUrl: "",
+      }));
+    }
+    showToast("Profile photo removed.");
+  };
+
   const handleAddMember = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMemberForm.name) return;
@@ -401,6 +456,11 @@ export default function AdminPage() {
       affiliation: newMemberForm.affiliation,
       email: newMemberForm.email,
       specialization: newMemberForm.specialization,
+      photoUrl: newMemberForm.photoUrl,
+      photoData: newMemberForm.photoData,
+      bio: newMemberForm.bio,
+      orcid: newMemberForm.orcid,
+      phone: newMemberForm.phone,
     };
     addMember(newM);
     setNewMemberModal(false);
@@ -410,6 +470,11 @@ export default function AdminPage() {
       affiliation: "",
       email: "",
       specialization: "",
+      photoUrl: "",
+      photoData: "",
+      bio: "",
+      orcid: "",
+      phone: "",
     });
     showToast("New editorial member added and live on board!");
   };
@@ -1267,9 +1332,25 @@ export default function AdminPage() {
                           {issue.status}
                         </span>
                       </div>
-                      <span className="text-xs text-slate-500">
-                        {issue.articlesCount} Articles Indexed
-                      </span>
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-xs text-slate-500 font-medium">
+                          {issue.articlesCount} Articles Indexed
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm(`Are you sure you want to delete ${issue.volume}, ${issue.issue} (${issue.period})? This cannot be undone.`)) {
+                              deleteIssue(issue.id);
+                              showToast(`Issue "${issue.volume}, ${issue.issue}" deleted successfully.`);
+                            }
+                          }}
+                          className="px-2.5 py-1 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white border border-rose-300 rounded flex items-center gap-1 transition-colors cursor-pointer shadow-2xs"
+                          title="Delete this Issue from Archive"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete</span>
+                        </button>
+                      </div>
                     </div>
                     <p className="text-xs text-slate-600 mb-2">
                       Theme: <strong>{issue.theme}</strong> • Publication Date: {issue.publicationDate}
@@ -1361,19 +1442,47 @@ export default function AdminPage() {
                     key={m.id}
                     className="border border-slate-200 rounded-lg p-3.5 hover:border-purple-300 transition-colors bg-white flex flex-col justify-between"
                   >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-sm text-slate-900">{m.name}</span>
-                        <span className="text-[10px] text-purple-800 bg-purple-50 font-semibold px-2 py-0.5 rounded">
-                          {m.role}
-                        </span>
-                      </div>
-                      <div className="text-slate-600 text-xs mt-1">{m.affiliation}</div>
-                      <div className="text-slate-500 text-[11px] mt-0.5">
-                        Area: <em>{m.specialization}</em>
-                      </div>
-                      <div className="text-slate-400 font-mono text-[11px] mt-0.5">
-                        {m.email}
+                    <div className="flex items-start gap-3">
+                      {m.photoData || m.photoUrl ? (
+                        <img
+                          src={m.photoData || m.photoUrl}
+                          alt={m.name}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-purple-200 shrink-0"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-purple-100 text-[#700070] flex items-center justify-center font-bold text-sm shrink-0 border border-purple-200">
+                          {m.name
+                            .replace(/^Dr\.\s*|^Prof\.\s*/i, "")
+                            .split(" ")
+                            .map((n: string) => n[0])
+                            .join("")
+                            .slice(0, 2)
+                            .toUpperCase()}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center justify-between gap-1">
+                          <span className="font-bold text-sm text-slate-900 truncate">{m.name}</span>
+                          <span className="text-[10px] text-purple-800 bg-purple-50 font-semibold px-2 py-0.5 rounded shrink-0">
+                            {m.role}
+                          </span>
+                        </div>
+                        <div className="text-slate-600 text-xs mt-0.5 font-medium">{m.affiliation}</div>
+                        {m.specialization && (
+                          <div className="text-slate-500 text-[11px] mt-0.5">
+                            Area: <em>{m.specialization}</em>
+                          </div>
+                        )}
+                        {m.email && (
+                          <div className="text-slate-400 font-mono text-[11px] mt-0.5">
+                            {m.email}
+                          </div>
+                        )}
+                        {m.orcid && (
+                          <div className="text-purple-700 text-[10px] font-mono mt-0.5 truncate">
+                            ORCID: {m.orcid}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="pt-2.5 mt-2 border-t border-slate-100 flex items-center justify-end gap-3 text-[11px]">
@@ -3253,75 +3362,216 @@ export default function AdminPage() {
       )}
 
       {/* -------------------------------------------------------------
-          ADD MEMBER MODAL
+          ADD MEMBER MODAL (PHOTO UPLOAD + COMPLETE DETAILS)
          ------------------------------------------------------------- */}
       {newMemberModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
-            <h3 className="font-editorial italic font-bold text-xl text-slate-900">
-              Add Editorial Board Member
-            </h3>
-
-            <form onSubmit={handleAddMember} className="space-y-3">
+          <div className="bg-white rounded-xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Full Name &amp; Title</label>
+                <h3 className="font-editorial italic font-bold text-xl text-slate-900">
+                  Add Editorial Board Member
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  Upload member portrait, configure designation, institutional affiliation, and contact details.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNewMemberModal(false)}
+                className="text-slate-400 hover:text-slate-700 p-1 rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddMember} className="space-y-3.5">
+              {/* Photo Upload Section */}
+              <div className="flex items-center gap-4 p-3 bg-purple-50/50 border border-purple-100 rounded-lg">
+                <div className="relative shrink-0">
+                  {newMemberForm.photoData || newMemberForm.photoUrl ? (
+                    <img
+                      src={newMemberForm.photoData || newMemberForm.photoUrl}
+                      alt="Preview"
+                      className="w-16 h-16 rounded-full object-cover border-2 border-[#700070] shadow-xs"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-purple-200/70 text-[#700070] flex flex-col items-center justify-center border-2 border-dashed border-purple-300">
+                      <Camera className="w-5 h-5 text-[#700070]" />
+                      <span className="text-[9px] font-bold mt-0.5">Photo</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <span className="block font-bold text-slate-800 text-xs">
+                    Member Portrait / Photo
+                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="px-2.5 py-1 bg-white border border-purple-300 hover:bg-purple-100/50 text-[#700070] rounded font-semibold text-xs cursor-pointer inline-flex items-center gap-1.5 transition-colors">
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>{newMemberForm.photoData ? "Change Photo" : "Upload Photo"}</span>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/jpg"
+                        onChange={(e) => handleMemberPhotoUpload(e, false)}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {(newMemberForm.photoData || newMemberForm.photoUrl) && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveMemberPhoto(false)}
+                        className="px-2 py-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 border border-rose-200 rounded text-xs font-semibold"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="url"
+                    placeholder="Or paste direct image URL (optional)"
+                    value={newMemberForm.photoUrl}
+                    onChange={(e) =>
+                      setNewMemberForm({ ...newMemberForm, photoUrl: e.target.value })
+                    }
+                    className="w-full px-2 py-1 border border-slate-200 rounded text-[11px] font-mono bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* Full Name */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Full Name &amp; Academic Title <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Prof. Sunita Rao"
+                  placeholder="e.g. Dr. Deepak Setia / Prof. Sunita Rao"
                   value={newMemberForm.name}
                   onChange={(e) => setNewMemberForm({ ...newMemberForm, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded"
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Designation / Role</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Associate Editor (Sociology)"
-                  value={newMemberForm.role}
-                  onChange={(e) => setNewMemberForm({ ...newMemberForm, role: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded"
-                />
+              {/* Role / Designation */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Quick Role Preset</label>
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        setNewMemberForm({ ...newMemberForm, role: e.target.value });
+                      }
+                    }}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                  >
+                    <option value="">-- Select Preset Role --</option>
+                    <option value="Editor-in-Chief">Editor-in-Chief</option>
+                    <option value="Managing Editor">Managing Editor</option>
+                    <option value="Associate Editor">Associate Editor</option>
+                    <option value="Executive Editor">Executive Editor</option>
+                    <option value="Editorial Board Member">Editorial Board Member</option>
+                    <option value="Senior Advisory Board Member">Senior Advisory Board Member</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Designation / Title <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Editor-in-Chief"
+                    value={newMemberForm.role}
+                    onChange={(e) => setNewMemberForm({ ...newMemberForm, role: e.target.value })}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
+                  />
+                </div>
               </div>
 
+              {/* Institutional Affiliation */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Institutional Affiliation</label>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Institutional Affiliation <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Center for Social Research"
+                  placeholder="e.g. Department of Social Sciences, Delhi University / Manthan Journal"
                   value={newMemberForm.affiliation}
                   onChange={(e) => setNewMemberForm({ ...newMemberForm, affiliation: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded"
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070] text-xs"
                 />
               </div>
 
+              {/* Specialization Area & Email */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Specialization / Subject Area</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Social Sciences & Interdisciplinary Inquiry"
+                    value={newMemberForm.specialization}
+                    onChange={(e) => setNewMemberForm({ ...newMemberForm, specialization: e.target.value })}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Official Email Address</label>
+                  <input
+                    type="email"
+                    placeholder="e.g. editor@manthanjournal.com"
+                    value={newMemberForm.email}
+                    onChange={(e) => setNewMemberForm({ ...newMemberForm, email: e.target.value })}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* ORCID & Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">ORCID / Scholar Profile Link</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. https://orcid.org/0000-0002-..."
+                    value={newMemberForm.orcid}
+                    onChange={(e) => setNewMemberForm({ ...newMemberForm, orcid: e.target.value })}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Phone / Contact (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. +91 98765 43210"
+                    value={newMemberForm.phone}
+                    onChange={(e) => setNewMemberForm({ ...newMemberForm, phone: e.target.value })}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Bio Summary */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Specialization Area</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Gender Studies & Sociology"
-                  value={newMemberForm.specialization}
-                  onChange={(e) => setNewMemberForm({ ...newMemberForm, specialization: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded"
+                <label className="block font-bold text-slate-700 mb-1">Brief Academic Bio / Profile</label>
+                <textarea
+                  rows={2}
+                  placeholder="Brief scholarly background, notable research contributions, and affiliations..."
+                  value={newMemberForm.bio}
+                  onChange={(e) => setNewMemberForm({ ...newMemberForm, bio: e.target.value })}
+                  className="w-full px-3 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Email Address</label>
-                <input
-                  type="email"
-                  placeholder="e.g. editor@univ.edu"
-                  value={newMemberForm.email}
-                  onChange={(e) => setNewMemberForm({ ...newMemberForm, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-3">
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setNewMemberModal(false)}
@@ -3331,9 +3581,9 @@ export default function AdminPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded cursor-pointer"
+                  className="px-5 py-2 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded cursor-pointer shadow-xs transition-colors"
                 >
-                  Add Member
+                  Add Member to Board
                 </button>
               </div>
             </form>
@@ -3342,83 +3592,241 @@ export default function AdminPage() {
       )}
 
       {/* -------------------------------------------------------------
-          EDIT MEMBER MODAL
+          EDIT MEMBER MODAL (PHOTO UPLOAD, EDIT DETAILS & DELETE)
          ------------------------------------------------------------- */}
       {editingMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
-            <h3 className="font-editorial italic font-bold text-xl text-slate-900">
-              Edit Editorial Member
-            </h3>
-
-            <form onSubmit={handleSaveEditedMember} className="space-y-3">
+          <div className="bg-white rounded-xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Full Name</label>
+                <h3 className="font-editorial italic font-bold text-xl text-slate-900">
+                  Edit Editorial Member
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  Update photo, name, role, institutional affiliation, specialization, and credentials.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingMember(null)}
+                className="text-slate-400 hover:text-slate-700 p-1 rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditedMember} className="space-y-3.5">
+              {/* Photo Upload Section */}
+              <div className="flex items-center gap-4 p-3 bg-purple-50/50 border border-purple-100 rounded-lg">
+                <div className="relative shrink-0">
+                  {editingMember.photoData || editingMember.photoUrl ? (
+                    <img
+                      src={editingMember.photoData || editingMember.photoUrl}
+                      alt={editingMember.name}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-[#700070] shadow-xs"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-purple-200/70 text-[#700070] flex flex-col items-center justify-center border-2 border-dashed border-purple-300">
+                      <Camera className="w-5 h-5 text-[#700070]" />
+                      <span className="text-[9px] font-bold mt-0.5">Photo</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <span className="block font-bold text-slate-800 text-xs">
+                    Member Portrait / Photo
+                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="px-2.5 py-1 bg-white border border-purple-300 hover:bg-purple-100/50 text-[#700070] rounded font-semibold text-xs cursor-pointer inline-flex items-center gap-1.5 transition-colors">
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>{editingMember.photoData ? "Change Photo" : "Upload Photo"}</span>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/jpg"
+                        onChange={(e) => handleMemberPhotoUpload(e, true)}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {(editingMember.photoData || editingMember.photoUrl) && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveMemberPhoto(true)}
+                        className="px-2 py-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 border border-rose-200 rounded text-xs font-semibold"
+                      >
+                        Remove Photo
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="url"
+                    placeholder="Or paste direct image URL"
+                    value={editingMember.photoUrl || ""}
+                    onChange={(e) =>
+                      setEditingMember({ ...editingMember, photoUrl: e.target.value })
+                    }
+                    className="w-full px-2 py-1 border border-slate-200 rounded text-[11px] font-mono bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* Full Name */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Full Name &amp; Academic Title <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={editingMember.name}
                   onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded"
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Role / Position</label>
-                <input
-                  type="text"
-                  required
-                  value={editingMember.role}
-                  onChange={(e) => setEditingMember({ ...editingMember, role: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded"
-                />
+              {/* Role / Designation */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Quick Role Preset</label>
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        setEditingMember({ ...editingMember, role: e.target.value });
+                      }
+                    }}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                  >
+                    <option value="">-- Choose Role Preset --</option>
+                    <option value="Editor-in-Chief">Editor-in-Chief</option>
+                    <option value="Managing Editor">Managing Editor</option>
+                    <option value="Associate Editor">Associate Editor</option>
+                    <option value="Executive Editor">Executive Editor</option>
+                    <option value="Editorial Board Member">Editorial Board Member</option>
+                    <option value="Senior Advisory Board Member">Senior Advisory Board Member</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Designation / Title <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editingMember.role}
+                    onChange={(e) => setEditingMember({ ...editingMember, role: e.target.value })}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
+                  />
+                </div>
               </div>
 
+              {/* Institutional Affiliation */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Affiliation</label>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Institutional Affiliation <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={editingMember.affiliation}
                   onChange={(e) => setEditingMember({ ...editingMember, affiliation: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded"
+                  className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070] text-xs"
                 />
               </div>
 
+              {/* Specialization & Email */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Specialization / Subject Area</label>
+                  <input
+                    type="text"
+                    value={editingMember.specialization || ""}
+                    onChange={(e) => setEditingMember({ ...editingMember, specialization: e.target.value })}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    value={editingMember.email || ""}
+                    onChange={(e) => setEditingMember({ ...editingMember, email: e.target.value })}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* ORCID & Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">ORCID / Scholar Link</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. https://orcid.org/0000-0002-..."
+                    value={editingMember.orcid || ""}
+                    onChange={(e) => setEditingMember({ ...editingMember, orcid: e.target.value })}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Phone / WhatsApp</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. +91 98765 43210"
+                    value={editingMember.phone || ""}
+                    onChange={(e) => setEditingMember({ ...editingMember, phone: e.target.value })}
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Bio */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Specialization</label>
-                <input
-                  type="text"
-                  value={editingMember.specialization || ""}
-                  onChange={(e) => setEditingMember({ ...editingMember, specialization: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded"
+                <label className="block font-bold text-slate-700 mb-1">Brief Academic Bio / Profile</label>
+                <textarea
+                  rows={2}
+                  placeholder="Scholarly background, affiliations..."
+                  value={editingMember.bio || ""}
+                  onChange={(e) => setEditingMember({ ...editingMember, bio: e.target.value })}
+                  className="w-full px-3 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs"
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  value={editingMember.email}
-                  onChange={(e) => setEditingMember({ ...editingMember, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-3">
+              {/* Actions with Delete Button */}
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setEditingMember(null)}
-                  className="px-4 py-2 border border-slate-300 rounded text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  onClick={() => {
+                    if (confirm(`Are you sure you want to delete ${editingMember.name}? This will remove them from the editorial board.`)) {
+                      deleteMember(editingMember.id);
+                      setEditingMember(null);
+                      showToast(`Removed "${editingMember.name}" from editorial board.`);
+                    }
+                  }}
+                  className="px-3 py-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 border border-rose-200 rounded font-semibold cursor-pointer flex items-center gap-1"
                 >
-                  Cancel
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete Member</span>
                 </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded cursor-pointer"
-                >
-                  Save Member Info
-                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingMember(null)}
+                    className="px-4 py-2 border border-slate-300 rounded text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded cursor-pointer shadow-xs transition-colors"
+                  >
+                    Save Member Info
+                  </button>
+                </div>
               </div>
             </form>
           </div>
