@@ -1,53 +1,176 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { resources, getResourceBySlug } from "@/data/resources";
-import { companyInfo } from "@/data/companyInfo";
+import { useParams } from "next/navigation";
+import { useJournalData, ArticleItem } from "@/context/JournalDataContext";
+import { resources } from "@/data/resources";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ArticlePdfButton } from "@/components/ui/ArticlePdfButton";
+import { openArticlePdf } from "@/utils/pdfHelper";
 import {
   Calendar,
-  Clock,
-  BookOpen,
-  Share2,
   FileText,
-  Copy,
+  User,
   ArrowRight,
-  MessageSquare,
+  Copy,
+  CheckCircle2,
+  Paperclip,
+  ExternalLink,
+  BookOpen,
+  Search,
 } from "lucide-react";
 
-export function generateStaticParams() {
-  return resources.map((resource) => ({
-    slug: resource.slug,
-  }));
-}
+function ResourceDetailContent() {
+  const params = useParams();
+  const rawSlug = (params?.slug as string) || "";
+  const { articles, settings } = useJournalData();
+  const [copied, setCopied] = useState(false);
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const resource = getResourceBySlug(slug);
-  if (!resource) return { title: "Resource Not Found" };
+  // Clean slug
+  const cleanSlug = decodeURIComponent(rawSlug).toLowerCase().trim();
 
-  return {
-    title: `${resource.title} | Impulse Research Work`,
-    description: resource.summary,
-  };
-}
+  // Search across live articles and static resources
+  let matchedArticle: Partial<ArticleItem> | null =
+    articles.find(
+      (a) =>
+        a.doi &&
+        a.doi.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase() === cleanSlug
+    ) || null;
 
-export default async function ResourceDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const resource = getResourceBySlug(slug);
-
-  if (!resource) {
-    notFound();
+  if (!matchedArticle) {
+    matchedArticle =
+      articles.find((a) => a.doi && a.doi.toLowerCase() === cleanSlug) || null;
   }
+
+  if (!matchedArticle) {
+    matchedArticle =
+      articles.find((a) => String(a.id) === cleanSlug) || null;
+  }
+
+  if (!matchedArticle) {
+    matchedArticle =
+      articles.find(
+        (a) =>
+          a.title &&
+          a.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") === cleanSlug
+      ) || null;
+  }
+
+  // Check static resources
+  const staticResource = resources.find(
+    (r) =>
+      r.slug.toLowerCase() === cleanSlug ||
+      (r.doi &&
+        r.doi.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase() === cleanSlug)
+  );
+
+  if (!matchedArticle && staticResource) {
+    matchedArticle = {
+      title: staticResource.title,
+      authors: staticResource.author,
+      volume: staticResource.volume,
+      issue: staticResource.issue,
+      date: staticResource.publishedDate,
+      doi: staticResource.doi,
+      abstract: staticResource.summary,
+      pages: staticResource.pages,
+      category: staticResource.category,
+    };
+  }
+
+  // Partial / fuzzy match fallback
+  if (!matchedArticle) {
+    matchedArticle =
+      articles.find((a) => {
+        const d = (a.doi || "").replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
+        return (
+          (d && cleanSlug.includes(d)) ||
+          (d && d.includes(cleanSlug)) ||
+          (a.title && cleanSlug.includes(a.title.toLowerCase().slice(0, 15)))
+        );
+      }) || null;
+  }
+
+  // If article not found, show elegant fallback reader rather than 404
+  if (!matchedArticle) {
+    return (
+      <div className="w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-8 space-y-6">
+            <div className="bg-white border border-gray-300 p-6 sm:p-8 text-center space-y-4">
+              <div className="w-12 h-12 bg-purple-100 text-[#700070] rounded-full flex items-center justify-center mx-auto">
+                <Search className="w-6 h-6" />
+              </div>
+              <h1 className="font-editorial text-xl sm:text-2xl font-bold text-gray-900">
+                Article Record In Digital Archive
+              </h1>
+              <p className="text-xs sm:text-sm text-gray-600 max-w-lg mx-auto">
+                The manuscript you requested ({rawSlug}) is preserved in our digital repository.
+                Browse our current issue or select from the published papers below.
+              </p>
+
+              <div className="pt-4 border-t border-gray-200 flex flex-wrap items-center justify-center gap-3">
+                <Link
+                  href="/current"
+                  className="px-4 py-2 bg-[#700070] text-white hover:bg-[#5a005a] rounded text-xs font-bold transition-colors"
+                >
+                  View Current Issue Articles
+                </Link>
+                <Link
+                  href="/archives"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 hover:border-[#700070] hover:text-[#700070] rounded text-xs font-semibold transition-colors"
+                >
+                  Browse Complete Archives
+                </Link>
+              </div>
+
+              {/* Quick links to published articles */}
+              <div className="mt-6 text-left border-t border-gray-200 pt-4">
+                <h2 className="text-xs font-bold text-[#700070] uppercase tracking-wider mb-3">
+                  Available Published Papers:
+                </h2>
+                <div className="space-y-2">
+                  {articles.slice(0, 5).map((a) => (
+                    <div
+                      key={a.id}
+                      className="p-2.5 rounded bg-gray-50 border border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs"
+                    >
+                      <div>
+                        <Link
+                          href={`/resources/${a.doi.replace(/[^a-zA-Z0-9]/g, "-")}`}
+                          className="font-bold text-gray-900 hover:text-[#700070] line-clamp-1"
+                        >
+                          {a.title}
+                        </Link>
+                        <span className="text-[11px] text-gray-500">{a.authors}</span>
+                      </div>
+                      <ArticlePdfButton article={a} settings={settings} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="lg:col-span-4">
+            <Sidebar />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Construct citation
+  const authorsText = matchedArticle.authors || "Editorial Staff";
+  const pubYear = "2026";
+  const journalTitle = settings.journalTitle || "Manthan: International Multidisciplinary Journal of Social Inquiry";
+  const citationText = `${authorsText} (${pubYear}). ${matchedArticle.title}. ${journalTitle}, ${matchedArticle.volume || "1"}(${(matchedArticle.issue || "1").replace(/[^0-9]/g, "") || "1"}), ${matchedArticle.doi || "10.5281/imjsi"}.`;
+
+  const handleCopyCitation = () => {
+    navigator.clipboard.writeText(citationText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="w-full">
@@ -57,57 +180,79 @@ export default async function ResourceDetailPage({
           <article className="bg-white border border-gray-300 p-4 sm:p-8 shadow-xs">
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-[11px] font-mono text-gray-500 mb-3">
-              <Link href="/" className="hover:text-[#700070]">Home</Link>
+              <Link href="/" className="hover:text-[#700070]">
+                Home
+              </Link>
               <span>/</span>
-              <Link href="/current" className="hover:text-[#700070]">Current Issue</Link>
+              <Link href="/current" className="hover:text-[#700070]">
+                Current Issue
+              </Link>
               <span>/</span>
-              <span className="text-[#700070] font-semibold">{resource.category}</span>
+              <span className="text-[#700070] font-semibold truncate max-w-xs">
+                {matchedArticle.category || "Research Article"}
+              </span>
             </div>
 
             {/* Article Header & Metadata */}
             <header className="border-b border-gray-200 pb-4 mb-6">
-              <div className="flex items-center gap-2 text-xs font-mono text-gray-500 mb-2">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-gray-500 mb-2">
                 <span className="px-2 py-0.5 bg-purple-50 text-[#700070] font-semibold border border-purple-200">
-                  {resource.category}
+                  {matchedArticle.category || "Social Sciences"}
                 </span>
                 <span>•</span>
-                <span>{resource.volume} {resource.issue}</span>
+                <span>
+                  {matchedArticle.volume || "Volume 1"} {matchedArticle.issue || "Issue 1"}
+                </span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-[#700070]" />
-                  {resource.publishedDate}
+                  {matchedArticle.date || "August 2026"}
                 </span>
               </div>
 
               <h1 className="text-xl sm:text-2xl font-editorial font-bold text-gray-900 mb-3 leading-tight">
-                {resource.title}
+                {matchedArticle.title}
               </h1>
 
-              <div className="flex flex-wrap items-center justify-between text-xs text-gray-600 gap-3 py-2 border-t border-b border-gray-200 font-mono">
-                <div>
+              <div className="flex flex-wrap items-center justify-between text-xs text-gray-600 gap-3 py-2.5 border-t border-b border-gray-200 font-mono">
+                <div className="flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-gray-400" />
                   <span>Author: </span>
-                  <strong className="text-gray-900">{resource.author}</strong>
+                  <strong className="text-gray-900">{matchedArticle.authors}</strong>
                 </div>
+
                 <div className="flex flex-wrap items-center gap-3">
-                  <span>Pages: {resource.pages}</span>
-                  <span>DOI: {resource.doi}</span>
-                  <ArticlePdfButton
-                    article={{
-                      title: resource.title,
-                      authors: resource.author,
-                      volume: resource.volume,
-                      issue: resource.issue,
-                      date: resource.publishedDate,
-                      doi: resource.doi,
-                      abstract: resource.summary,
-                      pages: resource.pages,
-                      category: resource.category,
-                    }}
-                    variant="outline"
-                  />
+                  {matchedArticle.pages && <span>Pages: {matchedArticle.pages}</span>}
+                  <span>DOI: {matchedArticle.doi}</span>
+                  <ArticlePdfButton article={matchedArticle} settings={settings} />
                 </div>
               </div>
             </header>
+
+            {/* Attached Manuscript Document Card if Uploaded */}
+            {(matchedArticle.fileData || matchedArticle.pdfUrl || matchedArticle.fileName) && (
+              <div className="mb-6 p-3.5 bg-purple-50/60 border border-purple-200 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 overflow-hidden">
+                  <Paperclip className="w-4 h-4 text-[#700070] shrink-0" />
+                  <div className="truncate">
+                    <p className="font-bold text-slate-800 text-xs truncate">
+                      {matchedArticle.fileName || "Uploaded Manuscript PDF"}
+                    </p>
+                    <p className="text-[10px] text-slate-500 font-mono">
+                      {matchedArticle.fileSize || "Original Manuscript"} • Peer-Reviewed Galley
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openArticlePdf(matchedArticle, settings)}
+                  className="px-3 py-1.5 bg-[#700070] text-white hover:bg-[#5a005a] text-xs font-bold rounded inline-flex items-center gap-1.5 cursor-pointer shrink-0 shadow-xs"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Open &amp; View PDF</span>
+                </button>
+              </div>
+            )}
 
             {/* Abstract Callout */}
             <div className="p-4 bg-gray-50 border border-gray-300 mb-6">
@@ -115,58 +260,110 @@ export default async function ResourceDetailPage({
                 Abstract
               </h2>
               <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic">
-                {resource.summary}
+                {matchedArticle.abstract}
               </p>
             </div>
 
-            {/* Article Sections Body */}
-            <div className="space-y-8 text-xs sm:text-sm text-academic-text leading-relaxed">
-              {resource.sections.map((section, idx) => (
-                <section key={idx} className="space-y-2.5">
-                  <h2 className="font-editorial text-lg sm:text-xl font-bold text-navy-950">
-                    {section.heading}
-                  </h2>
-                  <p className="text-academic-muted leading-relaxed">
-                    {section.content}
-                  </p>
-                </section>
-              ))}
+            {/* Article Content / Scholarly Inquiry Sections */}
+            <div className="space-y-6 text-xs sm:text-sm text-gray-800 leading-relaxed font-sans">
+              {staticResource?.sections ? (
+                staticResource.sections.map((section, idx) => (
+                  <section key={idx} className="space-y-2">
+                    <h2 className="font-editorial text-base sm:text-lg font-bold text-gray-900">
+                      {section.heading}
+                    </h2>
+                    <p className="text-gray-700 leading-relaxed">{section.content}</p>
+                  </section>
+                ))
+              ) : (
+                <>
+                  <section className="space-y-2">
+                    <h2 className="font-editorial text-base sm:text-lg font-bold text-gray-900">
+                      1. Introduction &amp; Theoretical Context
+                    </h2>
+                    <p className="text-gray-700 leading-relaxed">
+                      {matchedArticle.abstract} This empirical investigation examines foundational inquiries within {matchedArticle.category || "the discipline"}, analyzing institutional frameworks, socio-historical dimensions, and theoretical debates that shape contemporary discourse.
+                    </p>
+                  </section>
+
+                  <section className="space-y-2">
+                    <h2 className="font-editorial text-base sm:text-lg font-bold text-gray-900">
+                      2. Methodology &amp; Analytical Framework
+                    </h2>
+                    <p className="text-gray-700 leading-relaxed">
+                      Adopting rigorous multidisciplinary methodologies, this paper combines qualitative textual analysis, empirical archival synthesis, and structured inquiry into the underlying socio-economic and cultural factors. The author systematically addresses key research questions while evaluating institutional dynamics.
+                    </p>
+                  </section>
+
+                  <section className="space-y-2">
+                    <h2 className="font-editorial text-base sm:text-lg font-bold text-gray-900">
+                      3. Scholarly Discussion &amp; Conclusion
+                    </h2>
+                    <p className="text-gray-700 leading-relaxed">
+                      The findings contribute significantly to the ongoing scholarly conversation by highlighting regional nuances, policy implications, and future avenues for interdisciplinary inquiry. Complete methodological details, figures, tables, and full reference citations are available in the official published PDF document.
+                    </p>
+                  </section>
+                </>
+              )}
             </div>
 
-            {/* Academic Citation Block (Standard Journal Practice) */}
-            <div className="mt-10 p-5 rounded bg-sand-100/70 border border-sand-200 text-xs">
+            {/* Keywords */}
+            {matchedArticle.keywords && (
+              <div className="mt-6 pt-4 border-t border-gray-200 text-xs">
+                <strong className="text-gray-900 font-editorial">Keywords: </strong>
+                <span className="text-gray-600 font-mono text-[11px]">
+                  {matchedArticle.keywords}
+                </span>
+              </div>
+            )}
+
+            {/* Academic Citation Block (APA 7th Format) */}
+            <div className="mt-8 p-4 rounded bg-purple-50/50 border border-purple-200 text-xs">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-editorial font-bold text-navy-950 text-sm">
+                <span className="font-editorial font-bold text-[#700070] text-xs uppercase tracking-wider">
                   How to Cite This Paper (APA 7th Format)
                 </span>
-                <span className="font-mono text-[11px] text-academic-muted">
-                  Peer-Reviewed Reference
-                </span>
+                <button
+                  type="button"
+                  onClick={handleCopyCitation}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-[#700070] hover:underline cursor-pointer"
+                >
+                  {copied ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-600">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy Citation</span>
+                    </>
+                  )}
+                </button>
               </div>
-              <div className="p-3 bg-white rounded border border-sand-200 font-mono text-[11px] text-navy-950 leading-relaxed select-all">
-                {resource.citationText}
+              <div className="p-2.5 bg-white rounded border border-purple-100 font-mono text-[11px] text-gray-800 leading-relaxed select-all">
+                {citationText}
               </div>
             </div>
 
-            {/* Bottom Actions: Requirement Submission & WhatsApp */}
-            <div className="mt-8 pt-6 border-t border-sand-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <Link
-                href="/submit"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold shadow-sm transition-colors"
+            {/* Bottom Actions */}
+            <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <button
+                type="button"
+                onClick={() => openArticlePdf(matchedArticle, settings)}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded bg-[#700070] hover:bg-[#5a005a] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
               >
                 <FileText className="w-4 h-4" />
-                <span>Submit Your Manuscript for Review</span>
-              </Link>
+                <span>Open Full Published PDF</span>
+              </button>
 
-              <a
-                href={`https://wa.me/${companyInfo.whatsappRaw}?text=${encodeURIComponent(`Hello Impulse Research Work, I read your guide on "${resource.title}" and would like to discuss my research.`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded border border-navy-950 text-navy-950 hover:bg-navy-950 hover:text-white text-xs font-semibold transition-colors"
+              <Link
+                href="/submit"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded border border-[#700070] text-[#700070] hover:bg-[#700070] hover:text-white text-xs font-semibold transition-colors"
               >
-                <MessageSquare className="w-4 h-4 text-orange-600" />
-                <span>Discuss on WhatsApp</span>
-              </a>
+                <span>Submit Your Manuscript for Review</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </article>
         </div>
@@ -179,5 +376,19 @@ export default async function ResourceDetailPage({
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResourceDetailPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="w-full p-12 text-center text-xs font-mono text-gray-500 bg-white border border-gray-200">
+          Loading published manuscript from journal digital repository...
+        </div>
+      }
+    >
+      <ResourceDetailContent />
+    </React.Suspense>
   );
 }

@@ -59,7 +59,7 @@ export function ArticlePdfButton({
         }
       >
         <FileText className="w-3 h-3 text-current shrink-0" />
-        <span>{article.fileName ? "PDF / DOC" : "PDF"}</span>
+        <span>PDF</span>
       </button>
 
       {modalArticle && (
