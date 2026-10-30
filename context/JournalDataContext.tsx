@@ -235,107 +235,138 @@ const initialHomepage: HomepageData = {
 };
 
 const initialArticlesList: ArticleItem[] = [
-  ...defaultResources.map((r, i) => ({
-    id: i + 1,
-    title: r.title,
-    authors: r.author,
-    volume: r.volume || "Vol. 1",
-    issue: r.issue || "Issue 1",
-    date: r.publishedDate || "August 2026",
-    status: "Published",
-    doi: r.doi || `10.5281/imjsi.2026.01.0${i + 1}`,
-    abstract: r.sections?.[0]?.content || "Abstract indexed in journal record.",
-    views: 142 + i * 27,
-    downloads: Math.max(1, 5 - i),
-  })),
   {
-    id: 7,
+    id: 1,
+    title: "Revival and Adaptation: The Role of Confucianism in Contemporary China",
+    authors: "Khem Chand",
+    volume: "Vol. 1",
+    issue: "Issue 1",
+    date: "August 2026",
+    status: "Published",
+    doi: "10.5281/imjsi.2026.01.01",
+    abstract: "An analytical study investigating the resurgence, institutional adaptation, and state-society dynamics of Confucian philosophy in contemporary Chinese political and cultural discourse.",
+    pages: "pp. 18-23",
+    category: "Philosophy & Cultural Studies",
+    views: 142,
+    downloads: 5,
+  },
+  {
+    id: 2,
+    title: "Confucianism in India: Cross-Cultural Philosophical Dialogues in the 21st Century",
+    authors: "Chanden Kumar Jha",
+    volume: "Vol. 1",
+    issue: "Issue 1",
+    date: "August 2026",
+    status: "Published",
+    doi: "10.5281/imjsi.2026.01.02",
+    abstract: "A comparative exploration examining bilateral intellectual intersections between classical Confucian ethics and Indian philosophical paradigms in the contemporary global era.",
+    pages: "pp. 13-17",
+    category: "Comparative Philosophy",
+    views: 169,
+    downloads: 4,
+  },
+  {
+    id: 3,
     title: "Reforming Human Nature: Xunzi’s Ethical and Political Philosophy",
     authors: "Dr. Sakshi Sharma",
     volume: "Vol. 1",
     issue: "Issue 1",
     date: "August 2026",
     status: "Published",
-    doi: "10.5281/imjsi.2026.01.07",
-    abstract: "An exploration of Xunzi's moral philosophy concerning ritual norms and governance.",
+    doi: "10.5281/imjsi.2026.01.03",
+    abstract: "A critical textual analysis of Xunzi's assertion of inherent human moral ambiguity and the foundational requirement of ritual and institutional discipline for social cohesion.",
+    pages: "pp. 7-12",
+    category: "Classical Political Theory",
     views: 198,
     downloads: 4,
   },
   {
-    id: 8,
+    id: 4,
     title: "A Critical Analysis of Legal and Human Rights of Undertrial Female Prisoners in India",
     authors: "Rahul Sharma",
     volume: "Vol. 1",
     issue: "Issue 1",
     date: "August 2026",
     status: "Published",
-    doi: "10.5281/imjsi.2026.01.08",
-    abstract: "Empirical socio-legal inquiry into undertrial conditions and institutional reform.",
+    doi: "10.5281/imjsi.2026.01.04",
+    abstract: "An empirical socio-legal analysis reviewing statutory protections, prison conditions, judicial precedents, and systemic vulnerabilities confronting female undertrial detainees.",
+    pages: "pp. 1-6",
+    category: "Law & Human Rights",
     views: 220,
     downloads: 6,
   },
   {
-    id: 9,
+    id: 5,
     title: "Decline and Fall: Factors Contributing to the Downfall of the Mughal Empire",
     authors: "Aastha Rani",
     volume: "Vol. 1",
     issue: "Issue 1",
     date: "August 2026",
     status: "Published",
-    doi: "10.5281/imjsi.2026.01.09",
-    abstract: "Historiographical reassessment of agrarian crises and administrative decay.",
+    doi: "10.5281/imjsi.2026.01.05",
+    abstract: "A historiographical reassessment of the fiscal strains, agrarian distress, regional rebellions, and administrative fragmentation that precipitated the decline of the Mughal Empire in 18th-century South Asia.",
+    pages: "pp. 1-12",
+    category: "Historical Inquiries",
     views: 165,
     downloads: 3,
   },
   {
-    id: 10,
+    id: 6,
     title: "The Dynamics of Indian Nationalism: A Historical Analysis Age",
     authors: "Geetanshu",
     volume: "Vol. 1",
     issue: "Issue 1",
     date: "August 2026",
     status: "Published",
-    doi: "10.5281/imjsi.2026.01.10",
-    abstract: "Investigation of regional consciousness and mass mobilization.",
+    doi: "10.5281/imjsi.2026.01.06",
+    abstract: "A critical historical investigation exploring the multifaceted evolutionary trajectories, subaltern voices, and ideological currents that shaped the anti-colonial nationalist movement in India.",
+    pages: "37-41",
+    category: "Modern Indian History",
     views: 184,
     downloads: 2,
   },
   {
-    id: 11,
+    id: 7,
     title: "Digital Financial Inclusion and Rural Empowerment: A Socio-Economic Study",
     authors: "Dr. Neha Verma & Prof. V. K. Rao",
     volume: "Vol. 1",
     issue: "Issue 1",
     date: "August 2026",
     status: "Published",
-    doi: "10.5281/imjsi.2026.01.11",
-    abstract: "Socio-economic evaluation of digital credit and microfinance initiatives.",
+    doi: "10.5281/imjsi.2026.01.07",
+    abstract: "Socio-economic evaluation of digital credit and microfinance initiatives in rural clusters.",
+    pages: "pp. 42-49",
+    category: "Economics & Commerce",
     views: 110,
     downloads: 1,
   },
   {
-    id: 12,
+    id: 8,
     title: "Interdisciplinary Approaches to Sustainable Development in Developing Nations",
     authors: "Dr. Deepak Setia & Research Fellows",
     volume: "Vol. 1",
     issue: "Issue 1",
     date: "August 2026",
     status: "Published",
-    doi: "10.5281/imjsi.2026.01.12",
-    abstract: "Integrated frameworks harmonizing environmental resilience and economic policy.",
+    doi: "10.5281/imjsi.2026.01.08",
+    abstract: "Integrated frameworks harmonizing environmental resilience and economic policy in emerging economies.",
+    pages: "pp. 50-59",
+    category: "Multidisciplinary Studies",
     views: 245,
     downloads: 8,
   },
   {
-    id: 13,
+    id: 9,
     title: "Pedagogical Evolution: Integrating AI and Blended Learning in Higher Education",
     authors: "Pooja Malhotra",
     volume: "Vol. 1",
     issue: "Issue 1",
     date: "August 2026",
     status: "Published",
-    doi: "10.5281/imjsi.2026.01.13",
-    abstract: "Curricular paradigms and ethical considerations in automated higher education.",
+    doi: "10.5281/imjsi.2026.01.09",
+    abstract: "Curricular paradigms and ethical considerations in automated, blended higher education delivery.",
+    pages: "pp. 60-68",
+    category: "Education & Pedagogy",
     views: 190,
     downloads: 5,
   },
@@ -548,7 +579,29 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       if (h) setHomepage(JSON.parse(h));
 
       const art = localStorage.getItem(K_ARTICLES);
-      if (art) setArticles(JSON.parse(art));
+      if (art) {
+        try {
+          const parsed = JSON.parse(art);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const seenIds = new Set<number>();
+            let maxId = 0;
+            const sanitized = parsed.map((item: any, idx: number) => {
+              let id = typeof item.id === "number" && !isNaN(item.id) && item.id > 0 ? item.id : idx + 1;
+              if (seenIds.has(id)) {
+                id = maxId + 1;
+              }
+              seenIds.add(id);
+              if (id > maxId) maxId = id;
+              let doi = item.doi;
+              if (!doi) {
+                doi = `10.5281/imjsi.2026.01.${id < 10 ? `0${id}` : id}`;
+              }
+              return { ...item, id, doi };
+            });
+            setArticles(sanitized);
+          }
+        } catch {}
+      }
 
       const iss = localStorage.getItem(K_ISSUES);
       if (iss) setIssues(JSON.parse(iss));
@@ -626,9 +679,11 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
 
   const addArticle = (art: Omit<ArticleItem, "id" | "views" | "downloads">) => {
     setArticles((prev) => {
+      const nextId = prev.length ? Math.max(...prev.map((p) => p.id || 0)) + 1 : 1;
       const newItem: ArticleItem = {
         ...art,
-        id: prev.length ? Math.max(...prev.map((p) => p.id)) + 1 : 1,
+        id: nextId,
+        doi: art.doi || `10.5281/imjsi.2026.01.${nextId < 10 ? `0${nextId}` : nextId}`,
         views: 0,
         downloads: 0,
       };

@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useJournalData, ArticleItem } from "@/context/JournalDataContext";
 import { resources } from "@/data/resources";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ArticlePdfButton } from "@/components/ui/ArticlePdfButton";
-import { openArticlePdf } from "@/utils/pdfHelper";
+import { openArticlePdf, getArticlePdfBlobUrl } from "@/utils/pdfHelper";
+import { getArticleUrl } from "@/utils/articleHelper";
 import {
   Calendar,
   FileText,
@@ -19,6 +20,7 @@ import {
   ExternalLink,
   BookOpen,
   Search,
+  Download,
 } from "lucide-react";
 
 function ResourceDetailContent() {
@@ -26,38 +28,66 @@ function ResourceDetailContent() {
   const rawSlug = (params?.slug as string) || "";
   const { articles, settings } = useJournalData();
   const [copied, setCopied] = useState(false);
+  const [pdfInfo, setPdfInfo] = useState<{
+    url: string;
+    isBlob: boolean;
+    mimeType: string;
+    isDocx: boolean;
+  } | null>(null);
 
   // Clean slug
   const cleanSlug = decodeURIComponent(rawSlug).toLowerCase().trim();
 
-  // Search across live articles and static resources
-  let matchedArticle: Partial<ArticleItem> | null =
-    articles.find(
-      (a) =>
-        a.doi &&
-        a.doi.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase() === cleanSlug
-    ) || null;
+  // Search across live articles using foolproof ID and exact DOI matching
+  let matchedArticle: Partial<ArticleItem> | null = null;
 
-  if (!matchedArticle) {
-    matchedArticle =
-      articles.find((a) => a.doi && a.doi.toLowerCase() === cleanSlug) || null;
+  // 1. Match by unambiguous ID prefix (e.g. "art-6-...", "article-6-...", "art-10")
+  const explicitArtMatch =
+    cleanSlug.match(/^art(?:icle)?-(\d+)(?:-|$)/) ||
+    cleanSlug.match(/^id-(\d+)(?:-|$)/);
+  if (explicitArtMatch) {
+    const targetId = parseInt(explicitArtMatch[1], 10);
+    matchedArticle = articles.find((a) => a.id === targetId) || null;
   }
 
-  if (!matchedArticle) {
-    matchedArticle =
-      articles.find((a) => String(a.id) === cleanSlug) || null;
-  }
-
+  // 2. Match exact clean DOI (e.g. "10-5281-imjsi-2026-01-06")
   if (!matchedArticle) {
     matchedArticle =
       articles.find(
         (a) =>
-          a.title &&
-          a.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") === cleanSlug
+          a.doi &&
+          (a.doi.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase() === cleanSlug ||
+            a.doi.toLowerCase() === cleanSlug)
       ) || null;
   }
 
-  // Check static resources
+  // 3. Match numeric ID from slug prefix ONLY IF it is not a DOI (DOIs start with 10- / 10.)
+  if (
+    !matchedArticle &&
+    !cleanSlug.startsWith("10-") &&
+    !cleanSlug.startsWith("10.")
+  ) {
+    const numPrefix = cleanSlug.match(/^(\d+)(?:-|$)/);
+    if (numPrefix) {
+      const targetId = parseInt(numPrefix[1], 10);
+      matchedArticle = articles.find((a) => a.id === targetId) || null;
+    }
+  }
+
+  // 4. Match exact title slug
+  if (!matchedArticle) {
+    matchedArticle =
+      articles.find((a) => {
+        if (!a.title) return false;
+        const tSlug = a.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+        return tSlug === cleanSlug || cleanSlug.startsWith(tSlug.slice(0, 40));
+      }) || null;
+  }
+
+  // 5. Check static resources (fallback if not in live database)
   const staticResource = resources.find(
     (r) =>
       r.slug.toLowerCase() === cleanSlug ||
@@ -79,18 +109,48 @@ function ResourceDetailContent() {
     };
   }
 
-  // Partial / fuzzy match fallback
-  if (!matchedArticle) {
-    matchedArticle =
-      articles.find((a) => {
-        const d = (a.doi || "").replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
-        return (
-          (d && cleanSlug.includes(d)) ||
-          (d && d.includes(cleanSlug)) ||
-          (a.title && cleanSlug.includes(a.title.toLowerCase().slice(0, 15)))
-        );
-      }) || null;
-  }
+  // Setup PDF info hook safely at top level
+  useEffect(() => {
+    if (!matchedArticle) {
+      setPdfInfo(null);
+      return;
+    }
+    const info = getArticlePdfBlobUrl(matchedArticle, settings);
+    setPdfInfo(info);
+
+    return () => {
+      if (info && info.isBlob) {
+        URL.revokeObjectURL(info.url);
+      }
+    };
+  }, [
+    matchedArticle?.id,
+    matchedArticle?.title,
+    matchedArticle?.fileData,
+    matchedArticle?.pdfUrl,
+    settings,
+  ]);
+
+  // Construct citation
+  const authorsText = matchedArticle?.authors || "Editorial Staff";
+  const pubYear = "2026";
+  const journalTitle =
+    settings.journalTitle ||
+    "Manthan: International Multidisciplinary Journal of Social Inquiry";
+  const citationText = matchedArticle
+    ? `${authorsText} (${pubYear}). ${matchedArticle.title}. ${journalTitle}, ${
+        matchedArticle.volume || "1"
+      }(${(matchedArticle.issue || "1").replace(/[^0-9]/g, "") || "1"}), ${
+        matchedArticle.doi || "10.5281/imjsi"
+      }.`
+    : "";
+
+  const handleCopyCitation = () => {
+    if (!citationText) return;
+    navigator.clipboard.writeText(citationText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // If article not found, show elegant fallback reader rather than 404
   if (!matchedArticle) {
@@ -138,7 +198,7 @@ function ResourceDetailContent() {
                     >
                       <div>
                         <Link
-                          href={`/resources/${a.doi.replace(/[^a-zA-Z0-9]/g, "-")}`}
+                          href={getArticleUrl(a)}
                           className="font-bold text-gray-900 hover:text-[#700070] line-clamp-1"
                         >
                           {a.title}
@@ -159,18 +219,6 @@ function ResourceDetailContent() {
       </div>
     );
   }
-
-  // Construct citation
-  const authorsText = matchedArticle.authors || "Editorial Staff";
-  const pubYear = "2026";
-  const journalTitle = settings.journalTitle || "Manthan: International Multidisciplinary Journal of Social Inquiry";
-  const citationText = `${authorsText} (${pubYear}). ${matchedArticle.title}. ${journalTitle}, ${matchedArticle.volume || "1"}(${(matchedArticle.issue || "1").replace(/[^0-9]/g, "") || "1"}), ${matchedArticle.doi || "10.5281/imjsi"}.`;
-
-  const handleCopyCitation = () => {
-    navigator.clipboard.writeText(citationText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <div className="w-full">
@@ -266,7 +314,7 @@ function ResourceDetailContent() {
 
             {/* Article Content / Scholarly Inquiry Sections */}
             <div className="space-y-6 text-xs sm:text-sm text-gray-800 leading-relaxed font-sans">
-              {staticResource?.sections ? (
+              {staticResource && matchedArticle.title?.toLowerCase().trim() === staticResource.title?.toLowerCase().trim() && staticResource.sections ? (
                 staticResource.sections.map((section, idx) => (
                   <section key={idx} className="space-y-2">
                     <h2 className="font-editorial text-base sm:text-lg font-bold text-gray-900">
@@ -305,6 +353,63 @@ function ResourceDetailContent() {
                   </section>
                 </>
               )}
+            </div>
+
+            {/* Embedded Live PDF Document Reader */}
+            <div className="mt-8 border border-gray-300 rounded overflow-hidden shadow-xs">
+              <div className="bg-[#700070] text-white px-4 py-2.5 flex items-center justify-between text-xs font-bold">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-purple-200" />
+                  <span>
+                    {matchedArticle.fileData
+                      ? `Attached Manuscript Document: ${matchedArticle.fileName || "manuscript.pdf"}`
+                      : "Official Academic Galley Publication"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openArticlePdf(matchedArticle, settings)}
+                    className="px-2.5 py-1 bg-white/20 hover:bg-white/30 rounded text-[11px] font-semibold transition-colors cursor-pointer inline-flex items-center gap-1"
+                  >
+                    <span>Open in Full Tab</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="w-full h-[650px] bg-slate-100">
+                {pdfInfo?.isDocx ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-white">
+                    <FileText className="w-16 h-16 text-[#700070] mb-4" />
+                    <h4 className="text-lg font-bold text-slate-900 mb-2">
+                      Word Manuscript Document
+                    </h4>
+                    <p className="text-xs text-slate-600 max-w-md mb-6">
+                      This paper was uploaded as a Word Document ({matchedArticle.fileName || "manuscript.docx"}).
+                      Download it below to view in Microsoft Word, WPS, or Google Docs.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => openArticlePdf(matchedArticle, settings)}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#700070] text-white rounded font-bold text-xs shadow hover:bg-[#5a005a] transition-colors cursor-pointer"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download {matchedArticle.fileName || "Manuscript Document"}
+                    </button>
+                  </div>
+                ) : pdfInfo?.url ? (
+                  <iframe
+                    src={pdfInfo.url}
+                    title={matchedArticle.title || "Academic Galley Document"}
+                    className="w-full h-full border-0 bg-white"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-gray-500 font-mono">
+                    Loading academic galley document...
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Keywords */}

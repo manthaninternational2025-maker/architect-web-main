@@ -6,6 +6,7 @@ import { useJournalData, ArticleItem } from "@/context/JournalDataContext";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ArticlePdfButton } from "@/components/ui/ArticlePdfButton";
 import { ArticlePdfModal } from "@/components/ui/ArticlePdfModal";
+import { getArticleUrl } from "@/utils/articleHelper";
 import { FileText, Calendar, User, Mail, ArrowRight } from "lucide-react";
 
 export default function CurrentPage() {
@@ -51,7 +52,7 @@ export default function CurrentPage() {
             {publishedArticles.map((art) => (
               <div key={art.id} className="py-3.5 first:pt-0 last:pb-0">
                 <h3 className="font-editorial text-sm sm:text-base font-bold text-gray-900 hover:text-[#700070] mb-1 leading-snug">
-                  <Link href={`/resources/${(art.doi || String(art.id)).replace(/[^a-zA-Z0-9]/g, "-")}`}>
+                  <Link href={getArticleUrl(art)}>
                     {art.title}
                   </Link>
                 </h3>
@@ -71,7 +72,7 @@ export default function CurrentPage() {
                       <span className="font-mono text-[11px] text-gray-500">{art.pages}</span>
                     )}
                     <Link
-                      href={`/resources/${(art.doi || String(art.id)).replace(/[^a-zA-Z0-9]/g, "-")}`}
+                      href={getArticleUrl(art)}
                       className="px-2 py-0.5 border border-gray-300 text-gray-700 hover:border-[#700070] hover:text-[#700070] text-[11px] font-medium transition-colors"
                     >
                       Abstract
