@@ -184,6 +184,7 @@ export default function AdminPage() {
   const [newMemberForm, setNewMemberForm] = useState({
     name: "",
     role: "Editorial Board Member",
+    designation: "Assistant Professor",
     affiliation: "",
     email: "",
     specialization: "",
@@ -192,6 +193,7 @@ export default function AdminPage() {
     bio: "",
     orcid: "",
     phone: "",
+    websiteUrl: "",
   });
 
   // -------------------------------------------------------------
@@ -460,6 +462,7 @@ export default function AdminPage() {
     const newM = {
       name: newMemberForm.name,
       role: newMemberForm.role,
+      designation: newMemberForm.designation,
       affiliation: newMemberForm.affiliation,
       email: newMemberForm.email,
       specialization: newMemberForm.specialization,
@@ -468,12 +471,14 @@ export default function AdminPage() {
       bio: newMemberForm.bio,
       orcid: newMemberForm.orcid,
       phone: newMemberForm.phone,
+      websiteUrl: newMemberForm.websiteUrl,
     };
     addMember(newM);
     setNewMemberModal(false);
     setNewMemberForm({
       name: "",
       role: "Editorial Board Member",
+      designation: "Assistant Professor",
       affiliation: "",
       email: "",
       specialization: "",
@@ -482,6 +487,7 @@ export default function AdminPage() {
       bio: "",
       orcid: "",
       phone: "",
+      websiteUrl: "",
     });
     showToast("New editorial member added and live on board!");
   };
@@ -1500,29 +1506,6 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              {/* Informative Guidance Banner */}
-              <div className="bg-gradient-to-r from-purple-50 via-fuchsia-50/40 to-purple-50/30 border border-purple-200/90 rounded-lg p-3 text-xs text-purple-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-2xs">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-[#700070] text-white rounded-md shrink-0 shadow-xs">
-                    <Move className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-xs text-purple-950 flex flex-wrap items-center gap-1.5">
-                      <span>Manual Card Arrangement Enabled</span>
-                      <span className="text-[10px] bg-purple-200/80 text-[#700070] font-mono px-1.5 py-0.2 rounded font-bold">
-                        Upar • Niche • Daye • Baye
-                      </span>
-                    </p>
-                    <p className="text-[11px] text-purple-800/90 mt-0.5">
-                      Kisi bhi card ko <strong>uthakar (drag &amp; drop)</strong> kisi bhi jagah arrange karein, ya card par diye gaye <strong>arrows (← ↑ ↓ →)</strong> se ek-ek step adjust karein.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0 font-mono text-[11px] text-purple-700 bg-white border border-purple-200 px-2.5 py-1 rounded-md font-semibold">
-                  <GripVertical className="w-3.5 h-3.5 text-[#700070]" />
-                  <span>Total: {editorialMembers.length} Members</span>
-                </div>
-              </div>
 
               {/* Grid of Draggable Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
@@ -1633,9 +1616,25 @@ export default function AdminPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center justify-between gap-1">
                             <span className="font-bold text-sm text-slate-900 truncate">{m.name}</span>
-                            <span className="text-[10px] text-purple-800 bg-purple-50 font-semibold px-2 py-0.5 rounded shrink-0">
-                              {m.role}
-                            </span>
+                            <div className="flex flex-wrap items-center gap-1 shrink-0">
+                              {(m.name.toLowerCase().includes("deepak setia") ||
+                                m.role.toLowerCase().includes("editor") ||
+                                m.role.toLowerCase().includes("board") ||
+                                m.role.toLowerCase().includes("advisor")) && (
+                                <span className="text-[10px] font-bold text-white bg-[#700070] px-2 py-0.5 rounded shadow-2xs">
+                                  {m.name.toLowerCase().includes("deepak setia")
+                                    ? "Editor-in-Chief"
+                                    : m.role}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-purple-900 bg-purple-100 border border-purple-200 font-semibold px-2 py-0.5 rounded">
+                                {m.designation ||
+                                  (m.role.toLowerCase().includes("assistant") ||
+                                  m.role.toLowerCase().includes("professor")
+                                    ? m.role
+                                    : "Assistant Professor")}
+                              </span>
+                            </div>
                           </div>
                           <div className="text-slate-600 text-xs mt-0.5 font-medium">{m.affiliation}</div>
                           {m.specialization && (
@@ -1648,6 +1647,38 @@ export default function AdminPage() {
                               {m.email}
                             </div>
                           )}
+
+                          {/* Official Website Link */}
+                          {m.websiteUrl ? (
+                            <div className="mt-1">
+                              <a
+                                href={m.websiteUrl.startsWith("http") ? m.websiteUrl : `https://${m.websiteUrl}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#700070] hover:underline"
+                                title={`Visit official website of ${m.name}`}
+                              >
+                                <Globe className="w-3 h-3 text-[#700070]" />
+                                <span>Visit Website ↗</span>
+                              </a>
+                            </div>
+                          ) : (
+                            <div className="mt-1">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingMember({ ...m });
+                                }}
+                                className="inline-flex items-center gap-1 text-[10px] text-slate-400 hover:text-[#700070] border border-dashed border-slate-300 hover:border-[#700070] px-1.5 py-0.5 rounded transition-colors cursor-pointer"
+                              >
+                                <Globe className="w-2.5 h-2.5" />
+                                <span>+ Add Website</span>
+                              </button>
+                            </div>
+                          )}
+
                           {m.orcid && (
                             <div className="text-purple-700 text-[10px] font-mono mt-0.5 truncate">
                               ORCID: {m.orcid}
@@ -3626,39 +3657,68 @@ export default function AdminPage() {
               </div>
 
               {/* Role / Designation */}
+              {/* Role & Academic Designation */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Quick Role Preset</label>
-                  <select
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        setNewMemberForm({ ...newMemberForm, role: e.target.value });
-                      }
-                    }}
-                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white"
-                  >
-                    <option value="">-- Select Preset Role --</option>
-                    <option value="Editor-in-Chief">Editor-in-Chief</option>
-                    <option value="Managing Editor">Managing Editor</option>
-                    <option value="Associate Editor">Associate Editor</option>
-                    <option value="Executive Editor">Executive Editor</option>
-                    <option value="Editorial Board Member">Editorial Board Member</option>
-                    <option value="Senior Advisory Board Member">Senior Advisory Board Member</option>
-                  </select>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Journal Role <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="space-y-1.5">
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setNewMemberForm({ ...newMemberForm, role: e.target.value });
+                        }
+                      }}
+                      className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                    >
+                      <option value="">-- Select Preset Role --</option>
+                      <option value="Editor-in-Chief">Editor-in-Chief</option>
+                      <option value="Associate Editor">Associate Editor</option>
+                      <option value="Editorial Board Member">Editorial Board Member</option>
+                      <option value="Senior Advisory Board Member">Senior Advisory Board Member</option>
+                      <option value="Executive Reviewer">Executive Reviewer</option>
+                    </select>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Editor-in-Chief"
+                      value={newMemberForm.role}
+                      onChange={(e) => setNewMemberForm({ ...newMemberForm, role: e.target.value })}
+                      className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
+                    />
+                  </div>
                 </div>
 
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
-                    Designation / Title <span className="text-rose-500">*</span>
+                    Academic Designation (Post) <span className="text-rose-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Editor-in-Chief"
-                    value={newMemberForm.role}
-                    onChange={(e) => setNewMemberForm({ ...newMemberForm, role: e.target.value })}
-                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
-                  />
+                  <div className="space-y-1.5">
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setNewMemberForm({ ...newMemberForm, designation: e.target.value });
+                        }
+                      }}
+                      className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                    >
+                      <option value="">-- Select Academic Post --</option>
+                      <option value="Assistant Professor">Assistant Professor</option>
+                      <option value="Associate Professor">Associate Professor</option>
+                      <option value="Professor">Professor</option>
+                      <option value="Professor & Head">Professor & Head</option>
+                      <option value="Senior Research Fellow">Senior Research Fellow</option>
+                    </select>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Assistant Professor"
+                      value={newMemberForm.designation}
+                      onChange={(e) => setNewMemberForm({ ...newMemberForm, designation: e.target.value })}
+                      className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -3700,6 +3760,20 @@ export default function AdminPage() {
                     className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
                   />
                 </div>
+              </div>
+
+              {/* Official Website URL */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Official Website / Faculty Profile Link (Optional)
+                </label>
+                <input
+                  type="url"
+                  placeholder="e.g. https://rlacollege.edu.in/faculty/dr-deepak-setia"
+                  value={newMemberForm.websiteUrl}
+                  onChange={(e) => setNewMemberForm({ ...newMemberForm, websiteUrl: e.target.value })}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
+                />
               </div>
 
               {/* ORCID & Phone */}
@@ -3854,39 +3928,68 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* Role / Designation */}
+              {/* Role & Academic Designation */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Quick Role Preset</label>
-                  <select
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        setEditingMember({ ...editingMember, role: e.target.value });
-                      }
-                    }}
-                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white"
-                  >
-                    <option value="">-- Choose Role Preset --</option>
-                    <option value="Editor-in-Chief">Editor-in-Chief</option>
-                    <option value="Managing Editor">Managing Editor</option>
-                    <option value="Associate Editor">Associate Editor</option>
-                    <option value="Executive Editor">Executive Editor</option>
-                    <option value="Editorial Board Member">Editorial Board Member</option>
-                    <option value="Senior Advisory Board Member">Senior Advisory Board Member</option>
-                  </select>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Journal Role <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="space-y-1.5">
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setEditingMember({ ...editingMember, role: e.target.value });
+                        }
+                      }}
+                      className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                    >
+                      <option value="">-- Choose Role Preset --</option>
+                      <option value="Editor-in-Chief">Editor-in-Chief</option>
+                      <option value="Associate Editor">Associate Editor</option>
+                      <option value="Editorial Board Member">Editorial Board Member</option>
+                      <option value="Senior Advisory Board Member">Senior Advisory Board Member</option>
+                      <option value="Executive Reviewer">Executive Reviewer</option>
+                    </select>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Editor-in-Chief"
+                      value={editingMember.role || ""}
+                      onChange={(e) => setEditingMember({ ...editingMember, role: e.target.value })}
+                      className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
+                    />
+                  </div>
                 </div>
 
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">
-                    Designation / Title <span className="text-rose-500">*</span>
+                    Academic Designation (Post) <span className="text-rose-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={editingMember.role}
-                    onChange={(e) => setEditingMember({ ...editingMember, role: e.target.value })}
-                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
-                  />
+                  <div className="space-y-1.5">
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setEditingMember({ ...editingMember, designation: e.target.value });
+                        }
+                      }}
+                      className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                    >
+                      <option value="">-- Select Academic Post --</option>
+                      <option value="Assistant Professor">Assistant Professor</option>
+                      <option value="Associate Professor">Associate Professor</option>
+                      <option value="Professor">Professor</option>
+                      <option value="Professor & Head">Professor & Head</option>
+                      <option value="Senior Research Fellow">Senior Research Fellow</option>
+                    </select>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Assistant Professor"
+                      value={editingMember.designation || ""}
+                      onChange={(e) => setEditingMember({ ...editingMember, designation: e.target.value })}
+                      className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-medium"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -3898,7 +4001,7 @@ export default function AdminPage() {
                 <input
                   type="text"
                   required
-                  value={editingMember.affiliation}
+                  value={editingMember.affiliation || ""}
                   onChange={(e) => setEditingMember({ ...editingMember, affiliation: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070] text-xs"
                 />
@@ -3925,6 +4028,20 @@ export default function AdminPage() {
                     className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
                   />
                 </div>
+              </div>
+
+              {/* Official Website URL */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Official Website / Faculty Profile Link (Optional)
+                </label>
+                <input
+                  type="url"
+                  placeholder="e.g. https://rlacollege.edu.in/faculty/dr-deepak-setia"
+                  value={editingMember.websiteUrl || ""}
+                  onChange={(e) => setEditingMember({ ...editingMember, websiteUrl: e.target.value })}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:border-[#700070] text-xs font-mono"
+                />
               </div>
 
               {/* ORCID & Phone */}

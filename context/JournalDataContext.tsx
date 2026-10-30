@@ -77,7 +77,8 @@ export interface IssueItem {
 export interface EditorialMember {
   id: number;
   name: string;
-  role: string;
+  role: string; // Journal Editorial Role (e.g. Editor-in-Chief, Associate Editor)
+  designation?: string; // Academic Post (e.g. Assistant Professor, Professor)
   affiliation: string;
   email: string;
   specialization?: string;
@@ -86,6 +87,7 @@ export interface EditorialMember {
   bio?: string;
   orcid?: string;
   phone?: string;
+  websiteUrl?: string; // Official Academic / Faculty Profile Link
 }
 
 export interface AuthorInstructionsData {
@@ -365,57 +367,81 @@ const initialMembers: EditorialMember[] = [
     id: 1,
     name: "Dr. Deepak Setia",
     role: "Editor-in-Chief",
-    affiliation: "Impulse Publication Works",
-    email: defaultCompanyInfo.email,
-    specialization: "Social Sciences & Interdisciplinary Inquiry",
+    designation: "Assistant Professor",
+    affiliation: "Department of Political Science, Ram Lal Anand College, University of Delhi",
+    email: "deepak.polsc@rla.du.ac.in",
+    specialization: "Political Science",
+    websiteUrl: "https://rlacollege.edu.in",
   },
   {
     id: 2,
-    name: "Dr. S. K. Mukherjee",
-    role: "Associate Editor",
-    affiliation: "Department of Social Sciences, Delhi",
-    email: "associate.editor1@manthanjournal.com",
-    specialization: "Economics & Public Policy",
+    name: "Dr. Archana Kumari",
+    role: "Editorial Board Member",
+    designation: "Assistant Professor",
+    affiliation: "Department of History, Indraprastha College for Women, University of Delhi",
+    email: "archana.history@ip.du.ac.in",
+    specialization: "History",
+    websiteUrl: "https://ipcollege.ac.in",
   },
   {
     id: 3,
-    name: "Prof. Priya Nair",
-    role: "Senior Editorial Advisor",
-    affiliation: "Center for Advanced Humanities",
-    email: "advisor.sociology@manthanjournal.com",
-    specialization: "Sociology & Gender Studies",
+    name: "Dr. Vikash Yadav",
+    role: "Editorial Board Member",
+    designation: "Assistant Professor",
+    affiliation: "Department of Political Science at the School of Liberal Education, Galgotias University",
+    email: "vikash.yadav@galgotiasuniversity.edu.in",
+    specialization: "Political Science",
+    websiteUrl: "https://www.galgotiasuniversity.edu.in",
   },
   {
     id: 4,
-    name: "Dr. Rajeshwar Sharma",
+    name: "Dr. Amarjeet Singh",
     role: "Editorial Board Member",
-    affiliation: "Faculty of Law",
-    email: "editorial.law@manthanjournal.com",
-    specialization: "Law & Jurisprudence",
+    designation: "Assistant Professor",
+    affiliation: "Department of Zoology, Sri Venkateswara College, University of Delhi",
+    email: "amarjeet@svc.ac.in",
+    specialization: "Zoology",
+    websiteUrl: "https://www.svc.ac.in",
   },
   {
     id: 5,
-    name: "Dr. Ananya Roy",
-    role: "Executive Reviewer",
-    affiliation: "Institute of Social Inquiry",
-    email: "reviewer.roy@manthanjournal.com",
-    specialization: "Political Science & International Relations",
+    name: "Dr. Gajendra",
+    role: "Editorial Board Member",
+    designation: "Assistant Professor",
+    affiliation: "Centre for Diaspora Studies, Central University of Gujarat",
+    email: "gajendra@cug.ac.in",
+    specialization: "Diaspora Studies",
+    websiteUrl: "https://cug.ac.in",
   },
   {
     id: 6,
-    name: "Prof. Michael H. Adams",
-    role: "International Advisory Board",
-    affiliation: "School of Global Cultural Studies",
-    email: "adams.intl@manthanjournal.com",
-    specialization: "Comparative Philosophy",
+    name: "Dr. Sudipto Mitra (PhD, London), FRAS",
+    role: "Editorial Board Member",
+    designation: "Assistant Professor",
+    affiliation: "Department of History, Pachhunga University College, Mizoram University",
+    email: "sudipto.boulevardier@gmail.com",
+    specialization: "History",
+    websiteUrl: "https://pucollege.edu.in",
   },
   {
     id: 7,
-    name: "Dr. Tarun Sen",
-    role: "Managing Editorial Secretary",
-    affiliation: "Impulse Publication Works",
-    email: "editorial.desk@impulseresearchwork.com",
-    specialization: "Editorial Management & Scholarly Communications",
+    name: "Dr. Anisha Kaul",
+    role: "Editorial Board Member",
+    designation: "Assistant Professor",
+    affiliation: "Department of English, Indraprastha College for Women, University of Delhi",
+    email: "anishakaul@ip.du.ac.in",
+    specialization: "English",
+    websiteUrl: "https://ipcollege.ac.in",
+  },
+  {
+    id: 8,
+    name: "Dr. Kumar Saurabh",
+    role: "Editorial Board Member",
+    designation: "Assistant Professor",
+    affiliation: "Department of History, Miranda House College, University of Delhi",
+    email: "kumar.saurabh@mirandahouse.ac.in",
+    specialization: "History",
+    websiteUrl: "https://www.mirandahouse.ac.in",
   },
 ];
 
@@ -524,7 +550,28 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       if (iss) setIssues(JSON.parse(iss));
 
       const m = localStorage.getItem(K_MEMBERS);
-      if (m) setMembers(JSON.parse(m));
+      if (m) {
+        try {
+          const parsed = JSON.parse(m);
+          const normalized = parsed.map((item: EditorialMember) => {
+            if (item.name.toLowerCase().includes("deepak setia")) {
+              return {
+                ...item,
+                role: "Editor-in-Chief",
+                designation: item.designation || "Assistant Professor",
+                websiteUrl: item.websiteUrl || "https://rlacollege.edu.in",
+              };
+            }
+            if (!item.designation) {
+              item.designation = "Assistant Professor";
+            }
+            return item;
+          });
+          setMembers(normalized);
+        } catch {
+          setMembers(JSON.parse(m));
+        }
+      }
 
       const ins = localStorage.getItem(K_INSTRUCT);
       if (ins) setInstructions(JSON.parse(ins));

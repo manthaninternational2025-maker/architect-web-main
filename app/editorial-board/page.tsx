@@ -3,7 +3,7 @@
 import React from "react";
 import { useJournalData } from "@/context/JournalDataContext";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { Mail } from "lucide-react";
+import { Mail, Globe, ExternalLink } from "lucide-react";
 
 export default function EditorialBoardPage() {
   const { members, settings } = useJournalData();
@@ -39,13 +39,34 @@ export default function EditorialBoardPage() {
                   )}
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center justify-between gap-1">
+                    <div className="flex flex-wrap items-center justify-between gap-1.5">
                       <div className="font-bold text-gray-900 text-sm sm:text-base">
                         {member.name}
                       </div>
-                      <span className="text-[10px] font-bold text-purple-900 bg-purple-100 px-2 py-0.5 rounded shrink-0">
-                        {member.role}
-                      </span>
+
+                      {/* Dual Badges: Journal Editorial Role + Academic Post */}
+                      <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                        {/* Editor-in-Chief / Journal Role Badge */}
+                        {(member.name.toLowerCase().includes("deepak setia") ||
+                          member.role.toLowerCase().includes("editor") ||
+                          member.role.toLowerCase().includes("board") ||
+                          member.role.toLowerCase().includes("advisor")) && (
+                          <span className="text-[10px] font-bold text-white bg-[#700070] px-2 py-0.5 rounded shadow-2xs tracking-wide">
+                            {member.name.toLowerCase().includes("deepak setia")
+                              ? "Editor-in-Chief"
+                              : member.role}
+                          </span>
+                        )}
+
+                        {/* Academic Designation Badge (e.g. Assistant Professor) */}
+                        <span className="text-[10px] font-semibold text-purple-900 bg-purple-100 border border-purple-200 px-2 py-0.5 rounded">
+                          {member.designation ||
+                            (member.role.toLowerCase().includes("assistant") ||
+                            member.role.toLowerCase().includes("professor")
+                              ? member.role
+                              : "Assistant Professor")}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="text-gray-700 font-medium mt-1">
@@ -64,7 +85,7 @@ export default function EditorialBoardPage() {
                       </p>
                     )}
 
-                    <div className="mt-2 flex flex-wrap items-center gap-3 text-gray-600 font-mono text-[11px]">
+                    <div className="mt-2.5 flex flex-wrap items-center gap-4 text-gray-600 font-mono text-[11px]">
                       {member.email && (
                         <div className="flex items-center gap-1">
                           <Mail className="w-3.5 h-3.5 text-[#700070]" />
@@ -73,6 +94,21 @@ export default function EditorialBoardPage() {
                           </a>
                         </div>
                       )}
+
+                      {/* Official Website / Profile Link */}
+                      {member.websiteUrl && (
+                        <a
+                          href={member.websiteUrl.startsWith("http") ? member.websiteUrl : `https://${member.websiteUrl}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-bold text-[#700070] hover:text-[#550055] hover:underline"
+                          title={`Visit official website of ${member.name}`}
+                        >
+                          <Globe className="w-3.5 h-3.5" />
+                          <span>Visit Website ↗</span>
+                        </a>
+                      )}
+
                       {member.orcid && (
                         <a
                           href={member.orcid.startsWith("http") ? member.orcid : `https://orcid.org/${member.orcid}`}
