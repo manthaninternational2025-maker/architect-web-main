@@ -162,6 +162,7 @@ interface JournalDataContextType {
   addMember: (m: Omit<EditorialMember, "id">) => void;
   updateMember: (m: EditorialMember) => void;
   deleteMember: (id: number) => void;
+  reorderMembers: (newMembers: EditorialMember[]) => void;
   instructions: AuthorInstructionsData;
   updateInstructions: (data: Partial<AuthorInstructionsData>) => void;
   ethics: PublicationEthicsData;
@@ -677,6 +678,13 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
     });
   };
 
+  const reorderMembers = (newMembers: EditorialMember[]) => {
+    setMembers(newMembers);
+    try {
+      localStorage.setItem(K_MEMBERS, JSON.stringify(newMembers));
+    } catch {}
+  };
+
   const updateInstructions = (data: Partial<AuthorInstructionsData>) => {
     setInstructions((prev) => {
       const updated = { ...prev, ...data };
@@ -800,6 +808,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
         addMember,
         updateMember,
         deleteMember,
+        reorderMembers,
         instructions,
         updateInstructions,
         ethics,

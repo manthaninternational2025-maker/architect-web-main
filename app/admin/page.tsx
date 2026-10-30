@@ -28,6 +28,11 @@ import {
   Search,
   CheckCircle2,
   ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  ArrowDown,
+  GripVertical,
+  Move,
   Edit3,
   Trash2,
   Save,
@@ -109,6 +114,7 @@ export default function AdminPage() {
     addMember,
     updateMember,
     deleteMember,
+    reorderMembers,
     instructions,
     updateInstructions,
     ethics,
@@ -485,6 +491,67 @@ export default function AdminPage() {
     updateMember(editingMember);
     setEditingMember(null);
     showToast("Editorial member updated and saved live!");
+  };
+
+  // -------------------------------------------------------------
+  // EDITORIAL BOARD DRAG & DROP & DIRECTIONAL ARRANGE HELPERS
+  // -------------------------------------------------------------
+  const [draggedMemberIndex, setDraggedMemberIndex] = useState<number | null>(null);
+  const [dragOverMemberIndex, setDragOverMemberIndex] = useState<number | null>(null);
+
+  const moveMember = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex || toIndex < 0 || toIndex >= editorialMembers.length) return;
+    const updated = [...editorialMembers];
+    const [movedItem] = updated.splice(fromIndex, 1);
+    updated.splice(toIndex, 0, movedItem);
+    reorderMembers(updated);
+    showToast(`"${movedItem.name}" position updated (#${toIndex + 1}) live on website!`);
+  };
+
+  const moveMemberLeft = (index: number) => {
+    if (index > 0) moveMember(index, index - 1);
+  };
+
+  const moveMemberRight = (index: number) => {
+    if (index < editorialMembers.length - 1) moveMember(index, index + 1);
+  };
+
+  const moveMemberUp = (index: number) => {
+    const target = index >= 2 ? index - 2 : Math.max(0, index - 1);
+    moveMember(index, target);
+  };
+
+  const moveMemberDown = (index: number) => {
+    const target = index + 2 < editorialMembers.length ? index + 2 : Math.min(editorialMembers.length - 1, index + 1);
+    moveMember(index, target);
+  };
+
+  const handleMemberDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedMemberIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", index.toString());
+  };
+
+  const handleMemberDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (dragOverMemberIndex !== index) {
+      setDragOverMemberIndex(index);
+    }
+  };
+
+  const handleMemberDrop = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    if (draggedMemberIndex !== null && draggedMemberIndex !== targetIndex) {
+      moveMember(draggedMemberIndex, targetIndex);
+    }
+    setDraggedMemberIndex(null);
+    setDragOverMemberIndex(null);
+  };
+
+  const handleMemberDragEnd = () => {
+    setDraggedMemberIndex(null);
+    setDragOverMemberIndex(null);
   };
 
   // Sidebar navigation configuration
@@ -1436,55 +1503,164 @@ export default function AdminPage() {
                 </button>
               </div>
 
+              {/* Informative Guidance Banner */}
+              <div className="bg-gradient-to-r from-purple-50 via-fuchsia-50/40 to-purple-50/30 border border-purple-200/90 rounded-lg p-3 text-xs text-purple-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-2xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 bg-[#700070] text-white rounded-md shrink-0 shadow-xs">
+                    <Move className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-xs text-purple-950 flex flex-wrap items-center gap-1.5">
+                      <span>Manual Card Arrangement Enabled</span>
+                      <span className="text-[10px] bg-purple-200/80 text-[#700070] font-mono px-1.5 py-0.2 rounded font-bold">
+                        Upar • Niche • Daye • Baye
+                      </span>
+                    </p>
+                    <p className="text-[11px] text-purple-800/90 mt-0.5">
+                      Kisi bhi card ko <strong>uthakar (drag &amp; drop)</strong> kisi bhi jagah arrange karein, ya card par diye gaye <strong>arrows (← ↑ ↓ →)</strong> se ek-ek step adjust karein.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0 font-mono text-[11px] text-purple-700 bg-white border border-purple-200 px-2.5 py-1 rounded-md font-semibold">
+                  <GripVertical className="w-3.5 h-3.5 text-[#700070]" />
+                  <span>Total: {editorialMembers.length} Members</span>
+                </div>
+              </div>
+
+              {/* Grid of Draggable Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                {editorialMembers.map((m) => (
+                {editorialMembers.map((m, index) => (
                   <div
                     key={m.id}
-                    className="border border-slate-200 rounded-lg p-3.5 hover:border-purple-300 transition-colors bg-white flex flex-col justify-between"
+                    draggable={true}
+                    onDragStart={(e) => handleMemberDragStart(e, index)}
+                    onDragOver={(e) => handleMemberDragOver(e, index)}
+                    onDrop={(e) => handleMemberDrop(e, index)}
+                    onDragEnd={handleMemberDragEnd}
+                    className={`rounded-lg p-3.5 transition-all bg-white flex flex-col justify-between select-none relative group ${
+                      draggedMemberIndex === index
+                        ? "opacity-30 border-2 border-dashed border-[#700070] scale-95 shadow-xl bg-purple-100/50"
+                        : dragOverMemberIndex === index
+                        ? "border-2 border-[#700070] ring-2 ring-purple-300 bg-purple-50/60 shadow-lg scale-[1.01]"
+                        : "border border-slate-200 hover:border-purple-300 hover:shadow-xs"
+                    }`}
                   >
-                    <div className="flex items-start gap-3">
-                      {m.photoData || m.photoUrl ? (
-                        <img
-                          src={m.photoData || m.photoUrl}
-                          alt={m.name}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-purple-200 shrink-0"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-purple-100 text-[#700070] flex items-center justify-center font-bold text-sm shrink-0 border border-purple-200">
-                          {m.name
-                            .replace(/^Dr\.\s*|^Prof\.\s*/i, "")
-                            .split(" ")
-                            .map((n: string) => n[0])
-                            .join("")
-                            .slice(0, 2)
-                            .toUpperCase()}
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center justify-between gap-1">
-                          <span className="font-bold text-sm text-slate-900 truncate">{m.name}</span>
-                          <span className="text-[10px] text-purple-800 bg-purple-50 font-semibold px-2 py-0.5 rounded shrink-0">
-                            {m.role}
+                    <div>
+                      {/* Top Reordering Bar: Drag Handle + Directional Arrows */}
+                      <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-100">
+                        <div
+                          className="flex items-center gap-1.5 cursor-grab active:cursor-grabbing text-slate-400 hover:text-[#700070] transition-colors"
+                          title="Click & Drag karke upar, niche, daye, baye drop karein"
+                        >
+                          <GripVertical className="w-4 h-4 text-slate-400 group-hover:text-[#700070]" />
+                          <span className="font-mono text-[10px] font-bold bg-purple-50 text-[#700070] border border-purple-200 px-1.5 py-0.5 rounded">
+                            #{index + 1}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">
+                            Hold to Drag
                           </span>
                         </div>
-                        <div className="text-slate-600 text-xs mt-0.5 font-medium">{m.affiliation}</div>
-                        {m.specialization && (
-                          <div className="text-slate-500 text-[11px] mt-0.5">
-                            Area: <em>{m.specialization}</em>
+
+                        {/* Directional Controls: Left (Baye), Up (Upar), Down (Niche), Right (Daye) */}
+                        <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 p-0.5 rounded">
+                          <button
+                            type="button"
+                            disabled={index === 0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              moveMemberLeft(index);
+                            }}
+                            className="p-1 text-slate-600 hover:text-[#700070] hover:bg-white rounded disabled:opacity-25 disabled:hover:bg-transparent transition-colors cursor-pointer"
+                            title="Baye karein (Move Left)"
+                          >
+                            <ArrowLeft className="w-3 h-3" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={index === 0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              moveMemberUp(index);
+                            }}
+                            className="p-1 text-slate-600 hover:text-[#700070] hover:bg-white rounded disabled:opacity-25 disabled:hover:bg-transparent transition-colors cursor-pointer"
+                            title="Upar karein (Move Up)"
+                          >
+                            <ArrowUp className="w-3 h-3" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={index === editorialMembers.length - 1}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              moveMemberDown(index);
+                            }}
+                            className="p-1 text-slate-600 hover:text-[#700070] hover:bg-white rounded disabled:opacity-25 disabled:hover:bg-transparent transition-colors cursor-pointer"
+                            title="Niche karein (Move Down)"
+                          >
+                            <ArrowDown className="w-3 h-3" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={index === editorialMembers.length - 1}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              moveMemberRight(index);
+                            }}
+                            className="p-1 text-slate-600 hover:text-[#700070] hover:bg-white rounded disabled:opacity-25 disabled:hover:bg-transparent transition-colors cursor-pointer"
+                            title="Daye karein (Move Right)"
+                          >
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Member Info */}
+                      <div className="flex items-start gap-3">
+                        {m.photoData || m.photoUrl ? (
+                          <img
+                            src={m.photoData || m.photoUrl}
+                            alt={m.name}
+                            className="w-12 h-12 rounded-full object-cover border-2 border-purple-200 shrink-0"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-purple-100 text-[#700070] flex items-center justify-center font-bold text-sm shrink-0 border border-purple-200">
+                            {m.name
+                              .replace(/^Dr\.\s*|^Prof\.\s*/i, "")
+                              .split(" ")
+                              .map((n: string) => n[0])
+                              .join("")
+                              .slice(0, 2)
+                              .toUpperCase()}
                           </div>
                         )}
-                        {m.email && (
-                          <div className="text-slate-400 font-mono text-[11px] mt-0.5">
-                            {m.email}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center justify-between gap-1">
+                            <span className="font-bold text-sm text-slate-900 truncate">{m.name}</span>
+                            <span className="text-[10px] text-purple-800 bg-purple-50 font-semibold px-2 py-0.5 rounded shrink-0">
+                              {m.role}
+                            </span>
                           </div>
-                        )}
-                        {m.orcid && (
-                          <div className="text-purple-700 text-[10px] font-mono mt-0.5 truncate">
-                            ORCID: {m.orcid}
-                          </div>
-                        )}
+                          <div className="text-slate-600 text-xs mt-0.5 font-medium">{m.affiliation}</div>
+                          {m.specialization && (
+                            <div className="text-slate-500 text-[11px] mt-0.5">
+                              Area: <em>{m.specialization}</em>
+                            </div>
+                          )}
+                          {m.email && (
+                            <div className="text-slate-400 font-mono text-[11px] mt-0.5">
+                              {m.email}
+                            </div>
+                          )}
+                          {m.orcid && (
+                            <div className="text-purple-700 text-[10px] font-mono mt-0.5 truncate">
+                              ORCID: {m.orcid}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
+
+                    {/* Bottom Action Buttons */}
                     <div className="pt-2.5 mt-2 border-t border-slate-100 flex items-center justify-end gap-3 text-[11px]">
                       <button
                         type="button"
