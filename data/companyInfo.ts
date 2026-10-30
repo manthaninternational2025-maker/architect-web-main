@@ -32,7 +32,7 @@ export const companyInfo: CompanyInfo = {
   whatsapp: "+91 8527231973",
   whatsappRaw: "918527231973",
   whatsappUrl: "https://wa.me/918527231973?text=Hello%20Manthan%20Journal%2C%20I%20would%20like%20to%20submit%20my%20manuscript.",
-  address: "Impulse Publication Works, New Delhi & NCR, India",
+  address: "GT Karnal Road, Dilkhush Bagh Village, Ashok Vihar, New Delhi, Delhi 110033",
   startingYear: "2026",
   plagiarismTool: "PlagiarismCheckerX / Turnitin / Drillbit",
   disciplines: [

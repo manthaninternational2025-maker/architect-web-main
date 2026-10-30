@@ -570,7 +570,17 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     try {
       const s = localStorage.getItem(K_SETTINGS);
-      if (s) setSettings(JSON.parse(s));
+      if (s) {
+        try {
+          const parsed = JSON.parse(s);
+          if (!parsed.address || parsed.address.includes("New Delhi & NCR")) {
+            parsed.address = "GT Karnal Road, Dilkhush Bagh Village, Ashok Vihar, New Delhi, Delhi 110033";
+          }
+          setSettings(parsed);
+        } catch {
+          setSettings(JSON.parse(s));
+        }
+      }
 
       const a = localStorage.getItem(K_ANNOUNCE);
       if (a) setAnnouncement(JSON.parse(a));
@@ -637,7 +647,17 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       if (eth) setEthics(JSON.parse(eth));
 
       const c = localStorage.getItem(K_CONTACT);
-      if (c) setContact(JSON.parse(c));
+      if (c) {
+        try {
+          const parsed = JSON.parse(c);
+          if (!parsed.officeAddress || parsed.officeAddress.includes("New Delhi & NCR")) {
+            parsed.officeAddress = "GT Karnal Road, Dilkhush Bagh Village, Ashok Vihar, New Delhi, Delhi 110033";
+          }
+          setContact(parsed);
+        } catch {
+          setContact(JSON.parse(c));
+        }
+      }
 
       const sb = localStorage.getItem(K_SIDEBAR);
       if (sb) setSidebarConfig(JSON.parse(sb));

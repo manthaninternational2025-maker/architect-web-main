@@ -456,6 +456,40 @@ export default function AdminPage() {
     showToast("Profile photo removed.");
   };
 
+  const handleCoverPageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      showToast("Cover image is too large! Maximum allowed size is 10MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Data = reader.result as string;
+      setSidebarMenuState((prev) => {
+        const updated = { ...prev, coverImageUrl: base64Data };
+        updateSidebarConfig(updated);
+        return updated;
+      });
+      showToast("Cover page image uploaded and saved live across the website!");
+    };
+    reader.onerror = () => {
+      showToast("Failed to read cover image file.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleResetCoverPage = () => {
+    setSidebarMenuState((prev) => {
+      const updated = { ...prev, coverImageUrl: "/images/manthan-cover-page.png" };
+      updateSidebarConfig(updated);
+      return updated;
+    });
+    showToast("Cover page reset to official default Manthan cover.");
+  };
+
   const handleAddMember = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMemberForm.name) return;
@@ -1053,6 +1087,62 @@ export default function AdminPage() {
                   />
                 </div>
 
+                {/* Cover Page Management inside Journal Settings */}
+                <div className="border border-slate-200 p-4 rounded-lg bg-slate-50/70 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm">
+                        Journal Issue Cover Page
+                      </h4>
+                      <p className="text-slate-500 text-xs">
+                        Upload or replace the official cover page displayed in the website sidebar.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-white border border-slate-200 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={sidebarMenuState.coverImageUrl || "/images/manthan-cover-page.png"}
+                        alt="Current Cover"
+                        className="w-14 h-20 object-contain border border-slate-300 rounded shadow-xs bg-slate-50 shrink-0"
+                      />
+                      <div className="text-xs">
+                        <p className="font-bold text-slate-800">
+                          {sidebarMenuState.coverPageHeading || "Cover Page"}
+                        </p>
+                        <p className="text-slate-500 text-[11px] mt-0.5">
+                          Rendered on sidebar for all visitors. Upload custom PNG, JPG, or WebP.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                      <label
+                        htmlFor="settingsCoverUploadInput"
+                        className="flex-1 sm:flex-none px-3.5 py-2 bg-[#700070] hover:bg-[#550055] text-white rounded font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+                      >
+                        <FileUp className="w-3.5 h-3.5" />
+                        <span>Upload Cover</span>
+                      </label>
+                      <input
+                        id="settingsCoverUploadInput"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleCoverPageUpload}
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleResetCoverPage}
+                        className="px-3 py-2 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded text-xs font-semibold cursor-pointer transition-colors"
+                      >
+                        Reset Default
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex flex-wrap items-center gap-3 pt-2">
                   <button
                     type="submit"
@@ -1264,8 +1354,89 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* Articles Table */}
-              <div className="overflow-x-auto border border-slate-200 rounded">
+              {/* Mobile Card Layout (< md) */}
+              <div className="space-y-3 md:hidden">
+                {articlesList
+                  .filter(
+                    (a) =>
+                      a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      a.authors.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map((art) => (
+                    <div
+                      key={art.id}
+                      className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg space-y-2 text-xs"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="font-mono text-[10px] text-slate-500 font-bold bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                          #{art.id}
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            art.status === "Published"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : "bg-amber-50 text-amber-700 border-amber-200"
+                          }`}
+                        >
+                          {art.status}
+                        </span>
+                      </div>
+
+                      <h4 className="font-bold text-slate-900 leading-snug">
+                        {art.title}
+                      </h4>
+
+                      <div className="text-[11px] text-slate-600 flex flex-wrap items-center gap-1.5">
+                        <User className="w-3 h-3 text-slate-400" />
+                        <span className="font-semibold text-slate-800">{art.authors}</span>
+                        <span className="text-slate-300">•</span>
+                        <span>{art.volume}, {art.issue}</span>
+                      </div>
+
+                      <div className="text-[10px] font-mono text-slate-500">
+                        DOI: {art.doi} {art.pages ? `• ${art.pages}` : ""}
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openArticlePdf(art, settings)}
+                          className="inline-flex items-center gap-1.5 text-[#700070] bg-purple-50 hover:bg-[#700070] hover:text-white border border-purple-200 px-2.5 py-1.5 rounded font-bold text-[11px] transition-colors cursor-pointer"
+                        >
+                          <Paperclip className="w-3 h-3" />
+                          <span>{art.fileName || "View PDF"}</span>
+                        </button>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setEditingArticle({ ...art })}
+                            className="px-2.5 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white border border-blue-200 rounded font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
+                          >
+                            <Edit3 className="w-3 h-3" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (confirm(`Delete article #${art.id}: "${art.title}"?`)) {
+                                deleteArticle(art.id);
+                                showToast(`Article #${art.id} deleted.`);
+                              }
+                            }}
+                            className="px-2.5 py-1.5 bg-rose-50 text-rose-700 hover:bg-rose-600 hover:text-white border border-rose-200 rounded font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            <span>Delete</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+              {/* Desktop Table Layout (hidden md:block) */}
+              <div className="hidden md:block overflow-x-auto border border-slate-200 rounded">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold uppercase text-[10px] tracking-wider">
                     <tr>
@@ -2274,7 +2445,7 @@ export default function AdminPage() {
                     </div>
                     <div>
                       <label className="block font-bold text-slate-700 mb-1">
-                        Cover Image URL
+                        Cover Image URL (Direct Link)
                       </label>
                       <input
                         type="text"
@@ -2286,21 +2457,52 @@ export default function AdminPage() {
                           })
                         }
                         placeholder="/images/manthan-cover-page.png"
-                        className="w-full px-3 py-2 border border-slate-300 rounded bg-white text-sm"
+                        className="w-full px-3 py-2 border border-slate-300 rounded bg-white text-sm font-mono text-xs"
                       />
                     </div>
                   </div>
 
-                  {/* Active Cover Image Preview */}
-                  <div className="flex items-center gap-3 p-2.5 bg-white border border-slate-200 rounded">
-                    <img
-                      src={sidebarMenuState.coverImageUrl || "/images/manthan-cover-page.png"}
-                      alt="Cover Preview"
-                      className="w-12 h-18 object-contain border border-slate-200 rounded shadow-xs"
-                    />
-                    <div className="text-xs text-slate-600">
-                      <p className="font-semibold text-slate-800">Current Cover: {sidebarMenuState.coverPageHeading || "Cover Page"}</p>
-                      <p className="text-slate-500">Rendered under "Editorial Policies" with header banner and framed cover layout.</p>
+                  {/* Direct Cover Image Upload & Live Preview Card */}
+                  <div className="p-3.5 bg-white border border-slate-200 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={sidebarMenuState.coverImageUrl || "/images/manthan-cover-page.png"}
+                        alt="Cover Preview"
+                        className="w-16 h-22 object-contain border border-slate-300 rounded shadow-xs bg-slate-50 shrink-0"
+                      />
+                      <div className="text-xs text-slate-600">
+                        <p className="font-bold text-slate-900 text-sm">
+                          Cover: {sidebarMenuState.coverPageHeading || "Cover Page"}
+                        </p>
+                        <p className="text-slate-500 text-[11px] mt-0.5">
+                          Displaying live on sidebar for all visitors. You can upload any new image (PNG, JPG, WebP) directly.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto">
+                      <label
+                        htmlFor="coverUploadInput"
+                        className="flex-1 sm:flex-none px-3.5 py-2 bg-[#700070] hover:bg-[#550055] text-white rounded font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                      >
+                        <FileUp className="w-3.5 h-3.5" />
+                        <span>Upload New Cover</span>
+                      </label>
+                      <input
+                        id="coverUploadInput"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleCoverPageUpload}
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleResetCoverPage}
+                        className="px-3 py-2 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded text-xs font-semibold cursor-pointer transition-colors"
+                        title="Reset to default official Manthan cover"
+                      >
+                        Reset Default
+                      </button>
                     </div>
                   </div>
                 </div>

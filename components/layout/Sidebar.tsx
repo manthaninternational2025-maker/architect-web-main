@@ -60,35 +60,14 @@ export function Sidebar() {
             </h2>
           </div>
 
-          {/* Framed Cover Page Image */}
+          {/* Framed Cover Page Image (Static, Non-Clickable Display) */}
           <div className="p-3 bg-white flex flex-col items-center">
-            <div className="border border-gray-200 bg-gray-50/50 p-1.5 shadow-xs w-full max-w-[280px] rounded-xs group transition-all duration-200 hover:border-[#700070]/40">
-              <a
-                href={sidebarConfig.coverImageUrl || "/images/manthan-cover-page.png"}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Click to view full cover page"
-                className="block cursor-pointer overflow-hidden"
-              >
-                <img
-                  src={sidebarConfig.coverImageUrl || "/images/manthan-cover-page.png"}
-                  alt="Manthan: International Multidisciplinary Journal of Social Inquiry - Cover Page"
-                  className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                />
-              </a>
-            </div>
-
-            {/* Quick Action Link */}
-            <div className="mt-2.5 text-center">
-              <a
-                href={sidebarConfig.coverImageUrl || "/images/manthan-cover-page.png"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#700070] hover:text-[#550055] hover:underline"
-              >
-                <span>View / Download Cover Page</span>
-                <span className="text-[10px]">↗</span>
-              </a>
+            <div className="border border-gray-200 bg-gray-50/50 p-1.5 shadow-xs w-full max-w-[280px] rounded-xs select-none">
+              <img
+                src={sidebarConfig.coverImageUrl || "/images/manthan-cover-page.png"}
+                alt="Manthan: International Multidisciplinary Journal of Social Inquiry - Cover Page"
+                className="w-full h-auto object-contain block select-none pointer-events-none"
+              />
             </div>
           </div>
         </div>
