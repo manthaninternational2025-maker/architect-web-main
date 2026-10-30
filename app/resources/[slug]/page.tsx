@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { resources, getResourceBySlug } from "@/data/resources";
 import { companyInfo } from "@/data/companyInfo";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { ArticlePdfButton } from "@/components/ui/ArticlePdfButton";
 import {
   Calendar,
   Clock,
@@ -87,9 +88,23 @@ export default async function ResourceDetailPage({
                   <span>Author: </span>
                   <strong className="text-gray-900">{resource.author}</strong>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <span>Pages: {resource.pages}</span>
                   <span>DOI: {resource.doi}</span>
+                  <ArticlePdfButton
+                    article={{
+                      title: resource.title,
+                      authors: resource.author,
+                      volume: resource.volume,
+                      issue: resource.issue,
+                      date: resource.publishedDate,
+                      doi: resource.doi,
+                      abstract: resource.summary,
+                      pages: resource.pages,
+                      category: resource.category,
+                    }}
+                    variant="outline"
+                  />
                 </div>
               </div>
             </header>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { useJournalData } from "@/context/JournalDataContext";
+import { openArticlePdf } from "@/utils/pdfHelper";
 import { companyInfo } from "@/data/companyInfo";
 import { resources } from "@/data/resources";
 import {
@@ -1292,20 +1293,16 @@ export default function AdminPage() {
                                   {art.category}
                                 </span>
                               )}
-                              {(art.fileData || art.pdfUrl) && (
-                                <a
-                                  href={art.fileData || art.pdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download={art.fileName || undefined}
-                                  className="inline-flex items-center gap-1 text-[#700070] bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded font-sans font-bold hover:bg-[#700070] hover:text-white transition-colors"
-                                  title="Download / View Attached Document"
-                                >
-                                  <Paperclip className="w-2.5 h-2.5" />
-                                  <span>{art.fileName || "View Document"}</span>
-                                  {art.fileSize && <span className="text-[9px] opacity-75">({art.fileSize})</span>}
-                                </a>
-                              )}
+                              <button
+                                type="button"
+                                onClick={() => openArticlePdf(art, settings)}
+                                className="inline-flex items-center gap-1 text-[#700070] bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded font-sans font-bold hover:bg-[#700070] hover:text-white transition-colors cursor-pointer"
+                                title="Open & View PDF Document"
+                              >
+                                <Paperclip className="w-2.5 h-2.5" />
+                                <span>{art.fileName || "View PDF"}</span>
+                                {art.fileSize && <span className="text-[9px] opacity-75">({art.fileSize})</span>}
+                              </button>
                             </div>
                           </td>
                           <td className="py-2.5 px-3 text-slate-600 font-medium">
@@ -2890,15 +2887,13 @@ export default function AdminPage() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {newArticleForm.fileData && (
-                        <a
-                          href={newArticleForm.fileData}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          download={newArticleForm.fileName || "manuscript.pdf"}
-                          className="px-2 py-1 text-[11px] font-bold text-[#700070] bg-purple-50 hover:bg-purple-100 rounded border border-purple-200"
+                        <button
+                          type="button"
+                          onClick={() => openArticlePdf(newArticleForm, settings)}
+                          className="px-2 py-1 text-[11px] font-bold text-[#700070] bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 cursor-pointer"
                         >
-                          Preview
-                        </a>
+                          Open &amp; View PDF
+                        </button>
                       )}
                       <button
                         type="button"
@@ -3243,15 +3238,13 @@ export default function AdminPage() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {editingArticle.fileData && (
-                        <a
-                          href={editingArticle.fileData}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          download={editingArticle.fileName || "manuscript.pdf"}
-                          className="px-2 py-1 text-[11px] font-bold text-[#700070] bg-purple-50 hover:bg-purple-100 rounded border border-purple-200"
+                        <button
+                          type="button"
+                          onClick={() => openArticlePdf(editingArticle, settings)}
+                          className="px-2 py-1 text-[11px] font-bold text-[#700070] bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 cursor-pointer"
                         >
-                          Preview
-                        </a>
+                          Open &amp; View PDF
+                        </button>
                       )}
                       <button
                         type="button"

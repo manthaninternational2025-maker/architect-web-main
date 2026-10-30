@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useJournalData } from "@/context/JournalDataContext";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SpecTable } from "@/components/ui/SpecTable";
+import { ArticlePdfButton } from "@/components/ui/ArticlePdfButton";
 import { FileText, Calendar, User, ArrowRight, Bell, Mail } from "lucide-react";
 
 export default function HomePage() {
@@ -150,17 +151,7 @@ export default function HomePage() {
                       >
                         Abstract
                       </Link>
-                      <a
-                        href={art.fileData || art.pdfUrl || "/archives"}
-                        target={art.fileData || art.pdfUrl ? "_blank" : undefined}
-                        rel={art.fileData || art.pdfUrl ? "noopener noreferrer" : undefined}
-                        download={art.fileName || undefined}
-                        className="px-2 py-0.5 border border-[#700070] text-[#700070] hover:bg-[#700070] hover:text-white text-[11px] font-mono font-bold tracking-wider transition-all inline-flex items-center gap-1"
-                        title={art.fileName ? `Download ${art.fileName}` : "View PDF Document"}
-                      >
-                        <FileText className="w-3 h-3 text-[#700070] group-hover:text-white" />
-                        <span>{art.fileName ? "PDF / DOC" : "PDF"}</span>
-                      </a>
+                      <ArticlePdfButton article={art} settings={settings} />
                     </div>
                   </div>
                 </div>
