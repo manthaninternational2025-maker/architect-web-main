@@ -2257,35 +2257,50 @@ export default function AdminPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <label className="block font-bold text-slate-700 mb-1">
-                        Cover Box Title
+                        Cover Page Heading
                       </label>
                       <input
                         type="text"
-                        value={sidebarMenuState.coverBoxTitle}
+                        value={sidebarMenuState.coverPageHeading ?? "Cover Page"}
                         onChange={(e) =>
                           setSidebarMenuState({
                             ...sidebarMenuState,
-                            coverBoxTitle: e.target.value,
+                            coverPageHeading: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-300 rounded bg-white"
+                        placeholder="Cover Page"
+                        className="w-full px-3 py-2 border border-slate-300 rounded bg-white text-sm"
                       />
                     </div>
                     <div>
                       <label className="block font-bold text-slate-700 mb-1">
-                        Website Link URL
+                        Cover Image URL
                       </label>
                       <input
                         type="text"
-                        value={sidebarMenuState.coverBoxUrl}
+                        value={sidebarMenuState.coverImageUrl ?? "/images/manthan-cover-page.png"}
                         onChange={(e) =>
                           setSidebarMenuState({
                             ...sidebarMenuState,
-                            coverBoxUrl: e.target.value,
+                            coverImageUrl: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-300 rounded bg-white"
+                        placeholder="/images/manthan-cover-page.png"
+                        className="w-full px-3 py-2 border border-slate-300 rounded bg-white text-sm"
                       />
+                    </div>
+                  </div>
+
+                  {/* Active Cover Image Preview */}
+                  <div className="flex items-center gap-3 p-2.5 bg-white border border-slate-200 rounded">
+                    <img
+                      src={sidebarMenuState.coverImageUrl || "/images/manthan-cover-page.png"}
+                      alt="Cover Preview"
+                      className="w-12 h-18 object-contain border border-slate-200 rounded shadow-xs"
+                    />
+                    <div className="text-xs text-slate-600">
+                      <p className="font-semibold text-slate-800">Current Cover: {sidebarMenuState.coverPageHeading || "Cover Page"}</p>
+                      <p className="text-slate-500">Rendered under "Editorial Policies" with header banner and framed cover layout.</p>
                     </div>
                   </div>
                 </div>

@@ -125,6 +125,8 @@ export interface SidebarConfigData {
   coverBoxTitle: string;
   coverBoxIssn: string;
   coverBoxUrl: string;
+  coverPageHeading?: string;
+  coverImageUrl?: string;
   showManuscriptStatus: boolean;
   manuscriptStatusText: string;
   manuscriptStatusLink: string;
@@ -484,6 +486,8 @@ const initialContact: ContactData = {
 const initialSidebar: SidebarConfigData = {
   showEditorialPolicies: true,
   showCoverBox: true,
+  coverPageHeading: "Cover Page",
+  coverImageUrl: "/images/manthan-cover-page.png",
   coverBoxTitle: "Manthan: International Multidisciplinary Journal of Social Inquiry",
   coverBoxIssn: defaultCompanyInfo.issn,
   coverBoxUrl: "https://impulseresearchwork.com/",

@@ -49,24 +49,47 @@ export function Sidebar() {
       )}
 
       {/* -------------------------------------------------------------
-          CARD 2: JOURNAL COVER BOX (Solid Purple Box with White Frame)
+          CARD 2: COVER PAGE (Exact Reference Layout: Header Banner + Framed Cover Page)
          ------------------------------------------------------------- */}
       {sidebarConfig.showCoverBox && (
-        <div className="bg-[#700070] border-2 border-white p-4 text-center text-white shadow-xs">
-          <div className="border border-white/60 p-4 flex flex-col items-center justify-center min-h-[250px]">
-            <h3 className="font-editorial not-italic font-bold text-lg leading-snug whitespace-pre-line">
-              {sidebarConfig.coverBoxTitle || settings.journalTitle}
-            </h3>
-            <p className="font-editorial font-bold text-xs mt-2 tracking-wider">
-              (ISSN: {settings.issn})
-            </p>
-            <div className="w-full border-t border-white/40 my-3" />
-            <Link
-              href="/"
-              className="text-[11px] italic font-serif text-white hover:underline tracking-wider"
-            >
-              {sidebarConfig.coverBoxUrl || settings.website}
-            </Link>
+        <div className="bg-white border border-[#CCCCCC] overflow-hidden text-center shadow-xs">
+          {/* Header Banner matching Reference Image */}
+          <div className="bg-[#700070] text-white py-2 px-3 text-center border-b border-[#550055]">
+            <h2 className="text-sm sm:text-base font-bold tracking-wide">
+              {sidebarConfig.coverPageHeading || "Cover Page"}
+            </h2>
+          </div>
+
+          {/* Framed Cover Page Image */}
+          <div className="p-3 bg-white flex flex-col items-center">
+            <div className="border border-gray-200 bg-gray-50/50 p-1.5 shadow-xs w-full max-w-[280px] rounded-xs group transition-all duration-200 hover:border-[#700070]/40">
+              <a
+                href={sidebarConfig.coverImageUrl || "/images/manthan-cover-page.png"}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Click to view full cover page"
+                className="block cursor-pointer overflow-hidden"
+              >
+                <img
+                  src={sidebarConfig.coverImageUrl || "/images/manthan-cover-page.png"}
+                  alt="Manthan: International Multidisciplinary Journal of Social Inquiry - Cover Page"
+                  className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                />
+              </a>
+            </div>
+
+            {/* Quick Action Link */}
+            <div className="mt-2.5 text-center">
+              <a
+                href={sidebarConfig.coverImageUrl || "/images/manthan-cover-page.png"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#700070] hover:text-[#550055] hover:underline"
+              >
+                <span>View / Download Cover Page</span>
+                <span className="text-[10px]">↗</span>
+              </a>
+            </div>
           </div>
         </div>
       )}
