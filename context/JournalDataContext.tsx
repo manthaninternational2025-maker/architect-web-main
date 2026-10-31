@@ -566,7 +566,20 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
   const [sidebarConfig, setSidebarConfig] = useState<SidebarConfigData>(initialSidebar);
   const [messages, setMessages] = useState<MessageItem[]>(initialMessages);
 
-  // Load saved state from localStorage on mount
+  // Background server synchronizer so changes on Mobile/PC/Tablet persist everywhere
+  const syncToServer = (payload: Record<string, any>) => {
+    try {
+      if (typeof window !== "undefined") {
+        fetch("/api/journal-data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }).catch(() => {});
+      }
+    } catch {}
+  };
+
+  // Load saved state from localStorage on mount & synchronize with server
   useEffect(() => {
     try {
       const s = localStorage.getItem(K_SETTINGS);
@@ -664,6 +677,60 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
 
       const msg = localStorage.getItem(K_MESSAGES);
       if (msg) setMessages(JSON.parse(msg));
+
+      // Fetch live cross-device state from server API
+      fetch("/api/journal-data")
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.success && json.data) {
+            const d = json.data;
+            if (d.settings) {
+              setSettings(d.settings);
+              try { localStorage.setItem(K_SETTINGS, JSON.stringify(d.settings)); } catch {}
+            }
+            if (d.announcement) {
+              setAnnouncement(d.announcement);
+              try { localStorage.setItem(K_ANNOUNCE, JSON.stringify(d.announcement)); } catch {}
+            }
+            if (d.homepage) {
+              setHomepage(d.homepage);
+              try { localStorage.setItem(K_HOMEPAGE, JSON.stringify(d.homepage)); } catch {}
+            }
+            if (d.articles && Array.isArray(d.articles)) {
+              setArticles(d.articles);
+              try { localStorage.setItem(K_ARTICLES, JSON.stringify(d.articles)); } catch {}
+            }
+            if (d.issues && Array.isArray(d.issues)) {
+              setIssues(d.issues);
+              try { localStorage.setItem(K_ISSUES, JSON.stringify(d.issues)); } catch {}
+            }
+            if (d.members && Array.isArray(d.members)) {
+              setMembers(d.members);
+              try { localStorage.setItem(K_MEMBERS, JSON.stringify(d.members)); } catch {}
+            }
+            if (d.instructions) {
+              setInstructions(d.instructions);
+              try { localStorage.setItem(K_INSTRUCT, JSON.stringify(d.instructions)); } catch {}
+            }
+            if (d.ethics) {
+              setEthics(d.ethics);
+              try { localStorage.setItem(K_ETHICS, JSON.stringify(d.ethics)); } catch {}
+            }
+            if (d.contact) {
+              setContact(d.contact);
+              try { localStorage.setItem(K_CONTACT, JSON.stringify(d.contact)); } catch {}
+            }
+            if (d.sidebarConfig) {
+              setSidebarConfig(d.sidebarConfig);
+              try { localStorage.setItem(K_SIDEBAR, JSON.stringify(d.sidebarConfig)); } catch {}
+            }
+            if (d.messages && Array.isArray(d.messages)) {
+              setMessages(d.messages);
+              try { localStorage.setItem(K_MESSAGES, JSON.stringify(d.messages)); } catch {}
+            }
+          }
+        })
+        .catch(() => {});
     } catch {}
   }, []);
 
@@ -673,6 +740,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_SETTINGS, JSON.stringify(updated));
       } catch {}
+      syncToServer({ settings: updated });
       return updated;
     });
   };
@@ -683,6 +751,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_ANNOUNCE, JSON.stringify(updated));
       } catch {}
+      syncToServer({ announcement: updated });
       return updated;
     });
   };
@@ -693,6 +762,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_HOMEPAGE, JSON.stringify(updated));
       } catch {}
+      syncToServer({ homepage: updated });
       return updated;
     });
   };
@@ -711,6 +781,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_ARTICLES, JSON.stringify(updated));
       } catch {}
+      syncToServer({ articles: updated });
       return updated;
     });
   };
@@ -721,6 +792,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_ARTICLES, JSON.stringify(updated));
       } catch {}
+      syncToServer({ articles: updated });
       return updated;
     });
   };
@@ -731,6 +803,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_ARTICLES, JSON.stringify(updated));
       } catch {}
+      syncToServer({ articles: updated });
       return updated;
     });
   };
@@ -746,6 +819,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_ISSUES, JSON.stringify(updated));
       } catch {}
+      syncToServer({ issues: updated });
       return updated;
     });
   };
@@ -756,6 +830,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_ISSUES, JSON.stringify(updated));
       } catch {}
+      syncToServer({ issues: updated });
       return updated;
     });
   };
@@ -766,6 +841,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_ISSUES, JSON.stringify(updated));
       } catch {}
+      syncToServer({ issues: updated });
       return updated;
     });
   };
@@ -780,6 +856,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_MEMBERS, JSON.stringify(updated));
       } catch {}
+      syncToServer({ members: updated });
       return updated;
     });
   };
@@ -790,6 +867,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_MEMBERS, JSON.stringify(updated));
       } catch {}
+      syncToServer({ members: updated });
       return updated;
     });
   };
@@ -800,6 +878,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_MEMBERS, JSON.stringify(updated));
       } catch {}
+      syncToServer({ members: updated });
       return updated;
     });
   };
@@ -809,6 +888,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
     try {
       localStorage.setItem(K_MEMBERS, JSON.stringify(newMembers));
     } catch {}
+    syncToServer({ members: newMembers });
   };
 
   const updateInstructions = (data: Partial<AuthorInstructionsData>) => {
@@ -817,6 +897,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_INSTRUCT, JSON.stringify(updated));
       } catch {}
+      syncToServer({ instructions: updated });
       return updated;
     });
   };
@@ -827,6 +908,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_ETHICS, JSON.stringify(updated));
       } catch {}
+      syncToServer({ ethics: updated });
       return updated;
     });
   };
@@ -837,6 +919,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_CONTACT, JSON.stringify(updated));
       } catch {}
+      syncToServer({ contact: updated });
       return updated;
     });
   };
@@ -847,6 +930,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_SIDEBAR, JSON.stringify(updated));
       } catch {}
+      syncToServer({ sidebarConfig: updated });
       return updated;
     });
   };
@@ -863,6 +947,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_MESSAGES, JSON.stringify(updated));
       } catch {}
+      syncToServer({ messages: updated });
       return updated;
     });
   };
@@ -873,6 +958,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_MESSAGES, JSON.stringify(updated));
       } catch {}
+      syncToServer({ messages: updated });
       return updated;
     });
   };
@@ -883,6 +969,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       try {
         localStorage.setItem(K_MESSAGES, JSON.stringify(updated));
       } catch {}
+      syncToServer({ messages: updated });
       return updated;
     });
   };
@@ -911,6 +998,19 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       localStorage.removeItem(K_SIDEBAR);
       localStorage.removeItem(K_MESSAGES);
     } catch {}
+    syncToServer({
+      settings: initialSettings,
+      announcement: initialAnnouncement,
+      homepage: initialHomepage,
+      articles: initialArticlesList,
+      issues: initialIssues,
+      members: initialMembers,
+      instructions: initialInstructions,
+      ethics: initialEthics,
+      contact: initialContact,
+      sidebarConfig: initialSidebar,
+      messages: initialMessages,
+    });
   };
 
   return (

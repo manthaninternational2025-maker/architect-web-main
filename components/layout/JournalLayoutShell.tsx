@@ -33,7 +33,7 @@ function JournalLayoutContent({ children }: { children: React.ReactNode }) {
               Skip to main academic content
             </a>
 
-            <div className="max-w-[1000px] mx-auto bg-white border-x border-[#333333] shadow-2xl min-h-screen flex flex-col">
+            <div className="w-full sm:max-w-[1000px] sm:mx-auto bg-white sm:border-x sm:border-[#333333] shadow-2xl min-h-screen flex flex-col">
               <header className="w-full flex flex-col">
                 <TopUtilityBar />
                 <Masthead />
