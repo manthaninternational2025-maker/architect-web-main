@@ -16,31 +16,31 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="space-y-3.5 w-full">
+    <aside className="space-y-2.5 sm:space-y-3.5 w-full">
       {/* -------------------------------------------------------------
           CARD 1: EDITORIAL POLICIES (Exact Reference Layout)
          ------------------------------------------------------------- */}
       {sidebarConfig.showEditorialPolicies && (
-        <div className="bg-white border border-[#CCCCCC] p-3.5 text-center">
-          <h2 className="text-base font-bold text-[#111111] mb-2.5 text-left border-b border-gray-200 pb-1">
+        <div className="bg-white border border-[#CCCCCC] p-2 sm:p-3.5 text-center">
+          <h2 className="text-xs sm:text-base font-bold text-[#111111] mb-1.5 sm:mb-2.5 text-left border-b border-gray-200 pb-1">
             Editorial Policies
           </h2>
-        <div className="flex flex-col space-y-2 py-1">
+        <div className="flex flex-col space-y-1.5 sm:space-y-2 py-0.5 sm:py-1">
           <Link
             href="/academic-integrity"
-            className="text-[#700070] hover:text-[#550055] font-bold text-sm tracking-wide transition-colors"
+            className="text-[#700070] hover:text-[#550055] font-bold text-[11px] sm:text-sm tracking-wide transition-colors leading-tight"
           >
             Publication Ethics
           </Link>
           <Link
             href="/peer-review-policy"
-            className="text-[#700070] hover:text-[#550055] font-bold text-sm tracking-wide transition-colors"
+            className="text-[#700070] hover:text-[#550055] font-bold text-[11px] sm:text-sm tracking-wide transition-colors leading-tight"
           >
             Peer Review Process
           </Link>
           <Link
             href="/about"
-            className="text-[#700070] hover:text-[#550055] font-bold text-sm tracking-wide transition-colors"
+            className="text-[#700070] hover:text-[#550055] font-bold text-[11px] sm:text-sm tracking-wide transition-colors leading-tight"
           >
             Open Access Policy
           </Link>
@@ -54,15 +54,15 @@ export function Sidebar() {
       {sidebarConfig.showCoverBox && (
         <div className="bg-white border border-[#CCCCCC] overflow-hidden text-center shadow-xs">
           {/* Header Banner matching Reference Image */}
-          <div className="bg-[#700070] text-white py-2 px-3 text-center border-b border-[#550055]">
-            <h2 className="text-sm sm:text-base font-bold tracking-wide">
+          <div className="bg-[#700070] text-white py-1.5 sm:py-2 px-2 sm:px-3 text-center border-b border-[#550055]">
+            <h2 className="text-xs sm:text-base font-bold tracking-wide">
               {sidebarConfig.coverPageHeading || "Cover Page"}
             </h2>
           </div>
 
           {/* Framed Cover Page Image (Static, Non-Clickable Display) */}
-          <div className="p-3 bg-white flex flex-col items-center">
-            <div className="border border-gray-200 bg-gray-50/50 p-1.5 shadow-xs w-full max-w-[280px] rounded-xs select-none">
+          <div className="p-1.5 sm:p-3 bg-white flex flex-col items-center">
+            <div className="border border-gray-200 bg-gray-50/50 p-1 sm:p-1.5 shadow-xs w-full max-w-[280px] rounded-xs select-none">
               <img
                 src={sidebarConfig.coverImageUrl || "/images/manthan-cover-page.png"}
                 alt="Manthan: International Multidisciplinary Journal of Social Inquiry - Cover Page"
@@ -83,10 +83,10 @@ export function Sidebar() {
           CARD 3: MANUSCRIPT STATUS (Exact Reference Box)
          ------------------------------------------------------------- */}
       {sidebarConfig.showManuscriptStatus && (
-        <div className="bg-white border border-[#CCCCCC] p-3 text-center transition-colors hover:bg-gray-50">
+        <div className="bg-white border border-[#CCCCCC] p-2 sm:p-3 text-center transition-colors hover:bg-gray-50">
           <Link
             href={sidebarConfig.manuscriptStatusLink || "/submit"}
-            className="block text-[#700070] hover:text-[#550055] font-bold text-sm sm:text-base tracking-wide"
+            className="block text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-base tracking-wide leading-tight"
           >
             {sidebarConfig.manuscriptStatusText || "Manuscript Status"}
           </Link>

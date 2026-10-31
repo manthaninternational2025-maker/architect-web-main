@@ -33,14 +33,14 @@ function JournalLayoutContent({ children }: { children: React.ReactNode }) {
               Skip to main academic content
             </a>
 
-            <div className="w-full sm:max-w-[1000px] sm:mx-auto bg-white sm:border-x sm:border-[#333333] shadow-2xl min-h-screen flex flex-col">
+            <div className="w-full max-w-[1000px] mx-auto bg-white border-x border-[#333333] shadow-2xl min-h-screen flex flex-col">
               <header className="w-full flex flex-col">
                 <TopUtilityBar />
                 <Masthead />
                 <Navbar />
               </header>
 
-              <main id="main-content" className="flex-1 w-full bg-white px-3 sm:px-6 py-4">
+              <main id="main-content" className="flex-1 w-full bg-white px-2.5 sm:px-6 py-3 sm:py-4">
                 {children}
               </main>
 

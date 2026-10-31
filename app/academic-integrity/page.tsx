@@ -11,8 +11,8 @@ export default function AcademicIntegrityPage() {
 
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-8 space-y-6">
+      <div className="grid grid-cols-12 gap-2.5 sm:gap-6">
+        <div className="col-span-7 sm:col-span-8 space-y-4 sm:space-y-6">
           <article className="bg-white border border-gray-300 p-4 sm:p-6 shadow-xs text-xs sm:text-sm text-gray-800 leading-relaxed space-y-6">
             <h1 className="text-xl sm:text-2xl font-editorial font-bold text-[#111111] border-b border-gray-200 pb-2">
               Publication Ethics &amp; Integrity Charter
@@ -98,7 +98,7 @@ export default function AcademicIntegrityPage() {
           </article>
         </div>
 
-        <div className="lg:col-span-4">
+        <div className="col-span-5 sm:col-span-4">
           <Sidebar />
         </div>
       </div>

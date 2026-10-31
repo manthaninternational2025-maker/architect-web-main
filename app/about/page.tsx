@@ -14,9 +14,9 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-12 gap-2.5 sm:gap-6">
         {/* Main Content */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="col-span-7 sm:col-span-8 space-y-4 sm:space-y-6">
           <section className="bg-white rounded border border-sand-200 p-6 sm:p-8 shadow-sm">
             <SectionHeader
               title="About Impulse Research Work"
@@ -103,7 +103,7 @@ export default function AboutPage() {
         </div>
 
         {/* Sidebar */}
-        <div className="lg:col-span-4">
+        <div className="col-span-5 sm:col-span-4">
           <div className="sticky top-20">
             <Sidebar />
           </div>

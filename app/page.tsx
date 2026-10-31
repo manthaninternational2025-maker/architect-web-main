@@ -38,11 +38,11 @@ export default function HomePage() {
       )}
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-12 gap-2.5 sm:gap-6">
         {/* -------------------------------------------------------------
             LEFT COLUMN (Main Content Area — Exactly like Reference)
            ------------------------------------------------------------- */}
-        <div className="lg:col-span-8 space-y-4">
+        <div className="col-span-7 sm:col-span-8 space-y-4">
           <h1 className="text-xl sm:text-2xl font-editorial font-bold text-[#111111] border-b border-gray-200 pb-2">
             Home
           </h1>
@@ -184,7 +184,7 @@ export default function HomePage() {
         {/* -------------------------------------------------------------
             RIGHT COLUMN (Sidebar — Dynamic from Admin)
            ------------------------------------------------------------- */}
-        <div className="lg:col-span-4">
+        <div className="col-span-5 sm:col-span-4">
           <Sidebar />
         </div>
       </div>
