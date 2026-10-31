@@ -67,6 +67,12 @@ export function Sidebar() {
                 src={sidebarConfig.coverImageUrl || "/images/manthan-cover-page.png"}
                 alt="Manthan: International Multidisciplinary Journal of Social Inquiry - Cover Page"
                 className="w-full h-auto object-contain block select-none pointer-events-none"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.includes("manthan-cover-page.png")) {
+                    target.src = "/images/manthan-cover-page.png";
+                  }
+                }}
               />
             </div>
           </div>

@@ -673,7 +673,20 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       }
 
       const sb = localStorage.getItem(K_SIDEBAR);
-      if (sb) setSidebarConfig(JSON.parse(sb));
+      if (sb) {
+        try {
+          const parsed = JSON.parse(sb);
+          if (!parsed.coverImageUrl) {
+            parsed.coverImageUrl = "/images/manthan-cover-page.png";
+          }
+          if (!parsed.coverPageHeading) {
+            parsed.coverPageHeading = "Cover Page";
+          }
+          setSidebarConfig(parsed);
+        } catch {
+          setSidebarConfig(JSON.parse(sb));
+        }
+      }
 
       const msg = localStorage.getItem(K_MESSAGES);
       if (msg) setMessages(JSON.parse(msg));
@@ -721,6 +734,12 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
               try { localStorage.setItem(K_CONTACT, JSON.stringify(d.contact)); } catch {}
             }
             if (d.sidebarConfig) {
+              if (!d.sidebarConfig.coverImageUrl) {
+                d.sidebarConfig.coverImageUrl = "/images/manthan-cover-page.png";
+              }
+              if (!d.sidebarConfig.coverPageHeading) {
+                d.sidebarConfig.coverPageHeading = "Cover Page";
+              }
               setSidebarConfig(d.sidebarConfig);
               try { localStorage.setItem(K_SIDEBAR, JSON.stringify(d.sidebarConfig)); } catch {}
             }

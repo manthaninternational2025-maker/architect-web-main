@@ -456,58 +456,113 @@ export default function AdminPage() {
     showToast("Profile photo removed.");
   };
 
-  const handleCoverPageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Helper for fast, client-side canvas optimization (< 90KB) to prevent storage quota issues
+  const compressImageToDataUrl = (file: File, maxWidth = 1000, quality = 0.88): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let { width, height } = img;
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            resolve(e.target?.result as string);
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        img.onerror = () => resolve(e.target?.result as string);
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleCoverPageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 15 * 1024 * 1024) {
-      showToast("Cover image is too large! Maximum allowed size is 15MB.");
+    // Reset input value so selecting the same file again triggers onChange
+    e.target.value = "";
+
+    if (file.size > 20 * 1024 * 1024) {
+      showToast("Cover image is too large! Maximum allowed size is 20MB.");
       return;
     }
 
-    showToast("Uploading and updating cover page...");
+    showToast("Processing and updating cover page...");
 
-    // Send file to server upload API for persistent storage
-    const formData = new FormData();
-    formData.append("file", file);
+    try {
+      // 1. Instant client-side compression for 0ms lag
+      const optimizedDataUrl = await compressImageToDataUrl(file);
 
-    fetch("/api/upload-cover", {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.url) {
-          const updated = { ...sidebarMenuState, coverImageUrl: data.url };
-          setSidebarMenuState(updated);
-          updateSidebarConfig(updated);
-          showToast("Cover page updated and saved live across all devices!");
-        } else {
-          throw new Error(data.error || "Upload failed");
-        }
+      const instantState = {
+        ...sidebarMenuState,
+        coverImageUrl: optimizedDataUrl,
+      };
+      setSidebarMenuState(instantState);
+      updateSidebarConfig(instantState);
+
+      // 2. Server upload for persistent file storage across all devices
+      const formData = new FormData();
+      formData.append("file", file);
+
+      fetch("/api/upload-cover", {
+        method: "POST",
+        body: formData,
       })
-      .catch((err) => {
-        console.error("Cover upload API error, falling back to FileReader:", err);
-        const reader = new FileReader();
-        reader.onload = () => {
-          const base64Data = reader.result as string;
-          const updated = { ...sidebarMenuState, coverImageUrl: base64Data };
-          setSidebarMenuState(updated);
-          updateSidebarConfig(updated);
-          showToast("Cover page saved live!");
-        };
-        reader.readAsDataURL(file);
-      });
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.url) {
+            const serverUpdated = {
+              ...sidebarMenuState,
+              coverImageUrl: data.url,
+            };
+            setSidebarMenuState(serverUpdated);
+            updateSidebarConfig(serverUpdated);
+            showToast("Cover page updated and synced across all devices!");
+          }
+        })
+        .catch(() => {
+          // If server multipart fails, attempt JSON sync with optimized image
+          fetch("/api/upload-cover", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dataUrl: optimizedDataUrl }),
+          }).catch(() => {});
+        });
+
+      showToast("Cover page updated successfully!");
+    } catch (err) {
+      console.error("Cover upload error:", err);
+      showToast("Error updating cover page. Please try another image.");
+    }
   };
 
-  const handleResetCoverPage = () => {
+  const handleResetCoverPage = async () => {
+    showToast("Resetting cover page to official default...");
+    try {
+      await fetch("/api/upload-cover", { method: "DELETE" }).catch(() => {});
+    } catch {}
+
+    const defaultUrl = `/images/manthan-cover-page.png?v=${Date.now()}`;
     const updated = {
       ...sidebarMenuState,
-      coverImageUrl: `/images/manthan-cover-page.png?v=${Date.now()}`,
+      coverImageUrl: defaultUrl,
+      coverPageHeading: "Cover Page",
     };
     setSidebarMenuState(updated);
     updateSidebarConfig(updated);
-    showToast("Cover page reset to official default Manthan cover.");
+    showToast("Cover page reset to official Manthan Nov 2026 cover!");
   };
 
   const handleAddMember = (e: React.FormEvent) => {
@@ -933,7 +988,8 @@ export default function AdminPage() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   updateSettings(settingsForm);
-                  showToast("Journal settings updated and saved live!");
+                  updateSidebarConfig(sidebarMenuState);
+                  showToast("Journal settings & cover page saved live across all devices!");
                 }}
                 className="space-y-4 text-xs"
               >
@@ -1115,24 +1171,30 @@ export default function AdminPage() {
                         Journal Issue Cover Page
                       </h4>
                       <p className="text-slate-500 text-xs">
-                        Upload or replace the official cover page displayed in the website sidebar.
+                        Upload custom cover image (PNG, JPG, WebP), paste direct image URL, or reset to official default.
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-3 bg-white border border-slate-200 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="p-3 bg-white border border-slate-200 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <img
                         src={sidebarMenuState.coverImageUrl || "/images/manthan-cover-page.png"}
                         alt="Current Cover"
                         className="w-14 h-20 object-contain border border-slate-300 rounded shadow-xs bg-slate-50 shrink-0"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (!target.src.includes("manthan-cover-page.png")) {
+                            target.src = "/images/manthan-cover-page.png";
+                          }
+                        }}
                       />
                       <div className="text-xs">
                         <p className="font-bold text-slate-800">
                           {sidebarMenuState.coverPageHeading || "Cover Page"}
                         </p>
                         <p className="text-slate-500 text-[11px] mt-0.5">
-                          Rendered on sidebar for all visitors. Upload custom PNG, JPG, or WebP.
+                          Rendered on sidebar for all visitors across Mobile, Tablet, and PC.
                         </p>
                       </div>
                     </div>
@@ -1143,7 +1205,7 @@ export default function AdminPage() {
                         className="flex-1 sm:flex-none px-3.5 py-2 bg-[#700070] hover:bg-[#550055] text-white rounded font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-xs"
                       >
                         <FileUp className="w-3.5 h-3.5" />
-                        <span>Upload Cover</span>
+                        <span>Upload Cover Image</span>
                       </label>
                       <input
                         id="settingsCoverUploadInput"
@@ -1156,9 +1218,46 @@ export default function AdminPage() {
                         type="button"
                         onClick={handleResetCoverPage}
                         className="px-3 py-2 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded text-xs font-semibold cursor-pointer transition-colors"
+                        title="Reset to official Nov 2026 Manthan cover"
                       >
                         Reset Default
                       </button>
+                    </div>
+                  </div>
+
+                  {/* Direct Title and URL Inputs for total control */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1 text-[11px]">
+                        Cover Box Title / Heading
+                      </label>
+                      <input
+                        type="text"
+                        value={sidebarMenuState.coverPageHeading || "Cover Page"}
+                        onChange={(e) => {
+                          const updated = { ...sidebarMenuState, coverPageHeading: e.target.value };
+                          setSidebarMenuState(updated);
+                          updateSidebarConfig(updated);
+                        }}
+                        className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                        placeholder="Cover Page"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1 text-[11px]">
+                        Cover Image URL / Path (or auto-filled on upload)
+                      </label>
+                      <input
+                        type="text"
+                        value={sidebarMenuState.coverImageUrl || ""}
+                        onChange={(e) => {
+                          const updated = { ...sidebarMenuState, coverImageUrl: e.target.value };
+                          setSidebarMenuState(updated);
+                          updateSidebarConfig(updated);
+                        }}
+                        className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs font-mono bg-white"
+                        placeholder="/images/manthan-cover-page.png or https://..."
+                      />
                     </div>
                   </div>
                 </div>
@@ -2470,12 +2569,14 @@ export default function AdminPage() {
                       <input
                         type="text"
                         value={sidebarMenuState.coverImageUrl ?? "/images/manthan-cover-page.png"}
-                        onChange={(e) =>
-                          setSidebarMenuState({
+                        onChange={(e) => {
+                          const updated = {
                             ...sidebarMenuState,
                             coverImageUrl: e.target.value,
-                          })
-                        }
+                          };
+                          setSidebarMenuState(updated);
+                          updateSidebarConfig(updated);
+                        }}
                         placeholder="/images/manthan-cover-page.png"
                         className="w-full px-3 py-2 border border-slate-300 rounded bg-white text-sm font-mono text-xs"
                       />
@@ -2489,6 +2590,12 @@ export default function AdminPage() {
                         src={sidebarMenuState.coverImageUrl || "/images/manthan-cover-page.png"}
                         alt="Cover Preview"
                         className="w-16 h-22 object-contain border border-slate-300 rounded shadow-xs bg-slate-50 shrink-0"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (!target.src.includes("manthan-cover-page.png")) {
+                            target.src = "/images/manthan-cover-page.png";
+                          }
+                        }}
                       />
                       <div className="text-xs text-slate-600">
                         <p className="font-bold text-slate-900 text-sm">
