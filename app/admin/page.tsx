@@ -460,33 +460,53 @@ export default function AdminPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      showToast("Cover image is too large! Maximum allowed size is 10MB.");
+    if (file.size > 15 * 1024 * 1024) {
+      showToast("Cover image is too large! Maximum allowed size is 15MB.");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64Data = reader.result as string;
-      setSidebarMenuState((prev) => {
-        const updated = { ...prev, coverImageUrl: base64Data };
-        updateSidebarConfig(updated);
-        return updated;
+    showToast("Uploading and updating cover page...");
+
+    // Send file to server upload API for persistent storage
+    const formData = new FormData();
+    formData.append("file", file);
+
+    fetch("/api/upload-cover", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.url) {
+          const updated = { ...sidebarMenuState, coverImageUrl: data.url };
+          setSidebarMenuState(updated);
+          updateSidebarConfig(updated);
+          showToast("Cover page updated and saved live across all devices!");
+        } else {
+          throw new Error(data.error || "Upload failed");
+        }
+      })
+      .catch((err) => {
+        console.error("Cover upload API error, falling back to FileReader:", err);
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64Data = reader.result as string;
+          const updated = { ...sidebarMenuState, coverImageUrl: base64Data };
+          setSidebarMenuState(updated);
+          updateSidebarConfig(updated);
+          showToast("Cover page saved live!");
+        };
+        reader.readAsDataURL(file);
       });
-      showToast("Cover page image uploaded and saved live across the website!");
-    };
-    reader.onerror = () => {
-      showToast("Failed to read cover image file.");
-    };
-    reader.readAsDataURL(file);
   };
 
   const handleResetCoverPage = () => {
-    setSidebarMenuState((prev) => {
-      const updated = { ...prev, coverImageUrl: "/images/manthan-cover-page.png" };
-      updateSidebarConfig(updated);
-      return updated;
-    });
+    const updated = {
+      ...sidebarMenuState,
+      coverImageUrl: `/images/manthan-cover-page.png?v=${Date.now()}`,
+    };
+    setSidebarMenuState(updated);
+    updateSidebarConfig(updated);
     showToast("Cover page reset to official default Manthan cover.");
   };
 
