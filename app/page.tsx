@@ -1,19 +1,13 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { useJournalData } from "@/context/JournalDataContext";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SpecTable } from "@/components/ui/SpecTable";
-import { ArticlePdfButton } from "@/components/ui/ArticlePdfButton";
-import { getArticleUrl } from "@/utils/articleHelper";
-import { FileText, Calendar, User, ArrowRight, Bell, Mail } from "lucide-react";
+import { Bell, Mail } from "lucide-react";
 
 export default function HomePage() {
-  const { settings, announcement, homepage, articles } = useJournalData();
-
-  // Published articles for public display
-  const publishedArticles = articles.filter((a) => a.status === "Published");
+  const { settings, announcement, homepage } = useJournalData();
 
   return (
     <div className="w-full space-y-4">
@@ -125,83 +119,6 @@ export default function HomePage() {
               <li><strong>Philosophy:</strong> Discussions of philosophical ideas and their applications to contemporary issues.</li>
               <li><strong>Economics and Economic History:</strong> Studies on economic theories, policies, and historical economic developments.</li>
             </ol>
-          </section>
-
-          {/* -------------------------------------------------------------
-              CURRENT ISSUE & AUTHENTIC LATEST ARTICLES (Live from Admin)
-             ------------------------------------------------------------- */}
-          <section id="homepageIssue" className="pt-6 border-t border-gray-300 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 pb-1.5">
-              <h2 className="text-lg sm:text-xl font-editorial font-bold text-[#700070]">
-                Latest Articles: Volume 1, Issue 1 (August 2026)
-              </h2>
-              <span className="text-xs bg-[#700070] text-white px-2 py-0.5 font-bold">
-                Current Issue
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs text-gray-500 font-mono pb-2 border-b border-gray-200">
-              <span className="w-2 h-2 rounded-full bg-[#700070]" />
-              <Calendar className="w-3.5 h-3.5 text-[#700070]" />
-              <span>Published: August 2026 • {publishedArticles.length} Articles in Database</span>
-            </div>
-
-            <div className="divide-y divide-gray-200">
-              {publishedArticles.map((art) => (
-                <div
-                  key={art.id}
-                  className="py-3 px-2 rounded hover:bg-gray-50 transition-colors first:pt-2 last:pb-0"
-                >
-                  <h3 className="font-editorial text-sm sm:text-base font-bold text-gray-900 hover:text-[#700070] mb-1 leading-snug">
-                    <Link href={getArticleUrl(art)}>
-                      {art.title}
-                    </Link>
-                  </h3>
-
-                  <div className="text-xs text-gray-600 flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-gray-400" />
-                      <span className="font-semibold text-gray-800">{art.authors}</span>
-                      <span className="text-gray-400">•</span>
-                      <span className="bg-gray-100 text-gray-700 px-1.5 py-0.2 rounded text-[11px] font-mono">
-                        {art.volume} {art.issue}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2.5">
-                      <span className="font-mono text-[10px] text-gray-400">DOI: {art.doi}</span>
-                      <Link
-                        href={getArticleUrl(art)}
-                        className="px-2 py-0.5 border border-gray-300 text-gray-700 hover:border-[#700070] hover:text-[#700070] text-[11px] font-medium transition-colors"
-                      >
-                        Abstract
-                      </Link>
-                      <ArticlePdfButton article={art} settings={settings} />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="pt-3 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-              <Link
-                href="/archives"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#700070] hover:underline uppercase tracking-wider group"
-              >
-                <span>Browse All Archives</span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
-              </Link>
-
-              <span className="text-xs text-gray-500">
-                Send your article on email:{" "}
-                <a
-                  href={`mailto:${settings.email}`}
-                  className="font-mono text-[#700070] hover:underline font-bold break-all"
-                >
-                  {settings.email}
-                </a>
-              </span>
-            </div>
           </section>
         </div>
 
