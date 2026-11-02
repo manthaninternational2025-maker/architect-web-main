@@ -13,16 +13,16 @@ export function TopUtilityBar() {
   return (
     <aside aria-label="Journal Top Banner" className="bg-[#111111] text-white border-b border-black">
       <div className="w-full px-2.5 sm:px-3 py-1 sm:py-1.5 flex items-center justify-between gap-2 overflow-hidden">
-        <div className="flex items-center min-w-0 text-[11px] text-gray-300 font-sans leading-tight gap-2">
-          <span className="font-bold text-[#FFCC00] tracking-wide whitespace-nowrap">
+        <div className="flex items-center min-w-0 text-[11px] text-gray-300 font-sans leading-tight gap-1.5 sm:gap-2">
+          <span className="font-bold text-[#FFCC00] tracking-wide truncate max-w-[160px] sm:max-w-none">
             {settings.journalTitle}
           </span>
-          <span className="text-gray-500 shrink-0">|</span>
-          <span className="text-gray-200 whitespace-nowrap shrink-0">
+          <span className="text-gray-500 shrink-0 hidden md:inline">|</span>
+          <span className="text-gray-200 whitespace-nowrap shrink-0 hidden md:inline">
             An Open Access Peer Reviewed Refereed Journal
           </span>
           <span className="text-gray-500 shrink-0">|</span>
-          <span className="text-[#FFCC00] font-mono font-medium whitespace-nowrap shrink-0 text-[11px]">
+          <span className="text-[#FFCC00] font-mono font-medium whitespace-nowrap shrink-0 text-[10.5px] sm:text-[11px]">
             ISSN: {settings.issn}
           </span>
         </div>

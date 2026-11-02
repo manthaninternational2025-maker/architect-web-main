@@ -21,10 +21,11 @@ export const metadata: Metadata = {
   keywords: "Manthan Journal, IMJSI, multidisciplinary social inquiry, peer reviewed journal, open access, Impulse Publication Works, call for papers, Dr Deepak Setia",
 };
 
-// Set viewport width to 1024 so mobile devices display the exact full PC layout with sidebar and navbar
+// Mobile and tablet responsive viewport
 export const viewport: Viewport = {
-  width: 1024,
-  initialScale: 0.38,
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -37,9 +38,6 @@ export default function RootLayout({
       lang="en"
       className={`${sourceSerif.variable} ${inter.variable} h-full antialiased`}
     >
-      <head>
-        <meta name="viewport" content="width=1024" />
-      </head>
       <body className="min-h-full font-sans antialiased">
         <JournalLayoutShell>
           {children}

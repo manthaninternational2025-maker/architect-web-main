@@ -1,0 +1,71 @@
+{
+  "articles": [
+    {
+      "id": 1,
+      "title": "A Critical Analysis of Legal and Human Rights of Undertrial Female Prisoners in India",
+      "authors": "Anchal Gautam",
+      "volume": "Vol. 1",
+      "issue": "Issue 1",
+      "date": "August 2026",
+      "status": "Published",
+      "doi": "10.5281/imjsi.2026.01.01",
+      "abstract": "An empirical socio-legal analysis reviewing statutory protections, prison conditions, judicial precedents, and systemic vulnerabilities confronting female undertrial detainees.",
+      "pages": "pp. 1-12",
+      "category": "Law & Human Rights",
+      "views": 220,
+      "downloads": 6
+    },
+    {
+      "id": 2,
+      "title": "Decline and Fall: Factors Contributing to the Downfall of the Mughal Empire",
+      "authors": "Aastha Rani",
+      "volume": "Vol. 1",
+      "issue": "Issue 1",
+      "date": "August 2026",
+      "status": "Published",
+      "doi": "10.5281/imjsi.2026.01.02",
+      "abstract": "A historiographical reassessment of the fiscal strains, agrarian distress, regional rebellions, and administrative fragmentation that precipitated the decline of the Mughal Empire in 18th-century South Asia.",
+      "pages": "pp. 13-24",
+      "category": "Historical Inquiries",
+      "views": 165,
+      "downloads": 3
+    },
+    {
+      "id": 3,
+      "title": "The Dynamics of Indian Nationalism: A Historical Analysis Age",
+      "authors": "Geetanshu",
+      "volume": "Vol. 1",
+      "issue": "Issue 1",
+      "date": "August 2026",
+      "status": "Published",
+      "doi": "10.5281/imjsi.2026.01.03",
+      "abstract": "A critical historical investigation exploring the multifaceted evolutionary trajectories, subaltern voices, and ideological currents that shaped the anti-colonial nationalist movement in India.",
+      "pages": "pp. 25-36",
+      "category": "Modern Indian History",
+      "views": 184,
+      "downloads": 2
+    }
+  ],
+  "issues": [
+    {
+      "id": 1,
+      "volume": "Volume 1",
+      "issue": "Issue 1",
+      "period": "August 2026",
+      "publicationDate": "2026-08-01",
+      "status": "Published",
+      "articlesCount": 3,
+      "theme": "Inaugural Multidisciplinary Social Inquiry Issue"
+    },
+    {
+      "id": 2,
+      "volume": "Volume 1",
+      "issue": "Issue 2",
+      "period": "September 2026",
+      "publicationDate": "2026-09-01",
+      "status": "Open for Submissions",
+      "articlesCount": 0,
+      "theme": "Contemporary Perspectives in Social Governance & Economics"
+    }
+  ]
+}

@@ -101,12 +101,12 @@ export const resources: Resource[] = [
     publishedDate: "AUGUST 2026",
     summary: "An empirical socio-legal analysis reviewing statutory protections, prison conditions, judicial precedents, and systemic vulnerabilities confronting female undertrial detainees.",
     readTime: "9 min read",
-    author: "Rahul Sharma",
+    author: "Anchal Gautam",
     volume: "Vol. 1",
     issue: "Issue 1",
-    pages: "pp. 1-6",
+    pages: "pp. 1-12",
     doi: "10.5281/imjsi.2026.01.01",
-    citationText: "Sharma, R. (2026). A Critical Analysis of Legal and Human Rights of Undertrial Female Prisoners in India. Manthan: International Multidisciplinary Journal of Social Inquiry, 1(1), 1–6.",
+    citationText: "Gautam, A. (2026). A Critical Analysis of Legal and Human Rights of Undertrial Female Prisoners in India. Manthan: International Multidisciplinary Journal of Social Inquiry, 1(1), 1–12.",
     sections: [
       {
         heading: "Abstract",

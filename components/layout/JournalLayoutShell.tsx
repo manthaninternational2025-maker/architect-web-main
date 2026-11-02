@@ -25,7 +25,7 @@ function JournalLayoutContent({ children }: { children: React.ReactNode }) {
           </div>
         ) : (
           // Journal Portal Sheet Format (Royal Purple Background + Centered Sheet)
-          <div className="min-h-full bg-[#700070] text-[#222222] font-sans antialiased selection:bg-[#700070] selection:text-white py-3">
+          <div className="min-h-full bg-[#700070] text-[#222222] font-sans antialiased selection:bg-[#700070] selection:text-white py-0 sm:py-3">
             <a
               href="#main-content"
               className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#700070] focus:text-white focus:font-semibold focus:rounded"
@@ -33,14 +33,14 @@ function JournalLayoutContent({ children }: { children: React.ReactNode }) {
               Skip to main academic content
             </a>
 
-            <div className="w-[1000px] max-w-[1000px] mx-auto bg-white border border-[#333333] shadow-2xl min-h-screen flex flex-col">
+            <div className="w-full max-w-[1020px] mx-auto bg-white sm:border sm:border-[#333333] shadow-2xl min-h-screen flex flex-col">
               <header className="w-full flex flex-col">
                 <TopUtilityBar />
                 <Masthead />
                 <Navbar />
               </header>
 
-              <main id="main-content" className="flex-1 w-full bg-white px-6 py-4">
+              <main id="main-content" className="flex-1 w-full bg-white px-3 sm:px-5 md:px-6 py-4">
                 {children}
               </main>
 

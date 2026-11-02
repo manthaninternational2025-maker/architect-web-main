@@ -11,8 +11,8 @@ export default function ArchivesPage() {
 
   return (
     <div className="w-full">
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-8 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="col-span-1 lg:col-span-8 space-y-6">
           <h1 className="text-2xl font-editorial font-bold text-[#111111] border-b border-gray-200 pb-2">
             Archives
           </h1>
@@ -53,7 +53,7 @@ export default function ArchivesPage() {
           </div>
         </div>
 
-        <div className="col-span-4">
+        <div className="col-span-1 lg:col-span-4">
           <Sidebar />
         </div>
       </div>

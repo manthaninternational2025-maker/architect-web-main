@@ -237,138 +237,48 @@ const initialHomepage: HomepageData = {
 const initialArticlesList: ArticleItem[] = [
   {
     id: 1,
-    title: "Revival and Adaptation: The Role of Confucianism in Contemporary China",
-    authors: "Khem Chand",
+    title: "A Critical Analysis of Legal and Human Rights of Undertrial Female Prisoners in India",
+    authors: "Anchal Gautam",
     volume: "Vol. 1",
     issue: "Issue 1",
     date: "August 2026",
     status: "Published",
     doi: "10.5281/imjsi.2026.01.01",
-    abstract: "An analytical study investigating the resurgence, institutional adaptation, and state-society dynamics of Confucian philosophy in contemporary Chinese political and cultural discourse.",
-    pages: "pp. 18-23",
-    category: "Philosophy & Cultural Studies",
-    views: 142,
-    downloads: 5,
-  },
-  {
-    id: 2,
-    title: "Confucianism in India: Cross-Cultural Philosophical Dialogues in the 21st Century",
-    authors: "Chanden Kumar Jha",
-    volume: "Vol. 1",
-    issue: "Issue 1",
-    date: "August 2026",
-    status: "Published",
-    doi: "10.5281/imjsi.2026.01.02",
-    abstract: "A comparative exploration examining bilateral intellectual intersections between classical Confucian ethics and Indian philosophical paradigms in the contemporary global era.",
-    pages: "pp. 13-17",
-    category: "Comparative Philosophy",
-    views: 169,
-    downloads: 4,
-  },
-  {
-    id: 3,
-    title: "Reforming Human Nature: Xunzi’s Ethical and Political Philosophy",
-    authors: "Dr. Sakshi Sharma",
-    volume: "Vol. 1",
-    issue: "Issue 1",
-    date: "August 2026",
-    status: "Published",
-    doi: "10.5281/imjsi.2026.01.03",
-    abstract: "A critical textual analysis of Xunzi's assertion of inherent human moral ambiguity and the foundational requirement of ritual and institutional discipline for social cohesion.",
-    pages: "pp. 7-12",
-    category: "Classical Political Theory",
-    views: 198,
-    downloads: 4,
-  },
-  {
-    id: 4,
-    title: "A Critical Analysis of Legal and Human Rights of Undertrial Female Prisoners in India",
-    authors: "Rahul Sharma",
-    volume: "Vol. 1",
-    issue: "Issue 1",
-    date: "August 2026",
-    status: "Published",
-    doi: "10.5281/imjsi.2026.01.04",
     abstract: "An empirical socio-legal analysis reviewing statutory protections, prison conditions, judicial precedents, and systemic vulnerabilities confronting female undertrial detainees.",
-    pages: "pp. 1-6",
+    pages: "pp. 1-12",
     category: "Law & Human Rights",
     views: 220,
     downloads: 6,
   },
   {
-    id: 5,
+    id: 2,
     title: "Decline and Fall: Factors Contributing to the Downfall of the Mughal Empire",
     authors: "Aastha Rani",
     volume: "Vol. 1",
     issue: "Issue 1",
     date: "August 2026",
     status: "Published",
-    doi: "10.5281/imjsi.2026.01.05",
+    doi: "10.5281/imjsi.2026.01.02",
     abstract: "A historiographical reassessment of the fiscal strains, agrarian distress, regional rebellions, and administrative fragmentation that precipitated the decline of the Mughal Empire in 18th-century South Asia.",
-    pages: "pp. 1-12",
+    pages: "pp. 13-24",
     category: "Historical Inquiries",
     views: 165,
     downloads: 3,
   },
   {
-    id: 6,
+    id: 3,
     title: "The Dynamics of Indian Nationalism: A Historical Analysis Age",
     authors: "Geetanshu",
     volume: "Vol. 1",
     issue: "Issue 1",
     date: "August 2026",
     status: "Published",
-    doi: "10.5281/imjsi.2026.01.06",
+    doi: "10.5281/imjsi.2026.01.03",
     abstract: "A critical historical investigation exploring the multifaceted evolutionary trajectories, subaltern voices, and ideological currents that shaped the anti-colonial nationalist movement in India.",
-    pages: "37-41",
+    pages: "pp. 25-36",
     category: "Modern Indian History",
     views: 184,
     downloads: 2,
-  },
-  {
-    id: 7,
-    title: "Digital Financial Inclusion and Rural Empowerment: A Socio-Economic Study",
-    authors: "Dr. Neha Verma & Prof. V. K. Rao",
-    volume: "Vol. 1",
-    issue: "Issue 1",
-    date: "August 2026",
-    status: "Published",
-    doi: "10.5281/imjsi.2026.01.07",
-    abstract: "Socio-economic evaluation of digital credit and microfinance initiatives in rural clusters.",
-    pages: "pp. 42-49",
-    category: "Economics & Commerce",
-    views: 110,
-    downloads: 1,
-  },
-  {
-    id: 8,
-    title: "Interdisciplinary Approaches to Sustainable Development in Developing Nations",
-    authors: "Dr. Deepak Setia & Research Fellows",
-    volume: "Vol. 1",
-    issue: "Issue 1",
-    date: "August 2026",
-    status: "Published",
-    doi: "10.5281/imjsi.2026.01.08",
-    abstract: "Integrated frameworks harmonizing environmental resilience and economic policy in emerging economies.",
-    pages: "pp. 50-59",
-    category: "Multidisciplinary Studies",
-    views: 245,
-    downloads: 8,
-  },
-  {
-    id: 9,
-    title: "Pedagogical Evolution: Integrating AI and Blended Learning in Higher Education",
-    authors: "Pooja Malhotra",
-    volume: "Vol. 1",
-    issue: "Issue 1",
-    date: "August 2026",
-    status: "Published",
-    doi: "10.5281/imjsi.2026.01.09",
-    abstract: "Curricular paradigms and ethical considerations in automated, blended higher education delivery.",
-    pages: "pp. 60-68",
-    category: "Education & Pedagogy",
-    views: 190,
-    downloads: 5,
   },
 ];
 
@@ -380,7 +290,7 @@ const initialIssues: IssueItem[] = [
     period: "August 2026",
     publicationDate: "2026-08-01",
     status: "Published",
-    articlesCount: 13,
+    articlesCount: 3,
     theme: "Inaugural Multidisciplinary Social Inquiry Issue",
   },
   {
@@ -601,14 +511,30 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       const h = localStorage.getItem(K_HOMEPAGE);
       if (h) setHomepage(JSON.parse(h));
 
+      const isMockFaltuArticle = (item: any) => {
+        const author = (item.authors || "").toLowerCase();
+        const title = (item.title || "").toLowerCase();
+        return (
+          author.includes("khem chand") ||
+          author.includes("chanden kumar jha") ||
+          author.includes("sakshi sharma") ||
+          author.includes("rahul sharma") ||
+          author.includes("neha verma") ||
+          author.includes("pooja malhotra") ||
+          (author.includes("deepak setia") && title.includes("sustainable development"))
+        );
+      };
+
       const art = localStorage.getItem(K_ARTICLES);
       if (art) {
         try {
           const parsed = JSON.parse(art);
           if (Array.isArray(parsed) && parsed.length > 0) {
+            const filtered = parsed.filter((item: any) => !isMockFaltuArticle(item));
+            const toUse = filtered.length > 0 ? filtered : initialArticlesList;
             const seenIds = new Set<number>();
             let maxId = 0;
-            const sanitized = parsed.map((item: any, idx: number) => {
+            const sanitized = toUse.map((item: any, idx: number) => {
               let id = typeof item.id === "number" && !isNaN(item.id) && item.id > 0 ? item.id : idx + 1;
               if (seenIds.has(id)) {
                 id = maxId + 1;
@@ -622,12 +548,27 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
               return { ...item, id, doi };
             });
             setArticles(sanitized);
+            try { localStorage.setItem(K_ARTICLES, JSON.stringify(sanitized)); } catch {}
+            syncToServer({ articles: sanitized });
           }
         } catch {}
+      } else {
+        try { localStorage.setItem(K_ARTICLES, JSON.stringify(initialArticlesList)); } catch {}
+        syncToServer({ articles: initialArticlesList });
       }
 
       const iss = localStorage.getItem(K_ISSUES);
-      if (iss) setIssues(JSON.parse(iss));
+      if (iss) {
+        try {
+          const parsedIss = JSON.parse(iss);
+          const normalizedIss = parsedIss.map((it: any) =>
+            it.id === 1 && it.articlesCount > 3 ? { ...it, articlesCount: 3 } : it
+          );
+          setIssues(normalizedIss);
+        } catch {
+          setIssues(JSON.parse(iss));
+        }
+      }
 
       const m = localStorage.getItem(K_MEMBERS);
       if (m) {
@@ -710,8 +651,10 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
               try { localStorage.setItem(K_HOMEPAGE, JSON.stringify(d.homepage)); } catch {}
             }
             if (d.articles && Array.isArray(d.articles)) {
-              setArticles(d.articles);
-              try { localStorage.setItem(K_ARTICLES, JSON.stringify(d.articles)); } catch {}
+              const cleanArticles = d.articles.filter((item: any) => !isMockFaltuArticle(item));
+              const finalArticles = cleanArticles.length > 0 ? cleanArticles : initialArticlesList;
+              setArticles(finalArticles);
+              try { localStorage.setItem(K_ARTICLES, JSON.stringify(finalArticles)); } catch {}
             }
             if (d.issues && Array.isArray(d.issues)) {
               setIssues(d.issues);
