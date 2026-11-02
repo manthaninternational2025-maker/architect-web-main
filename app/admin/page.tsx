@@ -140,14 +140,15 @@ export default function AdminPage() {
   const [ethicsState, setEthicsState] = useState(ethics);
   const [contactState, setContactState] = useState(contact);
   const [sidebarMenuState, setSidebarMenuState] = useState(sidebarConfig);
+  const [dirtyTabs, setDirtyTabs] = useState<Record<string, boolean>>({});
 
-  useEffect(() => { setSettingsForm(settings); }, [settings]);
-  useEffect(() => { setHomepageState(homepage); }, [homepage]);
-  useEffect(() => { setAnnouncementState(announcement); }, [announcement]);
-  useEffect(() => { setInstructionsState(instructions); }, [instructions]);
-  useEffect(() => { setEthicsState(ethics); }, [ethics]);
-  useEffect(() => { setContactState(contact); }, [contact]);
-  useEffect(() => { setSidebarMenuState(sidebarConfig); }, [sidebarConfig]);
+  useEffect(() => { if (!dirtyTabs.settings) setSettingsForm(settings); }, [settings, dirtyTabs.settings]);
+  useEffect(() => { if (!dirtyTabs.homepage) setHomepageState(homepage); }, [homepage, dirtyTabs.homepage]);
+  useEffect(() => { if (!dirtyTabs.announcement) setAnnouncementState(announcement); }, [announcement, dirtyTabs.announcement]);
+  useEffect(() => { if (!dirtyTabs.instructions) setInstructionsState(instructions); }, [instructions, dirtyTabs.instructions]);
+  useEffect(() => { if (!dirtyTabs.ethics) setEthicsState(ethics); }, [ethics, dirtyTabs.ethics]);
+  useEffect(() => { if (!dirtyTabs.contact) setContactState(contact); }, [contact, dirtyTabs.contact]);
+  useEffect(() => { if (!dirtyTabs.sidebar) setSidebarMenuState(sidebarConfig); }, [sidebarConfig, dirtyTabs.sidebar]);
 
   const [newArticleModal, setNewArticleModal] = useState(false);
   const [editingArticle, setEditingArticle] = useState<any | null>(null);
@@ -335,9 +336,10 @@ export default function AdminPage() {
     showToast("Attached document removed.");
   };
 
-  const handleAddArticle = (e: React.FormEvent) => {
+  const handleAddArticle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newArticleForm.title || !newArticleForm.authors) return;
+    const nextId = articlesList.length ? Math.max(...articlesList.map((p: any) => p.id || 0)) + 1 : 1;
     const newArt = {
       title: newArticleForm.title,
       authors: newArticleForm.authors,
@@ -345,7 +347,7 @@ export default function AdminPage() {
       issue: newArticleForm.issue || "Issue 1",
       date: newArticleForm.date || "August 2026",
       status: newArticleForm.status || "Published",
-      doi: newArticleForm.doi,
+      doi: newArticleForm.doi || `10.5281/imjsi.2026.01.${nextId < 10 ? `0${nextId}` : nextId}`,
       abstract: newArticleForm.abstract || "Abstract submitted.",
       pages: newArticleForm.pages,
       keywords: newArticleForm.keywords,
@@ -354,8 +356,13 @@ export default function AdminPage() {
       fileSize: newArticleForm.fileSize,
       fileData: newArticleForm.fileData,
       pdfUrl: newArticleForm.pdfUrl,
+      id: nextId,
+      views: 0,
+      downloads: 0,
     };
     addArticle(newArt);
+    const updated = [newArt, ...articlesList];
+    await saveAllLive({ articles: updated });
     setNewArticleModal(false);
     setNewArticleForm({
       title: "",
@@ -374,19 +381,22 @@ export default function AdminPage() {
       fileData: "",
       pdfUrl: "",
     });
-    showToast("Article published with attached document and live on website!");
+    showToast("✅ Article published and live on website across all devices!");
   };
 
-  const handleSaveEditedArticle = (e: React.FormEvent) => {
+  const handleSaveEditedArticle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingArticle) return;
     updateArticle(editingArticle);
+    const updated = articlesList.map((a: any) => a.id === editingArticle.id ? editingArticle : a);
+    await saveAllLive({ articles: updated });
     setEditingArticle(null);
-    showToast(`Article #${editingArticle.id} updated and saved live!`);
+    showToast(`✅ Article #${editingArticle.id} updated and saved live!`);
   };
 
-  const handleAddIssue = (e: React.FormEvent) => {
+  const handleAddIssue = async (e: React.FormEvent) => {
     e.preventDefault();
+    const nextId = issuesList.length ? Math.max(...issuesList.map((p: any) => p.id)) + 1 : 1;
     const newIss = {
       volume: newIssueForm.volume,
       issue: newIssueForm.issue,
@@ -394,19 +404,25 @@ export default function AdminPage() {
       publicationDate: newIssueForm.publicationDate,
       status: newIssueForm.status,
       theme: newIssueForm.theme,
+      id: nextId,
+      articlesCount: 0,
       pdfUrl: "",
     };
     addIssue(newIss);
+    const updated = [...issuesList, newIss];
+    await saveAllLive({ issues: updated });
     setNewIssueModal(false);
-    showToast("New issue created in archive index and live on website!");
+    showToast("✅ New issue created in archive index and live on website!");
   };
 
-  const handleSaveEditedIssue = (e: React.FormEvent) => {
+  const handleSaveEditedIssue = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingIssue) return;
     updateIssue(editingIssue);
+    const updated = issuesList.map((iss: any) => iss.id === editingIssue.id ? editingIssue : iss);
+    await saveAllLive({ issues: updated });
     setEditingIssue(null);
-    showToast(`Issue "${editingIssue.volume}, ${editingIssue.issue}" updated live!`);
+    showToast(`✅ Issue "${editingIssue.volume}, ${editingIssue.issue}" updated live!`);
   };
 
   const handleMemberPhotoUpload = (
@@ -566,9 +582,10 @@ export default function AdminPage() {
     showToast("Cover page reset to official Manthan Nov 2026 cover!");
   };
 
-  const handleAddMember = (e: React.FormEvent) => {
+  const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMemberForm.name) return;
+    const nextId = editorialMembers.length ? Math.max(...editorialMembers.map((p: any) => p.id)) + 1 : 1;
     const newM = {
       name: newMemberForm.name,
       role: newMemberForm.role,
@@ -582,8 +599,11 @@ export default function AdminPage() {
       orcid: newMemberForm.orcid,
       phone: newMemberForm.phone,
       websiteUrl: newMemberForm.websiteUrl,
+      id: nextId,
     };
     addMember(newM);
+    const updated = [...editorialMembers, newM];
+    await saveAllLive({ members: updated });
     setNewMemberModal(false);
     setNewMemberForm({
       name: "",
@@ -599,15 +619,17 @@ export default function AdminPage() {
       phone: "",
       websiteUrl: "",
     });
-    showToast("New editorial member added and live on board!");
+    showToast("✅ New editorial member added and live on board!");
   };
 
-  const handleSaveEditedMember = (e: React.FormEvent) => {
+  const handleSaveEditedMember = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingMember) return;
     updateMember(editingMember);
+    const updated = editorialMembers.map((m: any) => m.id === editingMember.id ? editingMember : m);
+    await saveAllLive({ members: updated });
     setEditingMember(null);
-    showToast("Editorial member updated and saved live!");
+    showToast("✅ Editorial member updated and saved live!");
   };
 
   // -------------------------------------------------------------
@@ -616,12 +638,13 @@ export default function AdminPage() {
   const [draggedMemberIndex, setDraggedMemberIndex] = useState<number | null>(null);
   const [dragOverMemberIndex, setDragOverMemberIndex] = useState<number | null>(null);
 
-  const moveMember = (fromIndex: number, toIndex: number) => {
+  const moveMember = async (fromIndex: number, toIndex: number) => {
     if (fromIndex === toIndex || toIndex < 0 || toIndex >= editorialMembers.length) return;
     const updated = [...editorialMembers];
     const [movedItem] = updated.splice(fromIndex, 1);
     updated.splice(toIndex, 0, movedItem);
     reorderMembers(updated);
+    await saveAllLive({ members: updated });
     showToast(`"${movedItem.name}" position updated (#${toIndex + 1}) live on website!`);
   };
 
@@ -1645,9 +1668,11 @@ export default function AdminPage() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => {
+                            onClick={async () => {
                               if (confirm(`Delete article #${art.id}: "${art.title}"?`)) {
+                                const updated = articlesList.filter((a: any) => a.id !== art.id);
                                 deleteArticle(art.id);
+                                await saveAllLive({ articles: updated });
                                 showToast(`Article #${art.id} deleted.`);
                               }
                             }}
@@ -1737,8 +1762,10 @@ export default function AdminPage() {
                             </button>
                             <button
                               type="button"
-                              onClick={() => {
+                              onClick={async () => {
+                                const updated = articlesList.filter((a: any) => a.id !== art.id);
                                 deleteArticle(art.id);
+                                await saveAllLive({ articles: updated });
                                 showToast(`Article #${art.id} deleted.`);
                               }}
                               className="text-rose-500 hover:text-rose-700 p-1 cursor-pointer"
@@ -2097,8 +2124,10 @@ export default function AdminPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={async () => {
+                          const updated = editorialMembers.filter((item: any) => item.id !== m.id);
                           deleteMember(m.id);
+                          await saveAllLive({ members: updated });
                           showToast(`Removed ${m.name}`);
                         }}
                         className="text-rose-500 hover:underline cursor-pointer"
@@ -4004,9 +4033,11 @@ export default function AdminPage() {
               <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={async () => {
                     if (confirm(`Are you sure you want to delete ${editingIssue.volume}, ${editingIssue.issue}?`)) {
+                      const updated = issuesList.filter((iss: any) => iss.id !== editingIssue.id);
                       deleteIssue(editingIssue.id);
+                      await saveAllLive({ issues: updated });
                       setEditingIssue(null);
                       showToast(`Issue "${editingIssue.volume}, ${editingIssue.issue}" deleted.`);
                     }
@@ -4562,9 +4593,11 @@ export default function AdminPage() {
               <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={async () => {
                     if (confirm(`Are you sure you want to delete ${editingMember.name}? This will remove them from the editorial board.`)) {
+                      const updated = editorialMembers.filter((m: any) => m.id !== editingMember.id);
                       deleteMember(editingMember.id);
+                      await saveAllLive({ members: updated });
                       setEditingMember(null);
                       showToast(`Removed "${editingMember.name}" from editorial board.`);
                     }

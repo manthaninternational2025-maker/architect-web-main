@@ -617,12 +617,10 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
             });
             setArticles(sanitized);
             try { localStorage.setItem(K_ARTICLES, JSON.stringify(sanitized)); } catch {}
-            syncToServer({ articles: sanitized });
           }
         } catch {}
       } else {
         try { localStorage.setItem(K_ARTICLES, JSON.stringify(initialArticlesList)); } catch {}
-        syncToServer({ articles: initialArticlesList });
       }
 
       const iss = localStorage.getItem(K_ISSUES);
@@ -1053,6 +1051,20 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       sidebarConfig: overrides?.sidebarConfig || sidebarConfig,
       messages: overrides?.messages || messages,
     };
+
+    if (overrides) {
+      if (overrides.settings) setSettings(overrides.settings);
+      if (overrides.announcement) setAnnouncement(overrides.announcement);
+      if (overrides.homepage) setHomepage(overrides.homepage);
+      if (overrides.articles) setArticles(overrides.articles);
+      if (overrides.issues) setIssues(overrides.issues);
+      if (overrides.members) setMembers(overrides.members);
+      if (overrides.instructions) setInstructions(overrides.instructions);
+      if (overrides.ethics) setEthics(overrides.ethics);
+      if (overrides.contact) setContact(overrides.contact);
+      if (overrides.sidebarConfig) setSidebarConfig(overrides.sidebarConfig);
+      if (overrides.messages) setMessages(overrides.messages);
+    }
     try {
       localStorage.setItem(K_SETTINGS, JSON.stringify(fullPayload.settings));
       localStorage.setItem(K_ANNOUNCE, JSON.stringify(fullPayload.announcement));
