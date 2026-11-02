@@ -159,7 +159,7 @@ export default function HomePage() {
               ))}
             </div>
 
-            <div className="pt-3 border-t border-gray-200 flex items-center justify-between">
+            <div className="pt-3 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <Link
                 href="/archives"
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-[#700070] hover:underline uppercase tracking-wider group"
@@ -172,7 +172,7 @@ export default function HomePage() {
                 Send your article on email:{" "}
                 <a
                   href={`mailto:${settings.email}`}
-                  className="font-mono text-[#700070] hover:underline"
+                  className="font-mono text-[#700070] hover:underline font-bold break-all"
                 >
                   {settings.email}
                 </a>

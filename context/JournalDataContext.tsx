@@ -314,7 +314,8 @@ const initialMembers: EditorialMember[] = [
     affiliation: "Department of Political Science, Ram Lal Anand College, University of Delhi",
     email: "deepak.polsc@rla.du.ac.in",
     specialization: "Political Science",
-    websiteUrl: "https://rlacollege.edu.in",
+    photoUrl: "/images/editorial/dr-deepak-setia.png",
+    websiteUrl: "https://rlacollege.edu.in/academics/departments/Political%2BScience/faculty-detail-clone/fc421ca827450acbf2ead15941ef2f5b2a20e5d031e14e742476532cf9fd2638",
   },
   {
     id: 2,
@@ -324,6 +325,7 @@ const initialMembers: EditorialMember[] = [
     affiliation: "Department of History, Indraprastha College for Women, University of Delhi",
     email: "archana.history@ip.du.ac.in",
     specialization: "History",
+    photoUrl: "/images/editorial/dr-archana-kumari.png",
     websiteUrl: "https://ipcollege.ac.in",
   },
   {
@@ -334,6 +336,7 @@ const initialMembers: EditorialMember[] = [
     affiliation: "Department of Political Science at the School of Liberal Education, Galgotias University",
     email: "vikash.yadav@galgotiasuniversity.edu.in",
     specialization: "Political Science",
+    photoUrl: "/images/editorial/dr-vikash-yadav.png",
     websiteUrl: "https://www.galgotiasuniversity.edu.in",
   },
   {
@@ -344,6 +347,7 @@ const initialMembers: EditorialMember[] = [
     affiliation: "Department of Zoology, Sri Venkateswara College, University of Delhi",
     email: "amarjeet@svc.ac.in",
     specialization: "Zoology",
+    photoUrl: "/images/editorial/dr-amarjeet-singh.png",
     websiteUrl: "https://www.svc.ac.in",
   },
   {
@@ -354,6 +358,7 @@ const initialMembers: EditorialMember[] = [
     affiliation: "Centre for Diaspora Studies, Central University of Gujarat",
     email: "gajendra@cug.ac.in",
     specialization: "Diaspora Studies",
+    photoUrl: "/images/editorial/dr-gajendra.png",
     websiteUrl: "https://cug.ac.in",
   },
   {
@@ -364,6 +369,7 @@ const initialMembers: EditorialMember[] = [
     affiliation: "Department of History, Pachhunga University College, Mizoram University",
     email: "sudipto.boulevardier@gmail.com",
     specialization: "History",
+    photoUrl: "/images/editorial/dr-sudipto-mitra.png",
     websiteUrl: "https://pucollege.edu.in",
   },
   {
@@ -374,6 +380,7 @@ const initialMembers: EditorialMember[] = [
     affiliation: "Department of English, Indraprastha College for Women, University of Delhi",
     email: "anishakaul@ip.du.ac.in",
     specialization: "English",
+    photoUrl: "/images/editorial/dr-anisha-kaul.png",
     websiteUrl: "https://ipcollege.ac.in",
   },
   {
@@ -384,6 +391,7 @@ const initialMembers: EditorialMember[] = [
     affiliation: "Department of History, Miranda House College, University of Delhi",
     email: "kumar.saurabh@mirandahouse.ac.in",
     specialization: "History",
+    photoUrl: "/images/editorial/dr-kumar-saurabh.png",
     websiteUrl: "https://www.mirandahouse.ac.in",
   },
 ];
@@ -462,6 +470,43 @@ const initialMessages: MessageItem[] = [
     content: "Greetings. Our department is interested in organizing a themed issue with Manthan IMJSI in early 2027. Please share guest editorial guidelines.",
   },
 ];
+
+const normalizeEditorialMember = (item: EditorialMember): EditorialMember => {
+  const nameLower = (item.name || "").toLowerCase();
+  let photoUrl = item.photoUrl;
+  let websiteUrl = item.websiteUrl;
+
+  if (nameLower.includes("deepak setia")) {
+    websiteUrl = "https://rlacollege.edu.in/academics/departments/Political%2BScience/faculty-detail-clone/fc421ca827450acbf2ead15941ef2f5b2a20e5d031e14e742476532cf9fd2638";
+    if (!photoUrl && !item.photoData) {
+      photoUrl = "/images/editorial/dr-deepak-setia.png";
+    }
+    return {
+      ...item,
+      role: item.role || "Editor-in-Chief",
+      designation: item.designation || "Assistant Professor",
+      websiteUrl,
+      photoUrl,
+    };
+  }
+
+  if (!photoUrl && !item.photoData) {
+    if (nameLower.includes("archana")) photoUrl = "/images/editorial/dr-archana-kumari.png";
+    else if (nameLower.includes("vikash")) photoUrl = "/images/editorial/dr-vikash-yadav.png";
+    else if (nameLower.includes("amarjeet")) photoUrl = "/images/editorial/dr-amarjeet-singh.png";
+    else if (nameLower.includes("gajendra")) photoUrl = "/images/editorial/dr-gajendra.png";
+    else if (nameLower.includes("sudipto")) photoUrl = "/images/editorial/dr-sudipto-mitra.png";
+    else if (nameLower.includes("anisha")) photoUrl = "/images/editorial/dr-anisha-kaul.png";
+    else if (nameLower.includes("saurabh")) photoUrl = "/images/editorial/dr-kumar-saurabh.png";
+  }
+
+  return {
+    ...item,
+    designation: item.designation || "Assistant Professor",
+    photoUrl,
+    websiteUrl,
+  };
+};
 
 export function JournalDataProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<JournalSettings>(initialSettings);
@@ -574,24 +619,16 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       if (m) {
         try {
           const parsed = JSON.parse(m);
-          const normalized = parsed.map((item: EditorialMember) => {
-            if (item.name.toLowerCase().includes("deepak setia")) {
-              return {
-                ...item,
-                role: "Editor-in-Chief",
-                designation: item.designation || "Assistant Professor",
-                websiteUrl: item.websiteUrl || "https://rlacollege.edu.in",
-              };
-            }
-            if (!item.designation) {
-              item.designation = "Assistant Professor";
-            }
-            return item;
-          });
-          setMembers(normalized);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const normalized = parsed.map(normalizeEditorialMember);
+            setMembers(normalized);
+            try { localStorage.setItem(K_MEMBERS, JSON.stringify(normalized)); } catch {}
+          }
         } catch {
-          setMembers(JSON.parse(m));
+          setMembers(initialMembers);
         }
+      } else {
+        try { localStorage.setItem(K_MEMBERS, JSON.stringify(initialMembers)); } catch {}
       }
 
       const ins = localStorage.getItem(K_INSTRUCT);
@@ -661,8 +698,9 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
               try { localStorage.setItem(K_ISSUES, JSON.stringify(d.issues)); } catch {}
             }
             if (d.members && Array.isArray(d.members)) {
-              setMembers(d.members);
-              try { localStorage.setItem(K_MEMBERS, JSON.stringify(d.members)); } catch {}
+              const normalized = d.members.map(normalizeEditorialMember);
+              setMembers(normalized);
+              try { localStorage.setItem(K_MEMBERS, JSON.stringify(normalized)); } catch {}
             }
             if (d.instructions) {
               setInstructions(d.instructions);

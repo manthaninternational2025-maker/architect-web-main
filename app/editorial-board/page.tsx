@@ -88,8 +88,8 @@ export default function EditorialBoardPage() {
                     <div className="mt-2.5 flex flex-wrap items-center gap-4 text-gray-600 font-mono text-[11px]">
                       {member.email && (
                         <div className="flex items-center gap-1">
-                          <Mail className="w-3.5 h-3.5 text-[#700070]" />
-                          <a href={`mailto:${member.email}`} className="text-[#700070] hover:underline">
+                          <Mail className="w-3.5 h-3.5 text-[#700070] shrink-0" />
+                          <a href={`mailto:${member.email}`} className="text-[#700070] hover:underline break-all">
                             {member.email}
                           </a>
                         </div>

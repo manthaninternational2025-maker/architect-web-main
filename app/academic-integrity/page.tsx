@@ -84,15 +84,18 @@ export default function AcademicIntegrityPage() {
               </p>
             </section>
 
-            <div className="pt-4 border-t border-gray-200 flex items-center justify-between text-xs">
+            <div className="pt-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
               <Link
                 href="/submit"
-                className="px-4 py-2 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded"
+                className="w-full sm:w-auto text-center inline-flex items-center justify-center px-5 py-2.5 bg-[#700070] hover:bg-[#550055] text-white font-bold rounded transition-colors shadow-xs"
               >
-                Submit Manuscript
+                Submit Manuscript &rarr;
               </Link>
-              <span className="text-gray-500">
-                Editorial questions: <a href={`mailto:${settings.email}`} className="text-[#700070] font-mono font-bold hover:underline">{settings.email}</a>
+              <span className="text-gray-600">
+                Editorial questions:{" "}
+                <a href={`mailto:${settings.email}`} className="text-[#700070] font-mono font-bold hover:underline break-all">
+                  {settings.email}
+                </a>
               </span>
             </div>
           </article>

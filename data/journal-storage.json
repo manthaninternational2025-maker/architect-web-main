@@ -67,5 +67,95 @@
       "articlesCount": 0,
       "theme": "Contemporary Perspectives in Social Governance & Economics"
     }
+  ],
+  "members": [
+    {
+      "id": 1,
+      "name": "Dr. Deepak Setia",
+      "role": "Editor-in-Chief",
+      "designation": "Assistant Professor",
+      "affiliation": "Department of Political Science, Ram Lal Anand College, University of Delhi",
+      "email": "deepak.polsc@rla.du.ac.in",
+      "specialization": "Political Science",
+      "photoUrl": "/images/editorial/dr-deepak-setia.png",
+      "websiteUrl": "https://rlacollege.edu.in/academics/departments/Political%2BScience/faculty-detail-clone/fc421ca827450acbf2ead15941ef2f5b2a20e5d031e14e742476532cf9fd2638"
+    },
+    {
+      "id": 2,
+      "name": "Dr. Archana Kumari",
+      "role": "Editorial Board Member",
+      "designation": "Assistant Professor",
+      "affiliation": "Department of History, Indraprastha College for Women, University of Delhi",
+      "email": "archana.history@ip.du.ac.in",
+      "specialization": "History",
+      "photoUrl": "/images/editorial/dr-archana-kumari.png",
+      "websiteUrl": "https://ipcollege.ac.in"
+    },
+    {
+      "id": 3,
+      "name": "Dr. Vikash Yadav",
+      "role": "Editorial Board Member",
+      "designation": "Assistant Professor",
+      "affiliation": "Department of Political Science at the School of Liberal Education, Galgotias University",
+      "email": "vikash.yadav@galgotiasuniversity.edu.in",
+      "specialization": "Political Science",
+      "photoUrl": "/images/editorial/dr-vikash-yadav.png",
+      "websiteUrl": "https://www.galgotiasuniversity.edu.in"
+    },
+    {
+      "id": 4,
+      "name": "Dr. Amarjeet Singh",
+      "role": "Editorial Board Member",
+      "designation": "Assistant Professor",
+      "affiliation": "Department of Zoology, Sri Venkateswara College, University of Delhi",
+      "email": "amarjeet@svc.ac.in",
+      "specialization": "Zoology",
+      "photoUrl": "/images/editorial/dr-amarjeet-singh.png",
+      "websiteUrl": "https://www.svc.ac.in"
+    },
+    {
+      "id": 5,
+      "name": "Dr. Gajendra",
+      "role": "Editorial Board Member",
+      "designation": "Assistant Professor",
+      "affiliation": "Centre for Diaspora Studies, Central University of Gujarat",
+      "email": "gajendra@cug.ac.in",
+      "specialization": "Diaspora Studies",
+      "photoUrl": "/images/editorial/dr-gajendra.png",
+      "websiteUrl": "https://cug.ac.in"
+    },
+    {
+      "id": 6,
+      "name": "Dr. Sudipto Mitra (PhD, London), FRAS",
+      "role": "Editorial Board Member",
+      "designation": "Assistant Professor",
+      "affiliation": "Department of History, Pachhunga University College, Mizoram University",
+      "email": "sudipto.boulevardier@gmail.com",
+      "specialization": "History",
+      "photoUrl": "/images/editorial/dr-sudipto-mitra.png",
+      "websiteUrl": "https://pucollege.edu.in"
+    },
+    {
+      "id": 7,
+      "name": "Dr. Anisha Kaul",
+      "role": "Editorial Board Member",
+      "designation": "Assistant Professor",
+      "affiliation": "Department of English, Indraprastha College for Women, University of Delhi",
+      "email": "anishakaul@ip.du.ac.in",
+      "specialization": "English",
+      "photoUrl": "/images/editorial/dr-anisha-kaul.png",
+      "websiteUrl": "https://ipcollege.ac.in"
+    },
+    {
+      "id": 8,
+      "name": "Dr. Kumar Saurabh",
+      "role": "Editorial Board Member",
+      "designation": "Assistant Professor",
+      "affiliation": "Department of History, Miranda House College, University of Delhi",
+      "email": "kumar.saurabh@mirandahouse.ac.in",
+      "specialization": "History",
+      "photoUrl": "/images/editorial/dr-kumar-saurabh.png",
+      "websiteUrl": "https://www.mirandahouse.ac.in"
+    }
   ]
 }
