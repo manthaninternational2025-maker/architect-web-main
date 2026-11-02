@@ -2948,6 +2948,52 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                {/* Widget: Plagiarism Removal Services */}
+                <div className="border border-slate-200 p-4 rounded-lg bg-slate-50/50 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-800 text-sm">
+                      Plagiarism Removal Services Button
+                    </span>
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(sidebarMenuState.showPlagiarismRemovalServices)}
+                        onChange={(e) =>
+                          setSidebarMenuState({
+                            ...sidebarMenuState,
+                            showPlagiarismRemovalServices: e.target.checked,
+                          })
+                        }
+                        className="rounded text-[#700070]"
+                      />
+                      <span>Show on Sidebar</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Widget: Plagiarism Remover Online */}
+                <div className="border border-slate-200 p-4 rounded-lg bg-slate-50/50 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-800 text-sm">
+                      Plagiarism Remover Online Link
+                    </span>
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(sidebarMenuState.showPlagiarismRemoverOnline)}
+                        onChange={(e) =>
+                          setSidebarMenuState({
+                            ...sidebarMenuState,
+                            showPlagiarismRemoverOnline: e.target.checked,
+                          })
+                        }
+                        className="rounded text-[#700070]"
+                      />
+                      <span>Show on Sidebar</span>
+                    </label>
+                  </div>
+                </div>
+
                 {/* Widget 4: Impact Factor */}
                 <div className="border border-slate-200 p-4 rounded-lg bg-slate-50/50 space-y-3">
                   <div className="flex items-center justify-between">

@@ -16,7 +16,6 @@ export function SpecTable() {
     { label: "Subject", value: settings.subject },
     { label: "Language", value: settings.language },
     { label: "Publication Format", value: settings.publicationFormat || "Online" },
-    { label: "Phone No.", value: settings.phoneNo || "+91 8527231973" },
     { label: "Email id", value: settings.email, isEmail: true },
     { label: "Mobile No.", value: settings.mobileNo || "+91 8527231973" },
     { label: "Website", value: settings.website, isLink: true },

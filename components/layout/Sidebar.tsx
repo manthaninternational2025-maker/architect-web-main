@@ -100,14 +100,16 @@ export function Sidebar() {
       {/* -------------------------------------------------------------
           BOX 4: PLAGIARISM REMOVAL SERVICES (Exact Reference Box)
          ------------------------------------------------------------- */}
-      <div className="bg-white border border-[#CCCCCC] p-2.5 sm:p-3 text-center transition-colors hover:bg-gray-50">
-        <Link
-          href={sidebarConfig.plagiarismRemovalServicesLink || "/plagiarism"}
-          className="block text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-base tracking-wide leading-tight"
-        >
-          {sidebarConfig.plagiarismRemovalServicesText || "Plagiarism Removal Services"}
-        </Link>
-      </div>
+      {Boolean(sidebarConfig.showPlagiarismRemovalServices) && (
+        <div className="bg-white border border-[#CCCCCC] p-2.5 sm:p-3 text-center transition-colors hover:bg-gray-50">
+          <Link
+            href={sidebarConfig.plagiarismRemovalServicesLink || "/plagiarism"}
+            className="block text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-base tracking-wide leading-tight"
+          >
+            {sidebarConfig.plagiarismRemovalServicesText || "Plagiarism Removal Services"}
+          </Link>
+        </div>
+      )}
 
       {/* -------------------------------------------------------------
           BOX 5: CREATIVE COMMONS LICENSE (Exact Reference Box)
@@ -154,14 +156,16 @@ export function Sidebar() {
       {/* -------------------------------------------------------------
           BOX 6: PLAGIARISM REMOVER ONLINE (Exact Reference Box)
          ------------------------------------------------------------- */}
-      <div className="bg-white border border-[#CCCCCC] p-2 sm:p-2.5 text-center transition-colors hover:bg-gray-50">
-        <Link
-          href={sidebarConfig.plagiarismRemoverOnlineLink || "/plagiarism"}
-          className="block text-[#700070] hover:text-[#550055] font-semibold text-xs tracking-wide leading-tight"
-        >
-          {sidebarConfig.plagiarismRemoverOnlineText || "Plagiarism Remover Online"}
-        </Link>
-      </div>
+      {Boolean(sidebarConfig.showPlagiarismRemoverOnline) && (
+        <div className="bg-white border border-[#CCCCCC] p-2 sm:p-2.5 text-center transition-colors hover:bg-gray-50">
+          <Link
+            href={sidebarConfig.plagiarismRemoverOnlineLink || "/plagiarism"}
+            className="block text-[#700070] hover:text-[#550055] font-semibold text-xs tracking-wide leading-tight"
+          >
+            {sidebarConfig.plagiarismRemoverOnlineText || "Plagiarism Remover Online"}
+          </Link>
+        </div>
+      )}
 
       {/* -------------------------------------------------------------
           BOX 7: IMPACT FACTOR (Exact Reference Box)
