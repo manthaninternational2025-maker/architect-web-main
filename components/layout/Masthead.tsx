@@ -17,9 +17,6 @@ export function Masthead() {
           <p className="text-base sm:text-xl font-editorial not-italic font-bold text-[#700070] mt-1.5">
             (ISSN: {settings.issn})
           </p>
-          <p className="text-[11px] font-sans text-gray-500 uppercase tracking-widest mt-1">
-            Published by {settings.publisher} • Monthly Refereed Journal
-          </p>
         </div>
       </Link>
     </div>
