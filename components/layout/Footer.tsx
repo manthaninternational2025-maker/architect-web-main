@@ -1,8 +1,13 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { useJournalData } from "@/context/JournalDataContext";
 import { companyInfo } from "@/data/companyInfo";
 
 export function Footer() {
+  const { settings } = useJournalData();
+
   const footerLinks = [
     { label: "Home", href: "/" },
     { label: "Editorial Board", href: "/editorial-board" },
@@ -13,6 +18,11 @@ export function Footer() {
     { label: "Peer Review Process", href: "/peer-review-policy" },
     { label: "Contact Us", href: "/contact" },
   ];
+
+  const title = settings?.journalTitle || companyInfo.journalTitle;
+  const issn = settings?.issn || companyInfo.issn;
+  const publisher = settings?.publisher || companyInfo.publisher;
+  const shortTitle = settings?.shortTitle || companyInfo.shortTitle;
 
   return (
     <footer className="bg-white border-t border-gray-300 text-xs text-gray-700 mt-8 py-6 px-4">
@@ -32,13 +42,13 @@ export function Footer() {
         {/* Brand Licensing & Copyright */}
         <div className="text-center text-[11px] text-gray-600 leading-relaxed space-y-1">
           <p>
-            <strong>{companyInfo.journalTitle}</strong> • (ISSN: {companyInfo.issn})
+            <strong>{title}</strong> • (ISSN: {issn})
           </p>
           <p>
-            Published by <strong>{companyInfo.publisher}</strong> • Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
+            Published by <strong>{publisher}</strong> • Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
           </p>
           <p className="font-semibold text-gray-800 pt-1">
-            Copyright &copy; 2026 {companyInfo.shortTitle} — All Rights Reserved.
+            Copyright &copy; 2026 {shortTitle} — All Rights Reserved.
           </p>
         </div>
       </div>

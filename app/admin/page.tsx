@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAdminAuth } from "@/context/AdminAuthContext";
@@ -133,22 +133,77 @@ export default function AdminPage() {
   } = useJournalData();
 
   // Local form states synced with persistent JournalDataContext
-  const [settingsForm, setSettingsForm] = useState(settings);
-  const [homepageState, setHomepageState] = useState(homepage);
-  const [announcementState, setAnnouncementState] = useState(announcement);
-  const [instructionsState, setInstructionsState] = useState(instructions);
-  const [ethicsState, setEthicsState] = useState(ethics);
-  const [contactState, setContactState] = useState(contact);
-  const [sidebarMenuState, setSidebarMenuState] = useState(sidebarConfig);
-  const [dirtyTabs, setDirtyTabs] = useState<Record<string, boolean>>({});
+  const userHasEdited = useRef<Record<string, boolean>>({});
 
-  useEffect(() => { if (!dirtyTabs.settings) setSettingsForm(settings); }, [settings, dirtyTabs.settings]);
-  useEffect(() => { if (!dirtyTabs.homepage) setHomepageState(homepage); }, [homepage, dirtyTabs.homepage]);
-  useEffect(() => { if (!dirtyTabs.announcement) setAnnouncementState(announcement); }, [announcement, dirtyTabs.announcement]);
-  useEffect(() => { if (!dirtyTabs.instructions) setInstructionsState(instructions); }, [instructions, dirtyTabs.instructions]);
-  useEffect(() => { if (!dirtyTabs.ethics) setEthicsState(ethics); }, [ethics, dirtyTabs.ethics]);
-  useEffect(() => { if (!dirtyTabs.contact) setContactState(contact); }, [contact, dirtyTabs.contact]);
-  useEffect(() => { if (!dirtyTabs.sidebar) setSidebarMenuState(sidebarConfig); }, [sidebarConfig, dirtyTabs.sidebar]);
+  const [settingsForm, _setSettingsForm] = useState(settings);
+  const setSettingsForm = (updater: any) => {
+    userHasEdited.current.settings = true;
+    _setSettingsForm(updater);
+  };
+
+  const [homepageState, _setHomepageState] = useState(homepage);
+  const setHomepageState = (updater: any) => {
+    userHasEdited.current.homepage = true;
+    _setHomepageState(updater);
+  };
+
+  const [announcementState, _setAnnouncementState] = useState(announcement);
+  const setAnnouncementState = (updater: any) => {
+    userHasEdited.current.announcement = true;
+    _setAnnouncementState(updater);
+  };
+
+  const [instructionsState, _setInstructionsState] = useState(instructions);
+  const setInstructionsState = (updater: any) => {
+    userHasEdited.current.instructions = true;
+    _setInstructionsState(updater);
+  };
+
+  const [ethicsState, _setEthicsState] = useState(ethics);
+  const setEthicsState = (updater: any) => {
+    userHasEdited.current.ethics = true;
+    _setEthicsState(updater);
+  };
+
+  const [contactState, _setContactState] = useState(contact);
+  const setContactState = (updater: any) => {
+    userHasEdited.current.contact = true;
+    _setContactState(updater);
+  };
+
+  const [sidebarMenuState, _setSidebarMenuState] = useState(sidebarConfig);
+  const setSidebarMenuState = (updater: any) => {
+    userHasEdited.current.sidebar = true;
+    _setSidebarMenuState(updater);
+  };
+
+  useEffect(() => {
+    if (!userHasEdited.current.settings) _setSettingsForm(settings);
+  }, [settings]);
+
+  useEffect(() => {
+    if (!userHasEdited.current.homepage) _setHomepageState(homepage);
+  }, [homepage]);
+
+  useEffect(() => {
+    if (!userHasEdited.current.announcement) _setAnnouncementState(announcement);
+  }, [announcement]);
+
+  useEffect(() => {
+    if (!userHasEdited.current.instructions) _setInstructionsState(instructions);
+  }, [instructions]);
+
+  useEffect(() => {
+    if (!userHasEdited.current.ethics) _setEthicsState(ethics);
+  }, [ethics]);
+
+  useEffect(() => {
+    if (!userHasEdited.current.contact) _setContactState(contact);
+  }, [contact]);
+
+  useEffect(() => {
+    if (!userHasEdited.current.sidebar) _setSidebarMenuState(sidebarConfig);
+  }, [sidebarConfig]);
 
   const [newArticleModal, setNewArticleModal] = useState(false);
   const [editingArticle, setEditingArticle] = useState<any | null>(null);
@@ -528,6 +583,7 @@ export default function AdminPage() {
       };
       setSidebarMenuState(instantState);
       updateSidebarConfig(instantState);
+      saveAllLive({ sidebarConfig: instantState });
 
       // 2. Server upload for persistent file storage across all devices
       const formData = new FormData();
@@ -546,6 +602,7 @@ export default function AdminPage() {
             };
             setSidebarMenuState(serverUpdated);
             updateSidebarConfig(serverUpdated);
+            saveAllLive({ sidebarConfig: serverUpdated });
             showToast("Cover page updated and synced across all devices!");
           }
         })
@@ -579,6 +636,7 @@ export default function AdminPage() {
     };
     setSidebarMenuState(updated);
     updateSidebarConfig(updated);
+    saveAllLive({ sidebarConfig: updated });
     showToast("Cover page reset to official Manthan Nov 2026 cover!");
   };
 
@@ -845,7 +903,7 @@ export default function AdminPage() {
               <Menu className="w-5 h-5" />
             </button>
             <span className="text-[11px] sm:text-xs font-semibold text-[#700070] bg-purple-50 border border-purple-200 px-2 sm:px-2.5 py-1 rounded truncate">
-              {companyInfo.journalTitle} (ISSN: {companyInfo.issn})
+              {settings.journalTitle || companyInfo.journalTitle} (ISSN: {settings.issn || companyInfo.issn})
             </span>
           </div>
 
@@ -864,6 +922,7 @@ export default function AdminPage() {
                   sidebarConfig: sidebarMenuState,
                 });
                 if (ok) {
+                  userHasEdited.current = {};
                   showToast("✅ All journal data successfully saved live across PC, Laptop, Mobile & Tablet!");
                 } else {
                   showToast("Data updated locally.");
@@ -1038,10 +1097,31 @@ export default function AdminPage() {
               <form
                 onSubmit={async (e) => {
                   e.preventDefault();
+                  const rawImpact = settingsForm.impactFactor || "";
+                  const formattedImpact = rawImpact
+                    ? (rawImpact.toLowerCase().startsWith("impact factor") ? rawImpact : `Impact Factor: ${rawImpact}`)
+                    : (sidebarMenuState.impactFactorValue || "Impact Factor: 6.345*");
+
+                  const updatedSidebar = {
+                    ...sidebarMenuState,
+                    impactFactorValue: formattedImpact,
+                    coverBoxTitle: settingsForm.journalTitle || sidebarMenuState.coverBoxTitle,
+                    coverBoxIssn: settingsForm.issn || sidebarMenuState.coverBoxIssn,
+                    coverBoxUrl: settingsForm.website || sidebarMenuState.coverBoxUrl,
+                  };
+
+                  _setSidebarMenuState(updatedSidebar);
+                  updateSidebarConfig(updatedSidebar);
                   updateSettings(settingsForm);
-                  updateSidebarConfig(sidebarMenuState);
-                  const ok = await saveAllLive({ settings: settingsForm, sidebarConfig: sidebarMenuState });
+
+                  const ok = await saveAllLive({ 
+                    settings: settingsForm, 
+                    sidebarConfig: updatedSidebar 
+                  });
+
                   if (ok) {
+                    userHasEdited.current.settings = false;
+                    userHasEdited.current.sidebar = false;
                     showToast("✅ Journal settings & cover page saved live to server across all devices!");
                   } else {
                     showToast("Journal settings updated locally.");
@@ -1401,6 +1481,7 @@ export default function AdminPage() {
                     type="button"
                     onClick={() => {
                       if (confirm("Reset all journal data, articles, and settings to original defaults?")) {
+                        userHasEdited.current = {};
                         resetToDefaults();
                         showToast("Journal data restored to default system state.");
                       }
@@ -1434,6 +1515,7 @@ export default function AdminPage() {
                   updateHomepage(homepageState);
                   const ok = await saveAllLive({ homepage: homepageState });
                   if (ok) {
+                    userHasEdited.current.homepage = false;
                     showToast("✅ Homepage content saved and synced across all devices!");
                   } else {
                     showToast("Homepage content saved.");
@@ -2161,6 +2243,7 @@ export default function AdminPage() {
                   updateInstructions(instructionsState);
                   const ok = await saveAllLive({ instructions: instructionsState });
                   if (ok) {
+                    userHasEdited.current.instructions = false;
                     showToast("✅ Author instructions updated and synced across all devices!");
                   } else {
                     showToast("Author instructions saved.");
@@ -2316,6 +2399,7 @@ export default function AdminPage() {
                   updateEthics(ethicsState);
                   const ok = await saveAllLive({ ethics: ethicsState });
                   if (ok) {
+                    userHasEdited.current.ethics = false;
                     showToast("✅ Publication ethics policies saved and synced across all devices!");
                   } else {
                     showToast("Publication ethics saved.");
@@ -2424,6 +2508,7 @@ export default function AdminPage() {
                   updateContact(contactState);
                   const ok = await saveAllLive({ contact: contactState });
                   if (ok) {
+                    userHasEdited.current.contact = false;
                     showToast("✅ Contact information saved and synced across all devices!");
                   } else {
                     showToast("Contact information saved.");
@@ -2643,9 +2728,23 @@ export default function AdminPage() {
               <form
                 onSubmit={async (e) => {
                   e.preventDefault();
+                  const cleanImpact = sidebarMenuState.impactFactorValue
+                    ? sidebarMenuState.impactFactorValue.replace(/^Impact Factor:\s*/i, "").trim()
+                    : settingsForm.impactFactor;
+                  const updatedSettings = {
+                    ...settingsForm,
+                    impactFactor: cleanImpact || settingsForm.impactFactor,
+                  };
+                  _setSettingsForm(updatedSettings);
+                  updateSettings(updatedSettings);
                   updateSidebarConfig(sidebarMenuState);
-                  const ok = await saveAllLive({ sidebarConfig: sidebarMenuState });
+                  const ok = await saveAllLive({ 
+                    sidebarConfig: sidebarMenuState,
+                    settings: updatedSettings,
+                  });
                   if (ok) {
+                    userHasEdited.current.sidebar = false;
+                    userHasEdited.current.settings = false;
                     showToast("✅ Sidebar widget configurations saved and synced across all devices!");
                   } else {
                     showToast("Sidebar configuration saved.");
@@ -2920,6 +3019,7 @@ export default function AdminPage() {
                   updateAnnouncement(announcementState);
                   const ok = await saveAllLive({ announcement: announcementState });
                   if (ok) {
+                    userHasEdited.current.announcement = false;
                     showToast("✅ Announcement ticker saved and synced across all devices!");
                   } else {
                     showToast("Announcement ticker saved.");
