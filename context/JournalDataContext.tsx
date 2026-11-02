@@ -20,6 +20,9 @@ export interface JournalSettings {
   language: string;
   startingYear: string;
   plagiarismTool: string;
+  publicationFormat?: string;
+  phoneNo?: string;
+  mobileNo?: string;
 }
 
 export interface AnnouncementData {
@@ -108,6 +111,10 @@ export interface PublicationEthicsData {
   conflictOfInterest: string;
   retractionPolicy: string;
   humanEthics: string;
+  authorResponsibilities?: string[];
+  editorResponsibilities?: string[];
+  reviewerResponsibilities?: string[];
+  publisherResponsibilities?: string[];
 }
 
 export interface ContactData {
@@ -130,8 +137,14 @@ export interface SidebarConfigData {
   showManuscriptStatus: boolean;
   manuscriptStatusText: string;
   manuscriptStatusLink: string;
+  showPlagiarismRemovalServices?: boolean;
+  plagiarismRemovalServicesText?: string;
+  plagiarismRemovalServicesLink?: string;
   showCreativeCommons: boolean;
   ccLicenseText: string;
+  showPlagiarismRemoverOnline?: boolean;
+  plagiarismRemoverOnlineText?: string;
+  plagiarismRemoverOnlineLink?: string;
   showImpactFactor: boolean;
   impactFactorValue: string;
   showSearchBar: boolean;
@@ -179,7 +192,8 @@ interface JournalDataContextType {
   addMessage: (msg: Omit<MessageItem, "id" | "date" | "isRead">) => void;
   toggleMessageRead: (id: number) => void;
   deleteMessage: (id: number) => void;
-  resetToDefaults: () => void;
+  resetToDefaults: () => Promise<void> | void;
+  saveAllLive: (overrides?: Record<string, any>) => Promise<boolean>;
 }
 
 const JournalDataContext = createContext<JournalDataContextType | undefined>(undefined);
@@ -199,20 +213,23 @@ const K_MESSAGES = "manthan_live_messages";
 
 // Defaults
 const initialSettings: JournalSettings = {
-  journalTitle: defaultCompanyInfo.journalTitle,
-  shortTitle: defaultCompanyInfo.shortTitle,
-  issn: defaultCompanyInfo.issn,
-  publisher: defaultCompanyInfo.publisher,
-  frequency: defaultCompanyInfo.frequency,
-  editorInChief: defaultCompanyInfo.editorInChief,
-  email: defaultCompanyInfo.email,
-  address: defaultCompanyInfo.address,
-  website: "https://impulseresearchwork.com",
-  impactFactor: "xxxx*",
-  subject: "Humanities, Social Sciences, Economics, Political Science, History, Philosophy, Commerce, Law, Management & Multidisciplinary Studies",
-  language: "English / Multilingual",
+  journalTitle: "Manthan: International Multidisciplinary Journal of Social Inquiry",
+  shortTitle: "Manthan IMJSI",
+  issn: "Under Process (Online)",
+  publisher: "Impulse Research Work",
+  frequency: "Quarterly",
+  editorInChief: "Dr. Deepak Setia",
   startingYear: "2026",
-  plagiarismTool: defaultCompanyInfo.plagiarismTool,
+  subject: "Social Sciences, Humanities, Economics, Political Science, History, Philosophy, Commerce, Law & Multidisciplinary Studies",
+  language: "Multiple Language",
+  publicationFormat: "Online",
+  phoneNo: "+91 8527231973",
+  email: "manthaninternational2025@gmail.com",
+  mobileNo: "+91 8527231973",
+  website: "https://manthanjournal.com",
+  address: "GT Karnal Road, Dilkhush Bagh Village, Ashok Vihar, New Delhi, Delhi 110033",
+  plagiarismTool: "PlagiarismCheckerX / Turnitin / Drillbit",
+  impactFactor: "6.345*",
 };
 
 const initialAnnouncement: AnnouncementData = {
@@ -438,15 +455,21 @@ const initialSidebar: SidebarConfigData = {
   coverPageHeading: "Cover Page",
   coverImageUrl: "/images/manthan-cover-page.png",
   coverBoxTitle: "Manthan: International Multidisciplinary Journal of Social Inquiry",
-  coverBoxIssn: defaultCompanyInfo.issn,
-  coverBoxUrl: "https://impulseresearchwork.com/",
+  coverBoxIssn: "Under Process (Online)",
+  coverBoxUrl: "https://manthanjournal.com",
   showManuscriptStatus: true,
-  manuscriptStatusText: "Check Manuscript Status",
+  manuscriptStatusText: "Manuscript Status",
   manuscriptStatusLink: "/submit",
+  showPlagiarismRemovalServices: true,
+  plagiarismRemovalServicesText: "Plagiarism Removal Services",
+  plagiarismRemovalServicesLink: "/plagiarism",
   showCreativeCommons: true,
   ccLicenseText: "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.",
+  showPlagiarismRemoverOnline: true,
+  plagiarismRemoverOnlineText: "Plagiarism Remover Online",
+  plagiarismRemoverOnlineLink: "/plagiarism",
   showImpactFactor: true,
-  impactFactorValue: "Impact Factor: xxxx*",
+  impactFactorValue: "Impact Factor: 6.345*",
   showSearchBar: true,
 };
 
@@ -669,8 +692,11 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       const msg = localStorage.getItem(K_MESSAGES);
       if (msg) setMessages(JSON.parse(msg));
 
-      // Fetch live cross-device state from server API
-      fetch("/api/journal-data")
+      // Fetch live cross-device state from server API with cache busting
+      fetch(`/api/journal-data?_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache", "Pragma": "no-cache" },
+      })
         .then((res) => res.json())
         .then((json) => {
           if (json.success && json.data) {
@@ -1013,6 +1039,45 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
     });
   };
 
+  const saveAllLive = async (overrides?: Record<string, any>): Promise<boolean> => {
+    const fullPayload = {
+      settings: overrides?.settings || settings,
+      announcement: overrides?.announcement || announcement,
+      homepage: overrides?.homepage || homepage,
+      articles: overrides?.articles || articles,
+      issues: overrides?.issues || issues,
+      members: overrides?.members || members,
+      instructions: overrides?.instructions || instructions,
+      ethics: overrides?.ethics || ethics,
+      contact: overrides?.contact || contact,
+      sidebarConfig: overrides?.sidebarConfig || sidebarConfig,
+      messages: overrides?.messages || messages,
+    };
+    try {
+      localStorage.setItem(K_SETTINGS, JSON.stringify(fullPayload.settings));
+      localStorage.setItem(K_ANNOUNCE, JSON.stringify(fullPayload.announcement));
+      localStorage.setItem(K_HOMEPAGE, JSON.stringify(fullPayload.homepage));
+      localStorage.setItem(K_ARTICLES, JSON.stringify(fullPayload.articles));
+      localStorage.setItem(K_ISSUES, JSON.stringify(fullPayload.issues));
+      localStorage.setItem(K_MEMBERS, JSON.stringify(fullPayload.members));
+      localStorage.setItem(K_INSTRUCT, JSON.stringify(fullPayload.instructions));
+      localStorage.setItem(K_ETHICS, JSON.stringify(fullPayload.ethics));
+      localStorage.setItem(K_CONTACT, JSON.stringify(fullPayload.contact));
+      localStorage.setItem(K_SIDEBAR, JSON.stringify(fullPayload.sidebarConfig));
+      localStorage.setItem(K_MESSAGES, JSON.stringify(fullPayload.messages));
+    } catch {}
+    try {
+      const res = await fetch("/api/journal-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fullPayload),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <JournalDataContext.Provider
       value={{
@@ -1048,6 +1113,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
         toggleMessageRead,
         deleteMessage,
         resetToDefaults,
+        saveAllLive,
       }}
     >
       {children}

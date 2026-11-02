@@ -18,54 +18,58 @@ export function Sidebar() {
   return (
     <aside className="space-y-2.5 sm:space-y-3.5 w-full">
       {/* -------------------------------------------------------------
-          CARD 1: EDITORIAL POLICIES (Exact Reference Layout)
+          BOX 1: EDITORIAL POLICIES (Matches Reference Screenshot)
          ------------------------------------------------------------- */}
       {sidebarConfig.showEditorialPolicies && (
-        <div className="bg-white border border-[#CCCCCC] p-2 sm:p-3.5 text-center">
+        <div className="bg-white border border-[#CCCCCC] p-2.5 sm:p-3.5 text-center">
           <h2 className="text-xs sm:text-base font-bold text-[#111111] mb-1.5 sm:mb-2.5 text-left border-b border-gray-200 pb-1">
             Editorial Policies
           </h2>
-        <div className="flex flex-col space-y-1.5 sm:space-y-2 py-0.5 sm:py-1">
-          <Link
-            href="/academic-integrity"
-            className="text-[#700070] hover:text-[#550055] font-bold text-[11px] sm:text-sm tracking-wide transition-colors leading-tight"
-          >
-            Publication Ethics
-          </Link>
-          <Link
-            href="/peer-review-policy"
-            className="text-[#700070] hover:text-[#550055] font-bold text-[11px] sm:text-sm tracking-wide transition-colors leading-tight"
-          >
-            Peer Review Process
-          </Link>
-          <Link
-            href="/about"
-            className="text-[#700070] hover:text-[#550055] font-bold text-[11px] sm:text-sm tracking-wide transition-colors leading-tight"
-          >
-            Open Access Policy
-          </Link>
+          <div className="flex flex-col space-y-1.5 sm:space-y-2 py-0.5 sm:py-1">
+            <Link
+              href="/academic-integrity"
+              className="text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-sm tracking-wide transition-colors leading-tight"
+            >
+              Publication Ethics
+            </Link>
+            <Link
+              href="/peer-review-policy"
+              className="text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-sm tracking-wide transition-colors leading-tight"
+            >
+              Peer Review Process
+            </Link>
+            <Link
+              href="/open-access"
+              className="text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-sm tracking-wide transition-colors leading-tight"
+            >
+              Open Access Policy
+            </Link>
+            <Link
+              href="/plagiarism"
+              className="text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-sm tracking-wide transition-colors leading-tight"
+            >
+              Plagiarism
+            </Link>
+          </div>
         </div>
-      </div>
       )}
 
       {/* -------------------------------------------------------------
-          CARD 2: COVER PAGE (Exact Reference Layout: Header Banner + Framed Cover Page)
+          BOX 2: COVER PAGE (Framed Cover Page matching Reference Screenshot)
          ------------------------------------------------------------- */}
       {sidebarConfig.showCoverBox && (
         <div className="bg-white border border-[#CCCCCC] overflow-hidden text-center shadow-xs">
-          {/* Header Banner matching Reference Image */}
           <div className="bg-[#700070] text-white py-1.5 sm:py-2 px-2 sm:px-3 text-center border-b border-[#550055]">
             <h2 className="text-xs sm:text-base font-bold tracking-wide">
               {sidebarConfig.coverPageHeading || "Cover Page"}
             </h2>
           </div>
 
-          {/* Framed Cover Page Image (Static, Non-Clickable Display) */}
           <div className="p-1.5 sm:p-3 bg-white flex flex-col items-center">
             <div className="border border-gray-200 bg-gray-50/50 p-1 sm:p-1.5 shadow-xs w-full max-w-[280px] rounded-xs select-none">
               <img
                 src={sidebarConfig.coverImageUrl || "/images/manthan-cover-page.png"}
-                alt="Manthan: International Multidisciplinary Journal of Social Inquiry - Cover Page"
+                alt={`${settings.journalTitle} - Cover Page`}
                 className="w-full h-auto object-contain block select-none pointer-events-none"
                 onError={(e) => {
                   const target = e.currentTarget;
@@ -80,10 +84,10 @@ export function Sidebar() {
       )}
 
       {/* -------------------------------------------------------------
-          CARD 3: MANUSCRIPT STATUS (Exact Reference Box)
+          BOX 3: MANUSCRIPT STATUS (Exact Reference Box)
          ------------------------------------------------------------- */}
       {sidebarConfig.showManuscriptStatus && (
-        <div className="bg-white border border-[#CCCCCC] p-2 sm:p-3 text-center transition-colors hover:bg-gray-50">
+        <div className="bg-white border border-[#CCCCCC] p-2.5 sm:p-3 text-center transition-colors hover:bg-gray-50">
           <Link
             href={sidebarConfig.manuscriptStatusLink || "/submit"}
             className="block text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-base tracking-wide leading-tight"
@@ -94,11 +98,22 @@ export function Sidebar() {
       )}
 
       {/* -------------------------------------------------------------
-          CARD 4: CREATIVE COMMONS LICENSE (Exact Reference Box)
+          BOX 4: PLAGIARISM REMOVAL SERVICES (Exact Reference Box)
+         ------------------------------------------------------------- */}
+      <div className="bg-white border border-[#CCCCCC] p-2.5 sm:p-3 text-center transition-colors hover:bg-gray-50">
+        <Link
+          href={sidebarConfig.plagiarismRemovalServicesLink || "/plagiarism"}
+          className="block text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-base tracking-wide leading-tight"
+        >
+          {sidebarConfig.plagiarismRemovalServicesText || "Plagiarism Removal Services"}
+        </Link>
+      </div>
+
+      {/* -------------------------------------------------------------
+          BOX 5: CREATIVE COMMONS LICENSE (Exact Reference Box)
          ------------------------------------------------------------- */}
       {sidebarConfig.showCreativeCommons && (
         <div className="bg-white border border-[#CCCCCC] p-3 text-left">
-          {/* CC Badge Icons */}
           <div className="flex items-center gap-1 mb-2">
             <div className="inline-flex items-center justify-center px-1.5 py-0.5 border border-gray-400 rounded text-[10px] font-bold bg-gray-100 text-gray-700">
               CC
@@ -123,32 +138,44 @@ export function Sidebar() {
           </p>
           <p className="text-[10px] text-gray-600 mt-1">
             Based on a work at{" "}
-            <a href="https://impulseresearchwork.com/" className="text-[#700070] hover:underline">
-              https://impulseresearchwork.com/
+            <a href={settings.website} className="text-[#700070] hover:underline break-all">
+              {settings.website}
             </a>.
           </p>
           <p className="text-[10px] text-gray-600 mt-0.5">
             Permissions beyond the scope of this license may be available at{" "}
-            <a href="https://impulseresearchwork.com/" className="text-[#700070] hover:underline">
-              https://impulseresearchwork.com/
+            <a href={settings.website} className="text-[#700070] hover:underline break-all">
+              {settings.website}
             </a>.
           </p>
         </div>
       )}
 
       {/* -------------------------------------------------------------
-          CARD 7: IMPACT FACTOR (Exact Reference Box)
+          BOX 6: PLAGIARISM REMOVER ONLINE (Exact Reference Box)
+         ------------------------------------------------------------- */}
+      <div className="bg-white border border-[#CCCCCC] p-2 sm:p-2.5 text-center transition-colors hover:bg-gray-50">
+        <Link
+          href={sidebarConfig.plagiarismRemoverOnlineLink || "/plagiarism"}
+          className="block text-[#700070] hover:text-[#550055] font-semibold text-xs tracking-wide leading-tight"
+        >
+          {sidebarConfig.plagiarismRemoverOnlineText || "Plagiarism Remover Online"}
+        </Link>
+      </div>
+
+      {/* -------------------------------------------------------------
+          BOX 7: IMPACT FACTOR (Exact Reference Box)
          ------------------------------------------------------------- */}
       {sidebarConfig.showImpactFactor && (
         <div className="bg-white border border-[#CCCCCC] p-2 text-center">
           <span className="text-[#700070] font-bold text-xs sm:text-sm">
-            {sidebarConfig.impactFactorValue || `Impact Factor: ${settings.impactFactor}`}
+            {sidebarConfig.impactFactorValue || `Impact Factor: ${settings.impactFactor || "6.345*"}`}
           </span>
         </div>
       )}
 
       {/* -------------------------------------------------------------
-          CARD 8: SEARCH WIDGET (Exact Reference Box)
+          BOX 8: SEARCH WIDGET (Exact Reference Box)
          ------------------------------------------------------------- */}
       {sidebarConfig.showSearchBar && (
         <div className="bg-white border border-[#CCCCCC] p-3 text-left">

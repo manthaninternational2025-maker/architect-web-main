@@ -1,4 +1,40 @@
 {
+  "settings": {
+    "journalTitle": "Manthan: International Multidisciplinary Journal of Social Inquiry",
+    "shortTitle": "Manthan IMJSI",
+    "issn": "Under Process (Online)",
+    "publisher": "Impulse Research Work",
+    "frequency": "Quarterly",
+    "editorInChief": "Dr. Deepak Setia",
+    "startingYear": "2026",
+    "subject": "Social Sciences, Humanities, Economics, Political Science, History, Philosophy, Commerce, Law & Multidisciplinary Studies",
+    "language": "Multiple Language",
+    "publicationFormat": "Online",
+    "phoneNo": "+91 8527231973",
+    "email": "manthaninternational2025@gmail.com",
+    "mobileNo": "+91 8527231973",
+    "website": "https://manthanjournal.com",
+    "address": "GT Karnal Road, Dilkhush Bagh Village, Ashok Vihar, New Delhi, Delhi 110033",
+    "plagiarismTool": "PlagiarismCheckerX / Turnitin / Drillbit",
+    "impactFactor": "6.345*"
+  },
+  "announcement": {
+    "active": true,
+    "badge": "Call for Papers",
+    "text": "Volume 1, Issue 2 (September 2026) submissions open. Submit original papers by 15 August 2026.",
+    "deadline": "15 August 2026",
+    "contactEmail": "manthaninternational2025@gmail.com"
+  },
+  "homepage": {
+    "callForPapersHeadline": "Call for Papers: Volume 1, Issue 2 (September 2026)",
+    "callForPapersDeadline": "15 August 2026",
+    "callForPapersEmail": "manthaninternational2025@gmail.com",
+    "callForPapersActive": true,
+    "introP1": "Manthan: International Multidisciplinary Journal of Social Inquiry (ISSN: Under Process) is an open access peer reviewed refereed journal.",
+    "introP2": "The aim of Manthan: International Multidisciplinary Journal of Social Inquiry (ISSN: Under Process) is to encourage scientists, academicians and students to publish their experimental and theoretical details. Manthan: International Multidisciplinary Journal of Social Inquiry provides an advanced knowledge platform for the Social Sciences, Humanities, Management, Commerce, Education & Multidisciplinary Research professionals.",
+    "aboutText": "Manthan: International Multidisciplinary Journal of Social Inquiry, refereed, peer reviewed, open access journal. Researches in the field of humanities, social science, Community and Consumer Sciences, Economics, Political Science, Geography, Philosophy, History, Humanity and Languages concerning with social science, Anthropological, Behavioral Sciences, Sociology, Journalism and Role of Media in social science. Educational Sciences: For School Students, Women, Village and Society, Commerce, Law and Management related with humanities and social science.",
+    "policyText": "Manthan: International Multidisciplinary Journal of Social Inquiry (ISSN: Under Process), an open access peer reviewed refereed online journal, presents original research articles and rapid communications, covering all areas of Social Sciences and Humanities. The primary mission of the journal is to become the premier source of high quality research from whole of the world. Manthan considers all manuscripts on the strict condition that they have not been published already, under review elsewhere, nor are they under consideration for publication or in press elsewhere."
+  },
   "articles": [
     {
       "id": 1,
@@ -156,6 +192,119 @@
       "specialization": "History",
       "photoUrl": "/images/editorial/dr-kumar-saurabh.png",
       "websiteUrl": "https://www.mirandahouse.ac.in"
+    }
+  ],
+  "instructions": {
+    "heading": "Instruction to Authors",
+    "manuscriptScope": "Manthan: International Multidisciplinary Journal of Social Inquiry publishes research articles, communications, review papers and book reviews.",
+    "manuscriptTypes": [
+      "a) Research Articles",
+      "b) Rapid Communications",
+      "c) Reviews"
+    ],
+    "abstractWordLimit": "Up to 250 words",
+    "keywordsLimit": "Up to 5 keywords separated by commas",
+    "formattingFont": "Manuscripts should be prepared as word documents in Times New Roman (font size should be 12) on A4 size with a margin of 2 cm of all four sides. The manuscript should be typed double-spaced including references and tables also. All figures and tables should be at appropriate place in the text.",
+    "citationStyle": "The references should be represented as large brackets e.g. [3] in the text adhering to standard APA/academic format.",
+    "plagiarismThreshold": "Strictly under 10% (excluding references and standard quotations).",
+    "apcPolicy": "Upon acceptance, Authors are required to pay a nominal pre-press charge. Article processing charges (APCs) are associated with only accepted articles to cover the costs of making the final version freely available via open access.",
+    "apcIndian": "1200 Rs.",
+    "apcForeign": "30 USD",
+    "checklistItems": [
+      "Manuscript is original and has not been published elsewhere.",
+      "Title page contains all author affiliations and corresponding email.",
+      "Abstract is structured within 250 words with up to 5 keywords.",
+      "All references adhere strictly to standard citation style.",
+      "Plagiarism similarity index is verified below 10%.",
+      "Figures and tables are numbered with explicit captions and source credits."
+    ]
+  },
+  "ethics": {
+    "heading": "publication ethics",
+    "intro": "Publication ethics of Manthan: International Multidisciplinary Journal of Social Inquiry is mainly based on the Code of Conduct and Best-Practice Guidelines for Journal Editors (Committee on Publication Ethics, COPE, 2011).",
+    "authorResponsibilities": [
+      "Results should be presented by researchers in clear and honest way, without any false or inappropriate data manipulation.",
+      "Methods and procedures adopted during any research should be described clearly and unambiguously so that their findings can be confirmed by others.",
+      "Submitted work should be original, is not plagiarized, and has not been published elsewhere.",
+      "Authors will be solely responsible for submitted and published work.",
+      "The authorship of research publications should accurately reflect individuals' contributions to the work and its reporting.",
+      "Funding sources and relevant conflicts of interest should be disclosed."
+    ],
+    "editorResponsibilities": [
+      "Fair, correct and unbiased decisions should be made by editors, free from commercial consideration to ensure a fair and appropriate peer review process.",
+      "Editors should ensure complete transparency and honest reporting.",
+      "Editors should maintain the reliability of the published record by suggesting corrections when needed and rejecting suspected or alleged research and publication misconduct.",
+      "Editors should critically assess the ethical issues regarding studies in humans and animals.",
+      "Editors should observe conflict of interest during the review process and should have appropriate policies in place for handling editorial conflicts of interest."
+    ],
+    "reviewerResponsibilities": [
+      "Written, unbiased feedback should be provided in a timely manner.",
+      "Personal comments or criticism should be avoided.",
+      "Confidentiality of the review process should be maintained.",
+      "Any observed conflict of interest during the review process must be communicated to the Editor.",
+      "Any information that may be the reason for the rejection of publication of a manuscript must be communicated to the Editor."
+    ],
+    "publisherResponsibilities": [
+      "The editor of Manthan is responsible for editorial content and managing content-related processes.",
+      "It is the publisher's responsibility to promptly release corrections or retractions after the discovery of a significant error or scientific inaccuracy in a published work."
+    ],
+    "references": "Committee on Publication Ethics (COPE) (2011, March 7). Code of Conduct and Best-Practice Guidelines for Journal Editors. Retrieved from http://publicationethics.org/files/Code_of_conduct_for_journal_editors_Mar11.pdf",
+    "authorshipCriteria": "Authorship must reflect substantial contributions to conception, design, acquisition of data, analysis, drafting, and final approval.",
+    "peerReviewPolicy": "Double-blind peer review system ensuring impartial critique by at least two independent subject matter referees within 2-3 weeks.",
+    "plagiarismProtocol": "All submissions undergo rigorous similarity screening prior to editorial assessment using licensed software. Plagiarized texts face immediate rejection.",
+    "conflictOfInterest": "Authors, editors, and reviewers must disclose any financial, professional, or personal competing interests upon submission.",
+    "retractionPolicy": "In cases of academic misconduct, data falsification, or copyright violation, articles will be promptly retracted with formal notice.",
+    "humanEthics": "Research involving human participants must provide institutional ethical review board clearance and informed consent statements."
+  },
+  "contact": {
+    "officeAddress": "GT Karnal Road, Dilkhush Bagh Village, Ashok Vihar, New Delhi, Delhi 110033",
+    "editorialEmail": "manthaninternational2025@gmail.com",
+    "publisherEmail": "editor@impulseresearchwork.com",
+    "helplinePhone": "+91 8527231973 (WhatsApp Consultation Available)",
+    "officeHours": "Monday to Saturday: 9:00 AM – 6:00 PM IST",
+    "responseTime": "Editorial replies provided within 24 to 48 working hours."
+  },
+  "sidebarConfig": {
+    "showEditorialPolicies": true,
+    "showCoverBox": true,
+    "coverBoxTitle": "Manthan: IMJSI",
+    "coverBoxIssn": "ISSN (Online): Under Process",
+    "coverBoxUrl": "www.manthanjournal.com",
+    "coverPageHeading": "Cover Page",
+    "coverImageUrl": "/images/manthan-cover-page.png",
+    "showManuscriptStatus": true,
+    "manuscriptStatusText": "Manuscript Status",
+    "manuscriptStatusLink": "/submit",
+    "showPlagiarismRemovalServices": true,
+    "plagiarismRemovalServicesText": "Plagiarism Removal Services",
+    "plagiarismRemovalServicesLink": "/plagiarism",
+    "showCreativeCommons": true,
+    "ccLicenseText": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License",
+    "showPlagiarismRemoverOnline": true,
+    "plagiarismRemoverOnlineText": "Plagiarism Remover Online",
+    "plagiarismRemoverOnlineLink": "/plagiarism",
+    "showImpactFactor": true,
+    "impactFactorValue": "Impact Factor: 6.345*",
+    "showSearchBar": true
+  },
+  "messages": [
+    {
+      "id": 1,
+      "sender": "Prof. Arindam Das",
+      "email": "arindam.das@univ.edu",
+      "subject": "Manuscript Status Query: IMJSI-2026-088",
+      "date": "28 Oct 2026",
+      "isRead": true,
+      "content": "Respected Editor, I have submitted our empirical paper on rural credit unions. Could you confirm the completion of initial peer review?"
+    },
+    {
+      "id": 2,
+      "sender": "Dr. Kavita Menon",
+      "email": "kavita.m@researchinst.org",
+      "subject": "Inquiry regarding Special Issue on Gender & Society",
+      "date": "25 Oct 2026",
+      "isRead": true,
+      "content": "Greetings. Our department is interested in organizing a themed issue with Manthan IMJSI in early 2027. Please share guest editorial guidelines."
     }
   ]
 }

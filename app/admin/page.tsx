@@ -129,6 +129,7 @@ export default function AdminPage() {
     toggleMessageRead,
     deleteMessage,
     resetToDefaults,
+    saveAllLive,
   } = useJournalData();
 
   // Local form states synced with persistent JournalDataContext
@@ -826,6 +827,33 @@ export default function AdminPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={async () => {
+                showToast("Saving all data live to server...");
+                const ok = await saveAllLive({
+                  settings: settingsForm,
+                  homepage: homepageState,
+                  announcement: announcementState,
+                  instructions: instructionsState,
+                  ethics: ethicsState,
+                  contact: contactState,
+                  sidebarConfig: sidebarMenuState,
+                });
+                if (ok) {
+                  showToast("✅ All journal data successfully saved live across PC, Laptop, Mobile & Tablet!");
+                } else {
+                  showToast("Data updated locally.");
+                }
+              }}
+              className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#700070] hover:bg-[#550055] px-2.5 sm:px-3 py-1.5 rounded transition-colors shadow-xs cursor-pointer"
+              title="Save all journal settings, pages, members and articles live to server for mobile, laptop, and PC"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Save All Live</span>
+              <span className="sm:hidden">Save All</span>
+            </button>
+
             <Link
               href="/"
               className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-[#700070] hover:text-white px-2.5 sm:px-3 py-1.5 rounded transition-colors"
@@ -985,11 +1013,16 @@ export default function AdminPage() {
               </div>
 
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   updateSettings(settingsForm);
                   updateSidebarConfig(sidebarMenuState);
-                  showToast("Journal settings & cover page saved live across all devices!");
+                  const ok = await saveAllLive({ settings: settingsForm, sidebarConfig: sidebarMenuState });
+                  if (ok) {
+                    showToast("✅ Journal settings & cover page saved live to server across all devices!");
+                  } else {
+                    showToast("Journal settings updated locally.");
+                  }
                 }}
                 className="space-y-4 text-xs"
               >
@@ -1129,6 +1162,76 @@ export default function AdminPage() {
                       value={settingsForm.plagiarismTool}
                       onChange={(e) =>
                         setSettingsForm({ ...settingsForm, plagiarismTool: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Starting Year
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.startingYear}
+                      onChange={(e) =>
+                        setSettingsForm({ ...settingsForm, startingYear: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Language
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.language}
+                      onChange={(e) =>
+                        setSettingsForm({ ...settingsForm, language: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Publication Format
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.publicationFormat || "Online"}
+                      onChange={(e) =>
+                        setSettingsForm({ ...settingsForm, publicationFormat: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Phone No.
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.phoneNo || ""}
+                      onChange={(e) =>
+                        setSettingsForm({ ...settingsForm, phoneNo: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Mobile No.
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.mobileNo || ""}
+                      onChange={(e) =>
+                        setSettingsForm({ ...settingsForm, mobileNo: e.target.value })
                       }
                       className="w-full px-3 py-2 border border-slate-300 rounded focus:border-[#700070]"
                     />
@@ -1303,10 +1406,15 @@ export default function AdminPage() {
               </div>
 
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   updateHomepage(homepageState);
-                  showToast("Homepage content saved and live on website!");
+                  const ok = await saveAllLive({ homepage: homepageState });
+                  if (ok) {
+                    showToast("✅ Homepage content saved and synced across all devices!");
+                  } else {
+                    showToast("Homepage content saved.");
+                  }
                 }}
                 className="space-y-4 text-xs"
               >
@@ -2019,10 +2127,15 @@ export default function AdminPage() {
               </div>
 
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   updateInstructions(instructionsState);
-                  showToast("Author instructions updated and saved live!");
+                  const ok = await saveAllLive({ instructions: instructionsState });
+                  if (ok) {
+                    showToast("✅ Author instructions updated and synced across all devices!");
+                  } else {
+                    showToast("Author instructions saved.");
+                  }
                 }}
                 className="space-y-4 text-xs"
               >
@@ -2169,10 +2282,15 @@ export default function AdminPage() {
               </div>
 
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   updateEthics(ethicsState);
-                  showToast("Publication ethics policies updated and saved live!");
+                  const ok = await saveAllLive({ ethics: ethicsState });
+                  if (ok) {
+                    showToast("✅ Publication ethics policies saved and synced across all devices!");
+                  } else {
+                    showToast("Publication ethics saved.");
+                  }
                 }}
                 className="space-y-4 text-xs"
               >
@@ -2272,10 +2390,15 @@ export default function AdminPage() {
               </div>
 
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   updateContact(contactState);
-                  showToast("Contact information updated and saved live!");
+                  const ok = await saveAllLive({ contact: contactState });
+                  if (ok) {
+                    showToast("✅ Contact information saved and synced across all devices!");
+                  } else {
+                    showToast("Contact information saved.");
+                  }
                 }}
                 className="space-y-4 text-xs"
               >
@@ -2489,10 +2612,15 @@ export default function AdminPage() {
               </div>
 
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   updateSidebarConfig(sidebarMenuState);
-                  showToast("Sidebar widget configurations saved live!");
+                  const ok = await saveAllLive({ sidebarConfig: sidebarMenuState });
+                  if (ok) {
+                    showToast("✅ Sidebar widget configurations saved and synced across all devices!");
+                  } else {
+                    showToast("Sidebar configuration saved.");
+                  }
                 }}
                 className="space-y-4 text-xs"
               >
@@ -2758,10 +2886,15 @@ export default function AdminPage() {
               </div>
 
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   updateAnnouncement(announcementState);
-                  showToast("Announcement ticker updated live on public site!");
+                  const ok = await saveAllLive({ announcement: announcementState });
+                  if (ok) {
+                    showToast("✅ Announcement ticker saved and synced across all devices!");
+                  } else {
+                    showToast("Announcement ticker saved.");
+                  }
                 }}
                 className="space-y-4 text-xs"
               >

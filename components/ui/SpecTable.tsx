@@ -8,24 +8,26 @@ export function SpecTable() {
 
   const specs = [
     { label: "Title", value: settings.journalTitle },
-    { label: "Chief Editor", value: settings.editorInChief },
     { label: "Frequency", value: settings.frequency },
-    { label: "E-ISSN", value: `${settings.issn} (Applied)` },
+    { label: "ISSN", value: settings.issn },
     { label: "Publisher", value: settings.publisher },
+    { label: "Chief Editor", value: settings.editorInChief },
     { label: "Starting Year", value: settings.startingYear },
     { label: "Subject", value: settings.subject },
     { label: "Language", value: settings.language },
-    { label: "Publication Format", value: "Online" },
+    { label: "Publication Format", value: settings.publicationFormat || "Online" },
+    { label: "Phone No.", value: settings.phoneNo || "+91 8527231973" },
     { label: "Email id", value: settings.email, isEmail: true },
+    { label: "Mobile No.", value: settings.mobileNo || "+91 8527231973" },
     { label: "Website", value: settings.website, isLink: true },
     { label: "Address", value: settings.address },
-    { label: "Plagiarism Tool", value: settings.plagiarismTool },
+    { label: "Plagiarism", value: settings.plagiarismTool },
   ];
 
   return (
     <div className="my-4">
       <div className="text-center mb-3">
-        <h3 className="font-bold text-sm text-[#111111] underline inline-block">
+        <h3 className="font-bold text-sm text-[#111111] underline inline-block tracking-wide">
           Journal Particulars
         </h3>
       </div>
@@ -35,16 +37,16 @@ export function SpecTable() {
           <tbody>
             {specs.map((item, idx) => (
               <tr key={idx} className="border-b border-gray-300">
-                <td className="py-2 px-3 font-semibold text-gray-900 w-2/5 sm:w-1/3 border-r border-gray-300 bg-white">
+                <td className="py-2 px-3 font-semibold text-gray-900 w-2/5 sm:w-1/3 border-r border-gray-300 bg-white align-top">
                   {item.label}
                 </td>
-                <td className="py-2 px-3 text-gray-800 bg-white">
+                <td className="py-2 px-3 text-gray-800 bg-white align-top break-words">
                   {item.isLink ? (
-                    <a href={item.value} className="text-[#700070] hover:underline">
+                    <a href={item.value.startsWith("http") ? item.value : `https://${item.value}`} target="_blank" rel="noopener noreferrer" className="text-[#700070] hover:underline font-medium break-all">
                       {item.value}
                     </a>
                   ) : item.isEmail ? (
-                    <a href={`mailto:${item.value}`} className="text-[#700070] hover:underline font-mono">
+                    <a href={`mailto:${item.value}`} className="text-[#700070] hover:underline font-mono break-all">
                       {item.value}
                     </a>
                   ) : (

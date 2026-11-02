@@ -104,6 +104,30 @@ export default function HomePage() {
           </section>
 
           {/* -------------------------------------------------------------
+              DISCIPLINARY SCOPE & SUBTOPICS (Matching Reference Screenshot)
+             ------------------------------------------------------------- */}
+          <section className="pt-3 space-y-2">
+            <h2 className="text-base font-editorial font-bold text-[#700070] border-b border-gray-200 pb-1">
+              Disciplinary Scope &amp; Thematic Areas
+            </h2>
+            <p className="text-xs sm:text-sm text-justify text-gray-800 leading-relaxed font-sans">
+              <strong>{settings.journalTitle} (ISSN: {settings.issn})</strong> covers a wide range of topics within the fields of social sciences and humanities. While the specific subtopics may vary depending on the focus of individual articles and issues, here are some common subtopics that you might find in the journal:
+            </p>
+            <ol className="list-decimal pl-5 space-y-1.5 text-xs sm:text-sm text-gray-800 leading-relaxed font-sans">
+              <li><strong>Interdisciplinary Studies:</strong> Articles that explore the integration of different disciplines within the social sciences and humanities to address complex issues.</li>
+              <li><strong>Cultural Studies:</strong> Examination of culture, including cultural norms, practices, and their impact on society.</li>
+              <li><strong>Social Psychology:</strong> Research on individual and group behavior, attitudes, and perceptions in a social context.</li>
+              <li><strong>Environmental Humanities:</strong> Exploration of the relationship between humans and the environment, including topics like environmental ethics, sustainability, and climate change.</li>
+              <li><strong>Gender and Sexuality Studies:</strong> Research on gender identity, sexuality, and the social construction of gender roles.</li>
+              <li><strong>History and Historiography:</strong> Articles that delve into historical events, their interpretation, and the methods used to study the past.</li>
+              <li><strong>Literature and Literary Theory:</strong> Analysis of literary works, genres, and literary criticism.</li>
+              <li><strong>Political Science:</strong> Research on political systems, governance, international relations, and political ideologies.</li>
+              <li><strong>Philosophy:</strong> Discussions of philosophical ideas and their applications to contemporary issues.</li>
+              <li><strong>Economics and Economic History:</strong> Studies on economic theories, policies, and historical economic developments.</li>
+            </ol>
+          </section>
+
+          {/* -------------------------------------------------------------
               CURRENT ISSUE & AUTHENTIC LATEST ARTICLES (Live from Admin)
              ------------------------------------------------------------- */}
           <section id="homepageIssue" className="pt-6 border-t border-gray-300 space-y-4">
