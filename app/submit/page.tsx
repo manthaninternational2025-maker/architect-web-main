@@ -3,8 +3,8 @@ import { JournalSubmitForm } from "@/components/forms/JournalSubmitForm";
 import { Sidebar } from "@/components/layout/Sidebar";
 
 export const metadata = {
-  title: "Manuscript Status Check | Manthan: IMJSI",
-  description: "Check the review and publication status of your submitted manuscript.",
+  title: "Submit Manuscript | Manthan: IMJSI",
+  description: "Submit your original research article, communication, or review paper for double-blind peer review and publication.",
 };
 
 export default function SubmitPage() {

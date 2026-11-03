@@ -83,7 +83,7 @@ export function Sidebar() {
       {sidebarConfig.showManuscriptStatus && (
         <div className="bg-white border border-[#CCCCCC] p-2.5 sm:p-3 text-center transition-colors hover:bg-gray-50">
           <Link
-            href={sidebarConfig.manuscriptStatusLink || "/submit"}
+            href={sidebarConfig.manuscriptStatusLink || "/manuscript-status"}
             className="block text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-base tracking-wide leading-tight"
           >
             {sidebarConfig.manuscriptStatusText || "Manuscript Status"}
