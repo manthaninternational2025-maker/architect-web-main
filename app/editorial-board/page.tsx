@@ -85,12 +85,13 @@ export default function EditorialBoardPage() {
 
                       {/* Line 2: Badges (Dedicated Row for Perfect Consistency) */}
                       <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-0.5 pb-1.5">
-                        {/* Journal Editorial Role Badge */}
-                        <span className="text-[11px] font-bold text-white bg-[#700070] px-2.5 py-0.5 rounded shadow-2xs tracking-wide uppercase">
-                          {member.name.toLowerCase().includes("deepak setia")
-                            ? "Editor-in-Chief"
-                            : member.role || "Editorial Board Member"}
-                        </span>
+                        {/* Editor-in-Chief Badge */}
+                        {(member.name.toLowerCase().includes("deepak setia") ||
+                          member.role.toLowerCase() === "editor-in-chief") && (
+                          <span className="text-[11px] font-bold text-white bg-[#700070] px-2.5 py-0.5 rounded shadow-2xs tracking-wide uppercase">
+                            Editor-in-Chief
+                          </span>
+                        )}
 
                         {/* Academic Designation Badge */}
                         <span className="text-[11px] font-semibold text-purple-900 bg-purple-100 border border-purple-200 px-2.5 py-0.5 rounded">
