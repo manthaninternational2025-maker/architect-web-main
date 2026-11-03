@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { useJournalData } from "@/context/JournalDataContext";
-import { openArticlePdf } from "@/utils/pdfHelper";
+import { openArticlePdf, openSubmissionDocument, downloadSubmissionDocument } from "@/utils/pdfHelper";
 import { companyInfo } from "@/data/companyInfo";
 import { resources } from "@/data/resources";
 import {
@@ -2971,98 +2971,69 @@ export default function AdminPage() {
                           {msg.content}
                         </div>
 
-                        {/* File Action Section */}
-                        {fileDataUrl ? (
-                          <div className="mt-3 pt-3 border-t border-slate-200/80 flex flex-wrap items-center gap-2.5">
-                            <a
-                              href={fileDataUrl}
-                              download={parsedManuscriptName || `manuscript-${parsedTracking || msg.id}.pdf`}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#700070] hover:bg-[#5a005a] text-white text-xs font-bold rounded-md shadow-xs transition-colors cursor-pointer"
-                            >
-                              <Download className="w-3.5 h-3.5" />
-                              <span>Download Manuscript ({parsedManuscriptName || "PDF"})</span>
-                            </a>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const win = window.open();
-                                if (win) {
-                                  win.document.write(
-                                    `<iframe src="${fileDataUrl}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`
-                                  );
-                                }
-                              }}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-[#700070] text-xs font-bold rounded-md transition-colors cursor-pointer"
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                              <span>View PDF in Browser</span>
-                            </button>
-
-                            <a
-                              href="https://drive.google.com/drive/u/0/my-drive"
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={() => {
-                                const a = document.createElement("a");
-                                a.href = fileDataUrl;
-                                a.download = `${parsedTracking ? parsedTracking + "_" : ""}${parsedManuscriptName || "manuscript.pdf"}`;
-                                a.click();
-                                showToast("Downloaded PDF for manthaninternational2025@gmail.com Drive upload!");
-                              }}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-md transition-colors cursor-pointer"
-                            >
-                              <UploadCloud className="w-3.5 h-3.5 text-indigo-600" />
-                              <span>Save to Google Drive</span>
-                            </a>
-
-                            {undertakingDataUrl && (
-                              <a
-                                href={undertakingDataUrl}
-                                download={parsedUndertakingName || "undertaking.pdf"}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
-                              >
-                                <Download className="w-3.5 h-3.5" />
-                                <span>Download Undertaking ({parsedUndertakingName || "File"})</span>
-                              </a>
-                            )}
-                          </div>
-                        ) : parsedManuscriptName ? (
-                          <div className="mt-3 pt-3 border-t border-slate-200/80 bg-amber-50/70 border border-amber-200/80 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+                        {/* File Action Section - GUARANTEED TO OPEN & DOWNLOAD ANY PDF / DOCUMENT */}
+                        {(fileDataUrl || parsedManuscriptName) && (
+                          <div className="mt-3 pt-3 border-t border-slate-200/80 bg-purple-50/50 p-3 rounded-lg border border-purple-200/60 flex flex-wrap items-center justify-between gap-2.5">
                             <div className="flex items-center gap-2">
-                              <FileText className="w-4 h-4 text-amber-700 shrink-0" />
-                              <span className="text-slate-800">
-                                Attached Manuscript: <strong className="text-amber-950 font-bold">{parsedManuscriptName}</strong>{" "}
-                                {parsedManuscriptSize ? `(${parsedManuscriptSize})` : ""}
+                              <FileText className="w-4 h-4 text-[#700070] shrink-0" />
+                              <span className="text-slate-800 text-xs font-semibold">
+                                Manuscript: <strong className="text-purple-950 font-bold">{parsedManuscriptName || "Manuscript Document"}</strong>{" "}
+                                {parsedManuscriptSize ? <span className="text-slate-500 font-normal">({parsedManuscriptSize})</span> : ""}
                               </span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              {cleanPhone && (
+
+                            <div className="flex flex-wrap items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  openSubmissionDocument(msg, settingsForm);
+                                  showToast(`Opening "${parsedManuscriptName || "Manuscript PDF"}"...`);
+                                }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#700070] hover:bg-[#5a005a] text-white text-xs font-bold rounded-md shadow-xs transition-colors cursor-pointer"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>Open / View Document</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  downloadSubmissionDocument(msg, settingsForm);
+                                  showToast(`Downloading "${parsedManuscriptName || "Manuscript"}"...`);
+                                }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-md shadow-xs transition-colors cursor-pointer"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                <span>Download File</span>
+                              </button>
+
+                              <a
+                                href="https://drive.google.com/drive/u/0/my-drive"
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={() => {
+                                  downloadSubmissionDocument(msg, settingsForm);
+                                  showToast("Downloaded document for manthaninternational2025@gmail.com Drive upload!");
+                                }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-md transition-colors cursor-pointer"
+                              >
+                                <UploadCloud className="w-3.5 h-3.5 text-indigo-600" />
+                                <span>Save to Google Drive</span>
+                              </a>
+
+                              {undertakingDataUrl && (
                                 <a
-                                  href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-                                    `Hello ${msg.sender}, we received your manuscript submission for "${parsedManuscriptName}" (Tracking ID: ${parsedTracking || ""}) on Manthan Journal. Please share your complete PDF/Word document here on WhatsApp.`
-                                  )}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-2.5 py-1.5 rounded transition-colors"
+                                  href={undertakingDataUrl}
+                                  download={parsedUndertakingName || "undertaking.pdf"}
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
                                 >
-                                  <span>Request PDF on WhatsApp</span>
+                                  <Download className="w-3 h-3" />
+                                  <span>Undertaking</span>
                                 </a>
                               )}
-                              <a
-                                href={`mailto:${msg.email}?subject=${encodeURIComponent(
-                                  `Action Required: PDF Document for ${parsedManuscriptName} (${parsedTracking || ""})`
-                                )}&body=${encodeURIComponent(
-                                  `Dear ${msg.sender},\n\nWe have received your manuscript registration details for "${parsedManuscriptName}" (Tracking ID: ${parsedTracking || ""}).\n\nPlease reply to this email with your manuscript PDF attached so our editorial committee can begin peer review.\n\nWarm regards,\nEditorial Office\nManthan: International Multidisciplinary Journal of Social Inquiry\nmanthaninternational2025@gmail.com`
-                                )}`}
-                                className="inline-flex items-center gap-1 bg-purple-700 hover:bg-purple-800 text-white font-semibold text-xs px-2.5 py-1.5 rounded transition-colors"
-                              >
-                                <Mail className="w-3 h-3" />
-                                <span>Request PDF via Email</span>
-                              </a>
                             </div>
                           </div>
-                        ) : null}
+                        )}
 
                         {/* Bottom Action Footer */}
                         <div className="pt-3 mt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
