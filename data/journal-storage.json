@@ -7,7 +7,7 @@
     "frequency": "Quarterly",
     "editorInChief": "Dr. Deepak Setia",
     "startingYear": "2026",
-    "subject": "Social Sciences, Humanities, Economics, Political Science, History, Philosophy, Commerce, Law & Multidisciplinary Studies",
+    "subject": "Social Sciences",
     "language": "Multiple Language",
     "publicationFormat": "Online",
     "phoneNo": "+91 8527231973",
@@ -16,7 +16,7 @@
     "website": "https://manthanjournal.com",
     "address": "GT Karnal Road, Dilkhush Bagh Village, Ashok Vihar, New Delhi, Delhi 110033",
     "plagiarismTool": "PlagiarismCheckerX / Turnitin / Drillbit",
-    "impactFactor": "6.345*"
+    "impactFactor": "xxxx*"
   },
   "announcement": {
     "active": true,
@@ -35,7 +35,59 @@
     "aboutText": "Manthan: International Multidisciplinary Journal of Social Inquiry, refereed, peer reviewed, open access journal. Researches in the field of humanities, social science, Community and Consumer Sciences, Economics, Political Science, Geography, Philosophy, History, Humanity and Languages concerning with social science, Anthropological, Behavioral Sciences, Sociology, Journalism and Role of Media in social science. Educational Sciences: For School Students, Women, Village and Society, Commerce, Law and Management related with humanities and social science.",
     "policyText": "Manthan: International Multidisciplinary Journal of Social Inquiry (ISSN: Under Process), an open access peer reviewed refereed online journal, presents original research articles and rapid communications, covering all areas of Social Sciences and Humanities. The primary mission of the journal is to become the premier source of high quality research from whole of the world. Manthan considers all manuscripts on the strict condition that they have not been published already, under review elsewhere, nor are they under consideration for publication or in press elsewhere."
   },
-  "articles": [],
+  "articles": [
+    {
+      "id": 1,
+      "title": "Reinterpreting Tradition: Gan Yang's Intellectual Legacy and China's Contemporary Constitutional Discourse",
+      "authors": "Ashish Giri Faculty in Sri Venkateswara College, University of Delhi",
+      "volume": "Volume 1",
+      "issue": "Issue 1",
+      "date": "August 2026",
+      "status": "Published",
+      "doi": "10.5281/imjsi.2026.01.06",
+      "abstract": "This study examines Gan Yang's intellectual contribution to contemporary Chinese political philosophy, analyzing the theoretical synthesis of Confucian tradition, socialist heritage, and constitutional modernity in shaping 21st-century Chinese governance debates.",
+      "pages": "pp. 10-15",
+      "category": "Social Sciences",
+      "fileName": "Ashish Giri.pdf",
+      "fileSize": "725 KB",
+      "views": 420,
+      "downloads": 32
+    },
+    {
+      "id": 2,
+      "title": "Ethics and Governance in Ancient China: The Intellectual Legacies of Confucius, Laozi, and Han Feizi",
+      "authors": "Anchal Gautam Research Scholar, Department of East Asian Studies, University of Delhi",
+      "volume": "Volume 1",
+      "issue": "Issue 1",
+      "date": "August 2026",
+      "status": "Published",
+      "doi": "10.5281/imjsi.2026.01.05",
+      "abstract": "A comparative philosophical inquiry into the governing paradigms of Confucianism, Daoism, and Legalism in Classical China, evaluating their moral, structural, and legal foundations and their lasting imprint on East Asian statecraft.",
+      "pages": "pp. 5-9",
+      "category": "Social Sciences",
+      "fileName": "Anchal Gautam.pdf",
+      "fileSize": "819 KB",
+      "views": 315,
+      "downloads": 24
+    },
+    {
+      "id": 3,
+      "title": "The Evolution of Family Structures in Contemporary Chinese Society: A Socio-Demographic Analysis",
+      "authors": "Mr. Mohit Singh Research Scholar Department of Continuing Education & Extension, University of Delhi (DCEE, DU)",
+      "volume": "Volume 1",
+      "issue": "Issue 1",
+      "date": "August 2026",
+      "status": "Published",
+      "doi": "10.5281/imjsi.2026.01.04",
+      "abstract": "This research investigates the structural transformations, intergenerational dynamics, and demographic transitions characterizing modern Chinese family systems amidst rapid urbanization and social policy reforms.",
+      "pages": "pp. 1-4",
+      "category": "Social Sciences",
+      "fileName": "Mr. Mohit Singh.pdf",
+      "fileSize": "510 KB",
+      "views": 240,
+      "downloads": 18
+    }
+  ],
   "issues": [
     {
       "id": 1,
@@ -44,7 +96,7 @@
       "period": "August 2026",
       "publicationDate": "2026-08-01",
       "status": "Published",
-      "articlesCount": 0,
+      "articlesCount": 3,
       "theme": "Inaugural Multidisciplinary Social Inquiry Issue"
     },
     {
@@ -238,7 +290,7 @@
     "plagiarismRemoverOnlineText": "Plagiarism Remover Online",
     "plagiarismRemoverOnlineLink": "/plagiarism",
     "showImpactFactor": true,
-    "impactFactorValue": "Impact Factor: 6.345*",
+    "impactFactorValue": "Impact Factor: xxxx*",
     "showSearchBar": true
   },
   "messages": [

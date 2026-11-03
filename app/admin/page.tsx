@@ -1122,7 +1122,7 @@ export default function AdminPage() {
                   const rawImpact = settingsForm.impactFactor || "";
                   const formattedImpact = rawImpact
                     ? (rawImpact.toLowerCase().startsWith("impact factor") ? rawImpact : `Impact Factor: ${rawImpact}`)
-                    : (sidebarMenuState.impactFactorValue || "Impact Factor: 6.345*");
+                    : (sidebarMenuState.impactFactorValue || "Impact Factor: xxxx*");
 
                   const updatedSidebar = {
                     ...sidebarMenuState,

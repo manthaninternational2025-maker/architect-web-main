@@ -222,7 +222,7 @@ const initialSettings: JournalSettings = {
   frequency: "Quarterly",
   editorInChief: "Dr. Deepak Setia",
   startingYear: "2026",
-  subject: "Social Sciences, Humanities, Economics, Political Science, History, Philosophy, Commerce, Law & Multidisciplinary Studies",
+  subject: "Social Sciences",
   language: "Multiple Language",
   publicationFormat: "Online",
   phoneNo: "+91 8527231973",
@@ -231,7 +231,7 @@ const initialSettings: JournalSettings = {
   website: "https://manthanjournal.com",
   address: "GT Karnal Road, Dilkhush Bagh Village, Ashok Vihar, New Delhi, Delhi 110033",
   plagiarismTool: "PlagiarismCheckerX / Turnitin / Drillbit",
-  impactFactor: "6.345*",
+  impactFactor: "xxxx*",
 };
 
 const initialAnnouncement: AnnouncementData = {
@@ -253,7 +253,59 @@ const initialHomepage: HomepageData = {
   policyText: "The journal publishes original research papers, review articles, case studies, and book reviews adhering to rigorous peer-review and ethical publishing standards. Authors must ensure all cited works are acknowledged properly.",
 };
 
-const initialArticlesList: ArticleItem[] = [];
+const initialArticlesList: ArticleItem[] = [
+  {
+    id: 1,
+    title: "Reinterpreting Tradition: Gan Yang's Intellectual Legacy and China's Contemporary Constitutional Discourse",
+    authors: "Ashish Giri Faculty in Sri Venkateswara College, University of Delhi",
+    volume: "Volume 1",
+    issue: "Issue 1",
+    date: "August 2026",
+    status: "Published",
+    doi: "10.5281/imjsi.2026.01.06",
+    abstract: "This study examines Gan Yang's intellectual contribution to contemporary Chinese political philosophy, analyzing the theoretical synthesis of Confucian tradition, socialist heritage, and constitutional modernity in shaping 21st-century Chinese governance debates.",
+    pages: "pp. 10-15",
+    category: "Social Sciences",
+    fileName: "Ashish Giri.pdf",
+    fileSize: "725 KB",
+    views: 420,
+    downloads: 32,
+  },
+  {
+    id: 2,
+    title: "Ethics and Governance in Ancient China: The Intellectual Legacies of Confucius, Laozi, and Han Feizi",
+    authors: "Anchal Gautam Research Scholar, Department of East Asian Studies, University of Delhi",
+    volume: "Volume 1",
+    issue: "Issue 1",
+    date: "August 2026",
+    status: "Published",
+    doi: "10.5281/imjsi.2026.01.05",
+    abstract: "A comparative philosophical inquiry into the governing paradigms of Confucianism, Daoism, and Legalism in Classical China, evaluating their moral, structural, and legal foundations and their lasting imprint on East Asian statecraft.",
+    pages: "pp. 5-9",
+    category: "Social Sciences",
+    fileName: "Anchal Gautam.pdf",
+    fileSize: "819 KB",
+    views: 315,
+    downloads: 24,
+  },
+  {
+    id: 3,
+    title: "The Evolution of Family Structures in Contemporary Chinese Society: A Socio-Demographic Analysis",
+    authors: "Mr. Mohit Singh Research Scholar Department of Continuing Education & Extension, University of Delhi (DCEE, DU)",
+    volume: "Volume 1",
+    issue: "Issue 1",
+    date: "August 2026",
+    status: "Published",
+    doi: "10.5281/imjsi.2026.01.04",
+    abstract: "This research investigates the structural transformations, intergenerational dynamics, and demographic transitions characterizing modern Chinese family systems amidst rapid urbanization and social policy reforms.",
+    pages: "pp. 1-4",
+    category: "Social Sciences",
+    fileName: "Mr. Mohit Singh.pdf",
+    fileSize: "510 KB",
+    views: 240,
+    downloads: 18,
+  },
+];
 
 const initialIssues: IssueItem[] = [
   {
@@ -263,7 +315,7 @@ const initialIssues: IssueItem[] = [
     period: "August 2026",
     publicationDate: "2026-08-01",
     status: "Published",
-    articlesCount: 0,
+    articlesCount: 3,
     theme: "Inaugural Multidisciplinary Social Inquiry Issue",
   },
   {
@@ -425,7 +477,7 @@ const initialSidebar: SidebarConfigData = {
   plagiarismRemoverOnlineText: "Plagiarism Remover Online",
   plagiarismRemoverOnlineLink: "/plagiarism",
   showImpactFactor: true,
-  impactFactorValue: "Impact Factor: 6.345*",
+  impactFactorValue: "Impact Factor: xxxx*",
   showSearchBar: true,
 };
 
@@ -525,6 +577,12 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
           if (!parsed.address || parsed.address.includes("New Delhi & NCR")) {
             parsed.address = "GT Karnal Road, Dilkhush Bagh Village, Ashok Vihar, New Delhi, Delhi 110033";
           }
+          if (!parsed.subject || parsed.subject.includes("Economics, Political Science")) {
+            parsed.subject = "Social Sciences";
+          }
+          if (!parsed.impactFactor || parsed.impactFactor.includes("6.345")) {
+            parsed.impactFactor = "xxxx*";
+          }
           setSettings(parsed);
         } catch {
           setSettings(JSON.parse(s));
@@ -541,13 +599,17 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       if (art !== null) {
         try {
           const parsed = JSON.parse(art);
-          if (Array.isArray(parsed)) {
+          if (Array.isArray(parsed) && parsed.length > 0) {
             setArticles(parsed);
+          } else {
+            setArticles(initialArticlesList);
           }
-        } catch {}
+        } catch {
+          setArticles(initialArticlesList);
+        }
       } else {
-        setArticles([]);
-        try { localStorage.setItem(K_ARTICLES, JSON.stringify([])); } catch {}
+        setArticles(initialArticlesList);
+        try { localStorage.setItem(K_ARTICLES, JSON.stringify(initialArticlesList)); } catch {}
       }
 
       const iss = localStorage.getItem(K_ISSUES);
@@ -641,22 +703,56 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
               } catch {}
             }
 
-            // If the client has published articles locally, but server returned empty/older,
-            // never let server erase user's articles! Instead sync client articles to server!
-            if (hasLocalArticles && (!d.articles || d.articles.length === 0 || (localVersion && serverVersion && localVersion > serverVersion))) {
+            // If the client has published edits newer than the server,
+            // NEVER let the server overwrite client's work!
+            // Instead sync client's edits to server!
+            if (localVersion > serverVersion) {
+              const fullPayload: Record<string, any> = { timestamp: localVersion };
+              const s = localStorage.getItem(K_SETTINGS);
+              if (s) try { fullPayload.settings = JSON.parse(s); } catch {}
+              const an = localStorage.getItem(K_ANNOUNCE);
+              if (an) try { fullPayload.announcement = JSON.parse(an); } catch {}
+              const hp = localStorage.getItem(K_HOMEPAGE);
+              if (hp) try { fullPayload.homepage = JSON.parse(hp); } catch {}
+              if (hasLocalArticles) fullPayload.articles = localArticles;
+              const is = localStorage.getItem(K_ISSUES);
+              if (is) try { fullPayload.issues = JSON.parse(is); } catch {}
+              const mem = localStorage.getItem(K_MEMBERS);
+              if (mem) try { fullPayload.members = JSON.parse(mem); } catch {}
+              const sb = localStorage.getItem(K_SIDEBAR);
+              if (sb) try { fullPayload.sidebarConfig = JSON.parse(sb); } catch {}
+
               fetch("/api/journal-data", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ articles: localArticles, timestamp: localVersion || Date.now() }),
+                body: JSON.stringify(fullPayload),
               }).catch(() => {});
-            } else if (d.articles && Array.isArray(d.articles)) {
+              return;
+            }
+
+            // Server state adoption with sanitization against outdated legacy strings
+            if (d.articles && Array.isArray(d.articles) && d.articles.length > 0) {
               setArticles(d.articles);
               try { localStorage.setItem(K_ARTICLES, JSON.stringify(d.articles)); } catch {}
+            } else if (hasLocalArticles) {
+              setArticles(localArticles);
+              fetch("/api/journal-data", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ articles: localArticles, timestamp: Date.now() }),
+              }).catch(() => {});
             }
 
             if (d.settings) {
-              setSettings(d.settings);
-              try { localStorage.setItem(K_SETTINGS, JSON.stringify(d.settings)); } catch {}
+              const sanitizedSettings = { ...d.settings };
+              if (!sanitizedSettings.subject || sanitizedSettings.subject.includes("Economics, Political Science")) {
+                sanitizedSettings.subject = "Social Sciences";
+              }
+              if (!sanitizedSettings.impactFactor || sanitizedSettings.impactFactor.includes("6.345")) {
+                sanitizedSettings.impactFactor = "xxxx*";
+              }
+              setSettings(sanitizedSettings);
+              try { localStorage.setItem(K_SETTINGS, JSON.stringify(sanitizedSettings)); } catch {}
             }
             if (d.announcement) {
               setAnnouncement(d.announcement);
@@ -688,14 +784,18 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
               try { localStorage.setItem(K_CONTACT, JSON.stringify(d.contact)); } catch {}
             }
             if (d.sidebarConfig) {
-              if (!d.sidebarConfig.coverImageUrl) {
-                d.sidebarConfig.coverImageUrl = "/images/manthan-cover-page.png";
+              const sanitizedSidebar = { ...d.sidebarConfig };
+              if (!sanitizedSidebar.coverImageUrl) {
+                sanitizedSidebar.coverImageUrl = "/images/manthan-cover-page.png";
               }
-              if (!d.sidebarConfig.coverPageHeading) {
-                d.sidebarConfig.coverPageHeading = "Cover Page";
+              if (!sanitizedSidebar.coverPageHeading) {
+                sanitizedSidebar.coverPageHeading = "Cover Page";
               }
-              setSidebarConfig(d.sidebarConfig);
-              try { localStorage.setItem(K_SIDEBAR, JSON.stringify(d.sidebarConfig)); } catch {}
+              if (sanitizedSidebar.impactFactorValue && sanitizedSidebar.impactFactorValue.includes("6.345")) {
+                sanitizedSidebar.impactFactorValue = "Impact Factor: xxxx*";
+              }
+              setSidebarConfig(sanitizedSidebar);
+              try { localStorage.setItem(K_SIDEBAR, JSON.stringify(sanitizedSidebar)); } catch {}
             }
             if (d.messages && Array.isArray(d.messages)) {
               setMessages(d.messages);

@@ -178,7 +178,8 @@ export function Sidebar() {
         <div className="bg-white border border-[#CCCCCC] p-2 text-center">
           <span className="text-[#700070] font-bold text-xs sm:text-sm">
             {(() => {
-              const val = settings.impactFactor || sidebarConfig.impactFactorValue || "6.345*";
+              let val = settings.impactFactor || sidebarConfig.impactFactorValue || "xxxx*";
+              if (val.includes("6.345")) val = "xxxx*";
               if (val.toLowerCase().startsWith("impact factor")) return val;
               return `Impact Factor: ${val}`;
             })()}

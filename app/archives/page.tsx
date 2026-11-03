@@ -7,7 +7,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Calendar } from "lucide-react";
 
 export default function ArchivesPage() {
-  const { issues, settings } = useJournalData();
+  const { issues, settings, articles } = useJournalData();
 
   return (
     <div className="w-full">
@@ -40,7 +40,17 @@ export default function ArchivesPage() {
                     <Calendar className="w-3.5 h-3.5 text-[#700070]" />
                     Published: {iss.publicationDate || iss.period}
                   </span>
-                  <span>{iss.articlesCount || 0} Articles</span>
+                  <span>
+                    {(() => {
+                      const matchingCount = articles.filter(
+                        (a) =>
+                          a.status === "Published" &&
+                          a.volume?.toLowerCase().trim() === iss.volume?.toLowerCase().trim() &&
+                          a.issue?.toLowerCase().trim() === iss.issue?.toLowerCase().trim()
+                      ).length;
+                      return matchingCount > 0 ? matchingCount : (iss.articlesCount || 0);
+                    })()} Articles
+                  </span>
                 </div>
                 <Link
                   href={iss.status === 'Published' ? '/current' : '/submit'}
