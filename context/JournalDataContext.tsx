@@ -210,6 +210,7 @@ const K_ETHICS = "manthan_live_ethics";
 const K_CONTACT = "manthan_live_contact";
 const K_SIDEBAR = "manthan_live_sidebar";
 const K_MESSAGES = "manthan_live_messages";
+const K_VERSION = "manthan_live_version";
 
 // Defaults
 const initialSettings: JournalSettings = {
@@ -548,10 +549,12 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
   const syncToServer = (payload: Record<string, any>) => {
     try {
       if (typeof window !== "undefined") {
+        const timestamp = Date.now();
+        try { localStorage.setItem(K_VERSION, String(timestamp)); } catch {}
         fetch("/api/journal-data", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({ ...payload, timestamp }),
         }).catch(() => {});
       }
     } catch {}
@@ -594,15 +597,14 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       };
 
       const art = localStorage.getItem(K_ARTICLES);
-      if (art) {
+      if (art !== null) {
         try {
           const parsed = JSON.parse(art);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             const filtered = parsed.filter((item: any) => !isMockFaltuArticle(item));
-            const toUse = filtered.length > 0 ? filtered : initialArticlesList;
             const seenIds = new Set<number>();
             let maxId = 0;
-            const sanitized = toUse.map((item: any, idx: number) => {
+            const sanitized = filtered.map((item: any, idx: number) => {
               let id = typeof item.id === "number" && !isNaN(item.id) && item.id > 0 ? item.id : idx + 1;
               if (seenIds.has(id)) {
                 id = maxId + 1;
@@ -616,7 +618,6 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
               return { ...item, id, doi };
             });
             setArticles(sanitized);
-            try { localStorage.setItem(K_ARTICLES, JSON.stringify(sanitized)); } catch {}
           }
         } catch {}
       } else {
@@ -699,6 +700,27 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
         .then((json) => {
           if (json.success && json.data) {
             const d = json.data;
+            const localVersionStr = localStorage.getItem(K_VERSION);
+            const localVersion = localVersionStr ? parseInt(localVersionStr, 10) : 0;
+            const serverVersion = json.timestamp || d.timestamp || 0;
+
+            // If the client has newer edits than server, don't let stale server overwrite it!
+            if (localVersion && serverVersion && localVersion > serverVersion) {
+              const localArticles = localStorage.getItem(K_ARTICLES);
+              const pushPayload: Record<string, any> = {
+                timestamp: localVersion,
+              };
+              if (localArticles !== null) {
+                try { pushPayload.articles = JSON.parse(localArticles); } catch {}
+              }
+              fetch("/api/journal-data", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(pushPayload),
+              }).catch(() => {});
+              return;
+            }
+
             if (d.settings) {
               setSettings(d.settings);
               try { localStorage.setItem(K_SETTINGS, JSON.stringify(d.settings)); } catch {}
@@ -713,9 +735,8 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
             }
             if (d.articles && Array.isArray(d.articles)) {
               const cleanArticles = d.articles.filter((item: any) => !isMockFaltuArticle(item));
-              const finalArticles = cleanArticles.length > 0 ? cleanArticles : initialArticlesList;
-              setArticles(finalArticles);
-              try { localStorage.setItem(K_ARTICLES, JSON.stringify(finalArticles)); } catch {}
+              setArticles(cleanArticles);
+              try { localStorage.setItem(K_ARTICLES, JSON.stringify(cleanArticles)); } catch {}
             }
             if (d.issues && Array.isArray(d.issues)) {
               setIssues(d.issues);
@@ -751,6 +772,9 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
             if (d.messages && Array.isArray(d.messages)) {
               setMessages(d.messages);
               try { localStorage.setItem(K_MESSAGES, JSON.stringify(d.messages)); } catch {}
+            }
+            if (serverVersion) {
+              try { localStorage.setItem(K_VERSION, String(serverVersion)); } catch {}
             }
           }
         })
@@ -1038,32 +1062,34 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
   };
 
   const saveAllLive = async (overrides?: Record<string, any>): Promise<boolean> => {
+    const timestamp = Date.now();
     const fullPayload = {
-      settings: overrides?.settings || settings,
-      announcement: overrides?.announcement || announcement,
-      homepage: overrides?.homepage || homepage,
-      articles: overrides?.articles || articles,
-      issues: overrides?.issues || issues,
-      members: overrides?.members || members,
-      instructions: overrides?.instructions || instructions,
-      ethics: overrides?.ethics || ethics,
-      contact: overrides?.contact || contact,
-      sidebarConfig: overrides?.sidebarConfig || sidebarConfig,
-      messages: overrides?.messages || messages,
+      settings: overrides?.settings !== undefined ? overrides.settings : settings,
+      announcement: overrides?.announcement !== undefined ? overrides.announcement : announcement,
+      homepage: overrides?.homepage !== undefined ? overrides.homepage : homepage,
+      articles: overrides?.articles !== undefined ? overrides.articles : articles,
+      issues: overrides?.issues !== undefined ? overrides.issues : issues,
+      members: overrides?.members !== undefined ? overrides.members : members,
+      instructions: overrides?.instructions !== undefined ? overrides.instructions : instructions,
+      ethics: overrides?.ethics !== undefined ? overrides.ethics : ethics,
+      contact: overrides?.contact !== undefined ? overrides.contact : contact,
+      sidebarConfig: overrides?.sidebarConfig !== undefined ? overrides.sidebarConfig : sidebarConfig,
+      messages: overrides?.messages !== undefined ? overrides.messages : messages,
+      timestamp,
     };
 
     if (overrides) {
-      if (overrides.settings) setSettings(overrides.settings);
-      if (overrides.announcement) setAnnouncement(overrides.announcement);
-      if (overrides.homepage) setHomepage(overrides.homepage);
-      if (overrides.articles) setArticles(overrides.articles);
-      if (overrides.issues) setIssues(overrides.issues);
-      if (overrides.members) setMembers(overrides.members);
-      if (overrides.instructions) setInstructions(overrides.instructions);
-      if (overrides.ethics) setEthics(overrides.ethics);
-      if (overrides.contact) setContact(overrides.contact);
-      if (overrides.sidebarConfig) setSidebarConfig(overrides.sidebarConfig);
-      if (overrides.messages) setMessages(overrides.messages);
+      if (overrides.settings !== undefined) setSettings(overrides.settings);
+      if (overrides.announcement !== undefined) setAnnouncement(overrides.announcement);
+      if (overrides.homepage !== undefined) setHomepage(overrides.homepage);
+      if (overrides.articles !== undefined) setArticles(overrides.articles);
+      if (overrides.issues !== undefined) setIssues(overrides.issues);
+      if (overrides.members !== undefined) setMembers(overrides.members);
+      if (overrides.instructions !== undefined) setInstructions(overrides.instructions);
+      if (overrides.ethics !== undefined) setEthics(overrides.ethics);
+      if (overrides.contact !== undefined) setContact(overrides.contact);
+      if (overrides.sidebarConfig !== undefined) setSidebarConfig(overrides.sidebarConfig);
+      if (overrides.messages !== undefined) setMessages(overrides.messages);
     }
     try {
       localStorage.setItem(K_SETTINGS, JSON.stringify(fullPayload.settings));
@@ -1077,6 +1103,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       localStorage.setItem(K_CONTACT, JSON.stringify(fullPayload.contact));
       localStorage.setItem(K_SIDEBAR, JSON.stringify(fullPayload.sidebarConfig));
       localStorage.setItem(K_MESSAGES, JSON.stringify(fullPayload.messages));
+      localStorage.setItem(K_VERSION, String(timestamp));
     } catch {}
     try {
       const res = await fetch("/api/journal-data", {

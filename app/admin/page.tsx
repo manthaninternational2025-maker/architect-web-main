@@ -920,6 +920,9 @@ export default function AdminPage() {
                   ethics: ethicsState,
                   contact: contactState,
                   sidebarConfig: sidebarMenuState,
+                  articles: articlesList,
+                  issues: issuesList,
+                  members: editorialMembers,
                 });
                 if (ok) {
                   userHasEdited.current = {};
@@ -1664,14 +1667,34 @@ export default function AdminPage() {
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setNewArticleModal(true)}
-                  className="px-3.5 py-2 bg-[#700070] hover:bg-[#550055] text-white text-xs font-bold rounded flex items-center gap-1.5 transition-colors cursor-pointer self-start sm:self-auto"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Add New Article</span>
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      showToast("Saving articles live to server...");
+                      const ok = await saveAllLive({ articles: articlesList });
+                      if (ok) {
+                        showToast("✅ Articles changes saved live across all devices!");
+                      } else {
+                        showToast("Articles saved locally.");
+                      }
+                    }}
+                    className="px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                    title="Save current articles and edits live"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    <span>Save Articles Live</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewArticleModal(true)}
+                    className="px-3.5 py-2 bg-[#700070] hover:bg-[#550055] text-white text-xs font-bold rounded flex items-center gap-1.5 transition-colors cursor-pointer self-start sm:self-auto shadow-xs"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add New Article</span>
+                  </button>
+                </div>
               </div>
 
               {/* Search Bar */}
@@ -1751,11 +1774,11 @@ export default function AdminPage() {
                           <button
                             type="button"
                             onClick={async () => {
-                              if (confirm(`Delete article #${art.id}: "${art.title}"?`)) {
+                              if (window.confirm(`Are you sure you want to delete article #${art.id}: "${art.title}"?`)) {
                                 const updated = articlesList.filter((a: any) => a.id !== art.id);
                                 deleteArticle(art.id);
                                 await saveAllLive({ articles: updated });
-                                showToast(`Article #${art.id} deleted.`);
+                                showToast(`✅ Article #${art.id} deleted and saved live.`);
                               }
                             }}
                             className="px-2.5 py-1.5 bg-rose-50 text-rose-700 hover:bg-rose-600 hover:text-white border border-rose-200 rounded font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
@@ -1845,10 +1868,12 @@ export default function AdminPage() {
                             <button
                               type="button"
                               onClick={async () => {
-                                const updated = articlesList.filter((a: any) => a.id !== art.id);
-                                deleteArticle(art.id);
-                                await saveAllLive({ articles: updated });
-                                showToast(`Article #${art.id} deleted.`);
+                                if (window.confirm(`Are you sure you want to delete article #${art.id}: "${art.title}"?`)) {
+                                  const updated = articlesList.filter((a: any) => a.id !== art.id);
+                                  deleteArticle(art.id);
+                                  await saveAllLive({ articles: updated });
+                                  showToast(`✅ Article #${art.id} deleted and saved live.`);
+                                }
                               }}
                               className="text-rose-500 hover:text-rose-700 p-1 cursor-pointer"
                               title="Delete Article"
@@ -1915,9 +1940,11 @@ export default function AdminPage() {
                         </span>
                         <button
                           type="button"
-                          onClick={() => {
+                          onClick={async () => {
                             if (confirm(`Are you sure you want to delete ${issue.volume}, ${issue.issue} (${issue.period})? This cannot be undone.`)) {
+                              const updated = issuesList.filter((iss: any) => iss.id !== issue.id);
                               deleteIssue(issue.id);
+                              await saveAllLive({ issues: updated });
                               showToast(`Issue "${issue.volume}, ${issue.issue}" deleted successfully.`);
                             }
                           }}
@@ -1969,9 +1996,11 @@ export default function AdminPage() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => {
+                          onClick={async () => {
                             if (confirm(`Are you sure you want to delete ${issue.volume}, ${issue.issue} (${issue.period})? This cannot be undone.`)) {
+                              const updated = issuesList.filter((iss: any) => iss.id !== issue.id);
                               deleteIssue(issue.id);
+                              await saveAllLive({ issues: updated });
                               showToast(`Issue "${issue.volume}, ${issue.issue}" deleted successfully.`);
                             }
                           }}
