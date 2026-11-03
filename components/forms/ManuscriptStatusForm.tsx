@@ -131,7 +131,7 @@ Submission Date: ${new Date().toLocaleDateString("en-IN")}`,
 
   return (
     <div className="border border-gray-400 bg-white p-5 sm:p-7 text-[#222222]">
-      <h1 className="text-xl sm:text-2xl text-[#222222] font-normal mb-6">
+      <h1 className="text-xl sm:text-2xl text-[#0000dd] font-normal mb-5 tracking-tight">
         manuscript status check
       </h1>
 
@@ -283,3 +283,4 @@ Submission Date: ${new Date().toLocaleDateString("en-IN")}`,
     </div>
   );
 }
+

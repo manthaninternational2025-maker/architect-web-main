@@ -459,7 +459,7 @@ const initialSidebar: SidebarConfigData = {
   coverBoxUrl: "https://manthanjournal.com",
   showManuscriptStatus: true,
   manuscriptStatusText: "Manuscript Status",
-  manuscriptStatusLink: "/submit",
+  manuscriptStatusLink: "/manuscript-status",
   showPlagiarismRemovalServices: false,
   plagiarismRemovalServicesText: "Plagiarism Removal Services",
   plagiarismRemovalServicesLink: "/plagiarism",
