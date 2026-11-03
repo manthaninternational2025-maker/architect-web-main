@@ -3,7 +3,7 @@
 import React from "react";
 import { useJournalData } from "@/context/JournalDataContext";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { Mail, Globe } from "lucide-react";
+import { Mail, Globe, Phone } from "lucide-react";
 
 // Robust parser to separate Department from College & University
 function formatAffiliation(affiliation: string) {
@@ -145,21 +145,17 @@ export default function EditorialBoardPage() {
                           </div>
                         )}
 
-                        {member.websiteUrl && (
-                          <a
-                            href={
-                              member.websiteUrl.startsWith("http")
-                                ? member.websiteUrl
-                                : `https://${member.websiteUrl}`
-                            }
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 font-bold text-[#700070] hover:text-[#550055] hover:underline"
-                            title={`Visit official website of ${member.name}`}
-                          >
-                            <Globe className="w-3.5 h-3.5 shrink-0" />
-                            <span>Visit Website ↗</span>
-                          </a>
+                        {member.phone && (
+                          <div className="flex items-center gap-1.5 font-sans font-medium text-gray-800">
+                            <Phone className="w-3.5 h-3.5 text-[#700070] shrink-0" />
+                            <a
+                              href={`tel:${member.phone.replace(/[^0-9+]/g, "")}`}
+                              className="text-gray-800 hover:text-[#700070] hover:underline"
+                              title={`Contact ${member.name}`}
+                            >
+                              <span>Contact: {member.phone}</span>
+                            </a>
+                          </div>
                         )}
 
                         {member.orcid && (

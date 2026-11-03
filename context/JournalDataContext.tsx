@@ -23,6 +23,8 @@ export interface JournalSettings {
   publicationFormat?: string;
   phoneNo?: string;
   mobileNo?: string;
+  googleDriveWebhookUrl?: string;
+  googleDriveEmail?: string;
 }
 
 export interface AnnouncementData {
@@ -164,8 +166,14 @@ export interface MessageItem {
   submissionType?: string;
   manuscriptFileUrl?: string;
   manuscriptFileName?: string;
+  manuscriptFileSize?: string;
+  manuscriptFileData?: string;
   undertakingFileUrl?: string;
   undertakingFileName?: string;
+  undertakingFileSize?: string;
+  undertakingFileData?: string;
+  driveStatus?: string;
+  googleDriveFileUrl?: string;
 }
 
 interface JournalDataContextType {
@@ -338,6 +346,7 @@ const initialMembers: EditorialMember[] = [
     email: "deepak.polsc@rla.du.ac.in",
     specialization: "Political Science",
     photoUrl: "/images/editorial/dr-deepak-setia.png",
+    phone: "+91 8527231973",
     websiteUrl: "https://rlacollege.edu.in/academics/departments/Political%2BScience/faculty-detail-clone/fc421ca827450acbf2ead15941ef2f5b2a20e5d031e14e742476532cf9fd2638",
   },
   {

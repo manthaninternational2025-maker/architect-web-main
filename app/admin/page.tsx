@@ -254,6 +254,8 @@ export default function AdminPage() {
     websiteUrl: "",
   });
 
+  const [showDriveModal, setShowDriveModal] = useState(false);
+
   // -------------------------------------------------------------
   // 12. PROFILE & PASSWORD FORM STATE
   // -------------------------------------------------------------
@@ -2341,20 +2343,11 @@ export default function AdminPage() {
                             </div>
                           )}
 
-                          {/* Official Website Link */}
-                          {m.websiteUrl ? (
-                            <div className="mt-1">
-                              <a
-                                href={m.websiteUrl.startsWith("http") ? m.websiteUrl : `https://${m.websiteUrl}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#700070] hover:underline"
-                                title={`Visit official website of ${m.name}`}
-                              >
-                                <Globe className="w-3 h-3 text-[#700070]" />
-                                <span>Visit Website ↗</span>
-                              </a>
+                          {/* Contact Number */}
+                          {m.phone ? (
+                            <div className="mt-1 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
+                              <Phone className="w-3 h-3 text-emerald-600" />
+                              <span>Contact: {m.phone}</span>
                             </div>
                           ) : (
                             <div className="mt-1">
@@ -2366,8 +2359,8 @@ export default function AdminPage() {
                                 }}
                                 className="inline-flex items-center gap-1 text-[10px] text-slate-400 hover:text-[#700070] border border-dashed border-slate-300 hover:border-[#700070] px-1.5 py-0.5 rounded transition-colors cursor-pointer"
                               >
-                                <Globe className="w-2.5 h-2.5" />
-                                <span>+ Add Website</span>
+                                <Phone className="w-2.5 h-2.5" />
+                                <span>+ Add Contact Number</span>
                               </button>
                             </div>
                           )}
@@ -2804,7 +2797,7 @@ export default function AdminPage() {
              ============================================================= */}
           {activeTab === "messages" && (
             <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="font-editorial italic font-bold text-2xl text-slate-900">
                     Inbox / Submissions & Scholar Inquiries ({messagesList.length})
@@ -2813,22 +2806,72 @@ export default function AdminPage() {
                     Submissions, manuscript uploads, and inquiries received from authors and scholars.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const sample = {
-                      sender: "Dr. Ankit Srivastava",
-                      email: "ankit.s@university.ac.in",
-                      subject: "Submission Confirmation for Review Issue",
-                      content: "Inquiry regarding publication timelines for multidisciplinary manuscripts.",
-                    };
-                    addMessage(sample);
-                    showToast("New inquiry logged.");
-                  }}
-                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded transition-colors"
-                >
-                  Simulate New Message
-                </button>
+                <div className="flex items-center gap-2">
+                  <a
+                    href="https://drive.google.com/drive/u/0/my-drive"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-semibold text-xs rounded flex items-center gap-1.5 transition-colors"
+                  >
+                    <UploadCloud className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Open Drive: manthaninternational2025@gmail.com</span>
+                    <ExternalLink className="w-3 h-3 text-indigo-400" />
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const sample = {
+                        sender: "Dr. Ankit Srivastava",
+                        email: "ankit.s@university.ac.in",
+                        subject: "Submission Confirmation for Review Issue",
+                        content: "Inquiry regarding publication timelines for multidisciplinary manuscripts.",
+                      };
+                      addMessage(sample);
+                      showToast("New inquiry logged.");
+                    }}
+                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded transition-colors"
+                  >
+                    Simulate Message
+                  </button>
+                </div>
+              </div>
+
+              {/* Google Drive Vault Banner for manthaninternational2025@gmail.com */}
+              <div className="bg-linear-to-r from-purple-900 via-indigo-900 to-[#700070] rounded-xl p-4 text-white shadow-xs flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0 border border-white/20">
+                    <UploadCloud className="w-5 h-5 text-purple-200" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-white">Google Drive Vault Integration</span>
+                      <span className="bg-emerald-400/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-400/30">
+                        Target Email: manthaninternational2025@gmail.com
+                      </span>
+                    </div>
+                    <p className="text-xs text-purple-200 mt-0.5">
+                      Authors' submitted articles and PDFs are archived directly for the official journal Google Drive account.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a
+                    href="https://drive.google.com/drive/u/0/my-drive"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-purple-950 hover:bg-purple-50 text-xs font-bold rounded-lg shadow-xs transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-[#700070]" />
+                    <span>Open Drive Folder</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setShowDriveModal(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-lg border border-white/20 transition-colors cursor-pointer"
+                  >
+                    <span>Google Drive Sync Guide</span>
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -2840,8 +2883,34 @@ export default function AdminPage() {
                   </div>
                 ) : (
                   messagesList.map((msg) => {
-                    const cleanPhone = (msg.whatsapp || msg.phone || "").replace(/[^0-9]/g, "");
+                    // Smart parsing from either structured props or fallback to text regex
+                    const cleanPhone = (
+                      msg.whatsapp ||
+                      msg.phone ||
+                      msg.content.match(/WhatsApp:\s*([0-9+ -]+)/i)?.[1] ||
+                      ""
+                    ).replace(/[^0-9]/g, "");
                     const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}` : "";
+                    const parsedTracking =
+                      msg.trackingId ||
+                      msg.content.match(/Tracking ID:\s*([^\n]+)/i)?.[1]?.trim() ||
+                      msg.subject.match(/\((IMJSI-[^)]+)\)/)?.[1] ||
+                      "";
+                    const parsedManuscriptName =
+                      msg.manuscriptFileName ||
+                      msg.content.match(/Attached Manuscript:\s*([^\n(]+)/i)?.[1]?.trim() ||
+                      "";
+                    const parsedManuscriptSize =
+                      msg.manuscriptFileSize ||
+                      msg.content.match(/Attached Manuscript:[^(]*\(([^)]+)\)/i)?.[1]?.trim() ||
+                      "";
+                    const parsedUndertakingName =
+                      msg.undertakingFileName ||
+                      msg.content.match(/Attached Undertaking:\s*([^\n(]+)/i)?.[1]?.trim() ||
+                      "";
+                    const fileDataUrl = msg.manuscriptFileData || msg.manuscriptFileUrl;
+                    const undertakingDataUrl = msg.undertakingFileData || msg.undertakingFileUrl;
+
                     return (
                       <div
                         key={msg.id}
@@ -2854,22 +2923,20 @@ export default function AdminPage() {
                         <div className="flex flex-wrap items-center justify-between gap-2 text-xs mb-2">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="font-bold text-slate-900 text-sm">{msg.sender}</span>
-                            {msg.trackingId && (
+                            {parsedTracking && (
                               <span className="bg-purple-100 text-[#700070] font-mono font-bold text-[10px] px-2 py-0.5 rounded border border-purple-200">
-                                #{msg.trackingId}
+                                #{parsedTracking}
                               </span>
                             )}
-                            {msg.submissionType && (
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
-                                msg.submissionType === "status_check"
-                                  ? "bg-amber-100 text-amber-800 border border-amber-200"
-                                  : "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                              }`}>
-                                {msg.submissionType === "status_check" ? "Status Inquiry" : "Manuscript Submission"}
-                              </span>
-                            )}
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
+                              msg.submissionType === "status_check"
+                                ? "bg-amber-100 text-amber-800 border border-amber-200"
+                                : "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                            }`}>
+                              {msg.submissionType === "status_check" ? "Status Inquiry" : "Manuscript Submission"}
+                            </span>
                             {!msg.isRead && (
-                              <span className="bg-rose-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+                              <span className="bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase">
                                 New
                               </span>
                             )}
@@ -2884,14 +2951,14 @@ export default function AdminPage() {
                               {msg.email}
                             </span>
                           )}
-                          {msg.whatsapp && (
+                          {(msg.whatsapp || cleanPhone) && (
                             <a
                               href={waUrl}
                               target="_blank"
                               rel="noreferrer"
                               className="inline-flex items-center gap-1 font-mono text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded border border-emerald-200 font-semibold transition-colors"
                             >
-                              <span>WhatsApp: {msg.whatsapp}</span>
+                              <span>WhatsApp: {msg.whatsapp || cleanPhone}</span>
                             </a>
                           )}
                         </div>
@@ -2904,38 +2971,102 @@ export default function AdminPage() {
                           {msg.content}
                         </div>
 
-                        {/* Uploaded File Attachments if present */}
-                        {(msg.manuscriptFileUrl || msg.undertakingFileUrl) && (
-                          <div className="mt-3 pt-3 border-t border-slate-200/60 flex flex-wrap gap-2">
-                            {msg.manuscriptFileUrl && (
+                        {/* File Action Section */}
+                        {fileDataUrl ? (
+                          <div className="mt-3 pt-3 border-t border-slate-200/80 flex flex-wrap items-center gap-2.5">
+                            <a
+                              href={fileDataUrl}
+                              download={parsedManuscriptName || `manuscript-${parsedTracking || msg.id}.pdf`}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#700070] hover:bg-[#5a005a] text-white text-xs font-bold rounded-md shadow-xs transition-colors cursor-pointer"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              <span>Download Manuscript ({parsedManuscriptName || "PDF"})</span>
+                            </a>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const win = window.open();
+                                if (win) {
+                                  win.document.write(
+                                    `<iframe src="${fileDataUrl}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`
+                                  );
+                                }
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-[#700070] text-xs font-bold rounded-md transition-colors cursor-pointer"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>View PDF in Browser</span>
+                            </button>
+
+                            <a
+                              href="https://drive.google.com/drive/u/0/my-drive"
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={() => {
+                                const a = document.createElement("a");
+                                a.href = fileDataUrl;
+                                a.download = `${parsedTracking ? parsedTracking + "_" : ""}${parsedManuscriptName || "manuscript.pdf"}`;
+                                a.click();
+                                showToast("Downloaded PDF for manthaninternational2025@gmail.com Drive upload!");
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-md transition-colors cursor-pointer"
+                            >
+                              <UploadCloud className="w-3.5 h-3.5 text-indigo-600" />
+                              <span>Save to Google Drive</span>
+                            </a>
+
+                            {undertakingDataUrl && (
                               <a
-                                href={msg.manuscriptFileUrl}
-                                download={msg.manuscriptFileName || "manuscript"}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#700070] hover:bg-[#5a005a] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
-                              >
-                                <Download className="w-3.5 h-3.5" />
-                                <span>Download Manuscript ({msg.manuscriptFileName || "File"})</span>
-                              </a>
-                            )}
-                            {msg.undertakingFileUrl && (
-                              <a
-                                href={msg.undertakingFileUrl}
-                                download={msg.undertakingFileName || "undertaking"}
-                                target="_blank"
-                                rel="noreferrer"
+                                href={undertakingDataUrl}
+                                download={parsedUndertakingName || "undertaking.pdf"}
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
                               >
                                 <Download className="w-3.5 h-3.5" />
-                                <span>Download Undertaking ({msg.undertakingFileName || "File"})</span>
+                                <span>Download Undertaking ({parsedUndertakingName || "File"})</span>
                               </a>
                             )}
                           </div>
-                        )}
+                        ) : parsedManuscriptName ? (
+                          <div className="mt-3 pt-3 border-t border-slate-200/80 bg-amber-50/70 border border-amber-200/80 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-amber-700 shrink-0" />
+                              <span className="text-slate-800">
+                                Attached Manuscript: <strong className="text-amber-950 font-bold">{parsedManuscriptName}</strong>{" "}
+                                {parsedManuscriptSize ? `(${parsedManuscriptSize})` : ""}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {cleanPhone && (
+                                <a
+                                  href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+                                    `Hello ${msg.sender}, we received your manuscript submission for "${parsedManuscriptName}" (Tracking ID: ${parsedTracking || ""}) on Manthan Journal. Please share your complete PDF/Word document here on WhatsApp.`
+                                  )}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-2.5 py-1.5 rounded transition-colors"
+                                >
+                                  <span>Request PDF on WhatsApp</span>
+                                </a>
+                              )}
+                              <a
+                                href={`mailto:${msg.email}?subject=${encodeURIComponent(
+                                  `Action Required: PDF Document for ${parsedManuscriptName} (${parsedTracking || ""})`
+                                )}&body=${encodeURIComponent(
+                                  `Dear ${msg.sender},\n\nWe have received your manuscript registration details for "${parsedManuscriptName}" (Tracking ID: ${parsedTracking || ""}).\n\nPlease reply to this email with your manuscript PDF attached so our editorial committee can begin peer review.\n\nWarm regards,\nEditorial Office\nManthan: International Multidisciplinary Journal of Social Inquiry\nmanthaninternational2025@gmail.com`
+                                )}`}
+                                className="inline-flex items-center gap-1 bg-purple-700 hover:bg-purple-800 text-white font-semibold text-xs px-2.5 py-1.5 rounded transition-colors"
+                              >
+                                <Mail className="w-3 h-3" />
+                                <span>Request PDF via Email</span>
+                              </a>
+                            </div>
+                          </div>
+                        ) : null}
 
+                        {/* Bottom Action Footer */}
                         <div className="pt-3 mt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-3">
                             {waUrl && (
                               <a
                                 href={waUrl}
@@ -2948,17 +3079,30 @@ export default function AdminPage() {
                             )}
                             <a
                               href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject)}`}
-                              className="text-[#700070] hover:underline font-semibold flex items-center gap-1 ml-2"
+                              className="text-[#700070] hover:underline font-semibold flex items-center gap-1"
                             >
                               <Send className="w-3 h-3" />
-                              <span>Reply via Email</span>
+                              <span>Reply to Author</span>
+                            </a>
+                            <a
+                              href={`mailto:manthaninternational2025@gmail.com?subject=${encodeURIComponent(
+                                `[Drive Backup] Submission: ${msg.sender} (${parsedTracking || "New"})`
+                              )}&body=${encodeURIComponent(
+                                `Submission Details for manthaninternational2025@gmail.com Drive:\n\nCandidate: ${msg.sender}\nTracking ID: ${parsedTracking || ""}\nWhatsApp: ${cleanPhone}\nEmail: ${msg.email}\nAttached File: ${parsedManuscriptName}\n\nFull Details:\n${msg.content}`
+                              )}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-indigo-700 hover:underline font-semibold flex items-center gap-1"
+                            >
+                              <UploadCloud className="w-3 h-3" />
+                              <span>Forward to manthaninternational2025@gmail.com</span>
                             </a>
                           </div>
                           <div className="flex items-center gap-3">
                             <button
                               type="button"
                               onClick={() => toggleMessageRead(msg.id)}
-                              className="text-slate-600 hover:text-slate-900 font-medium"
+                              className="text-slate-600 hover:text-slate-900 font-medium cursor-pointer"
                             >
                               {msg.isRead ? "Mark Unread" : "Mark Read"}
                             </button>
@@ -2968,7 +3112,7 @@ export default function AdminPage() {
                                 deleteMessage(msg.id);
                                 showToast("Submission deleted from inbox.");
                               }}
-                              className="text-rose-500 hover:text-rose-700 font-semibold"
+                              className="text-rose-500 hover:text-rose-700 font-semibold cursor-pointer"
                             >
                               Delete
                             </button>
@@ -5042,6 +5186,96 @@ export default function AdminPage() {
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* =============================================================
+          MODAL: GOOGLE DRIVE REPOSITORY & AUTOMATION GUIDE
+         ============================================================= */}
+      {showDriveModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="p-4 bg-linear-to-r from-purple-900 via-indigo-900 to-[#700070] text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <UploadCloud className="w-5 h-5 text-purple-200" />
+                <h3 className="font-bold text-base">Google Drive Vault Setup (manthaninternational2025@gmail.com)</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDriveModal(false)}
+                className="p-1 hover:bg-white/20 rounded text-white cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4 text-xs text-slate-700 leading-relaxed">
+              <div className="bg-emerald-50 border border-emerald-200 p-3.5 rounded-lg flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-emerald-950 text-sm">Google Drive Connected: manthaninternational2025@gmail.com</h4>
+                  <p className="text-emerald-800 text-xs mt-0.5">
+                    Whenever an author submits an article with a PDF, you can access, download, view in browser, and save the file to your Google Drive folder with 1-click.
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-slate-900 text-sm mb-1">Method 1: 1-Click Save to Google Drive (Recommended)</h4>
+                <p className="text-slate-600 mb-2">
+                  In every submission card in Inbox, click <strong>"Save to Google Drive"</strong>. It immediately downloads the manuscript and opens your official Google Drive repository in a new tab so you can drag and drop it into your folder.
+                </p>
+                <a
+                  href="https://drive.google.com/drive/u/0/my-drive"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#700070] hover:bg-[#5a005a] text-white font-bold rounded shadow-xs transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Open Google Drive (manthaninternational2025@gmail.com)</span>
+                </a>
+              </div>
+
+              <div className="pt-3 border-t border-slate-200">
+                <h4 className="font-bold text-slate-900 text-sm mb-1">Method 2: Automatic Real-Time Webhook (Zero Manual Work)</h4>
+                <p className="text-slate-600 mb-2">
+                  If you want every candidate submission to automatically land into a Google Sheet and Google Drive folder inside <strong>manthaninternational2025@gmail.com</strong>, paste the Google Apps Script Web App URL below:
+                </p>
+
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    placeholder="https://script.google.com/macros/s/AKfycbx.../exec"
+                    value={settingsForm.googleDriveWebhookUrl || ""}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, googleDriveWebhookUrl: e.target.value })}
+                    className="flex-1 px-3 py-1.5 border border-slate-300 rounded font-mono text-xs focus:border-[#700070]"
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const updated = { ...settings, googleDriveWebhookUrl: settingsForm.googleDriveWebhookUrl };
+                      updateSettings(updated);
+                      await saveAllLive({ settings: updated });
+                      showToast("Google Drive Webhook saved live!");
+                    }}
+                    className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded cursor-pointer transition-colors"
+                  >
+                    Save Webhook
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowDriveModal(false)}
+                className="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold rounded text-xs cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -5,6 +5,15 @@ import Link from "next/link";
 import { useJournalData } from "@/context/JournalDataContext";
 import { CheckCircle2, X } from "lucide-react";
 
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+}
+
 export function JournalSubmitForm() {
   const { settings, addMessage } = useJournalData();
 
@@ -168,6 +177,25 @@ ${undertakingFile ? `Attached Undertaking: ${undertakingFile.name}` : ""}`;
 
     let generatedTracking = `IMJSI-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
+    let manuscriptDataUrl = "";
+    let undertakingDataUrl = "";
+
+    try {
+      if (manuscriptFile) {
+        manuscriptDataUrl = await readFileAsDataUrl(manuscriptFile);
+      }
+    } catch (readErr) {
+      console.warn("Could not read manuscript file as data url:", readErr);
+    }
+
+    try {
+      if (undertakingFile) {
+        undertakingDataUrl = await readFileAsDataUrl(undertakingFile);
+      }
+    } catch (readErr) {
+      console.warn("Could not read undertaking file as data url:", readErr);
+    }
+
     try {
       // 1. Send multipart payload with attached files to server API
       const multiData = new FormData();
@@ -192,9 +220,19 @@ ${undertakingFile ? `Attached Undertaking: ${undertakingFile.name}` : ""}`;
 
       if (manuscriptFile) {
         multiData.append("manuscriptFile", manuscriptFile);
+        if (manuscriptDataUrl) {
+          multiData.append("manuscriptFileData", manuscriptDataUrl);
+          multiData.append("manuscriptFileName", manuscriptFile.name);
+          multiData.append("manuscriptFileSize", `${(manuscriptFile.size / 1024).toFixed(1)} KB`);
+        }
       }
       if (undertakingFile) {
         multiData.append("undertakingFile", undertakingFile);
+        if (undertakingDataUrl) {
+          multiData.append("undertakingFileData", undertakingDataUrl);
+          multiData.append("undertakingFileName", undertakingFile.name);
+          multiData.append("undertakingFileSize", `${(undertakingFile.size / 1024).toFixed(1)} KB`);
+        }
       }
 
       const res = await fetch("/api/submit-manuscript", {
@@ -210,12 +248,24 @@ ${undertakingFile ? `Attached Undertaking: ${undertakingFile.name}` : ""}`;
       console.warn("Could not post to /api/submit-manuscript, falling back to local context:", apiErr);
     }
 
-    // 2. Also register in local context for 0ms reactivity
+    // 2. Also register in local context for 0ms instant reactivity with full file data
     addMessage({
       sender: fullName || formData.email,
       email: formData.email,
+      whatsapp: formData.whatsapp,
+      phone: formData.phone,
+      trackingId: generatedTracking,
+      submissionType: "manuscript",
       subject: `Manuscript Submission: ${manuscriptFile.name} (${generatedTracking})`,
       content: submissionDetails,
+      manuscriptFileName: manuscriptFile.name,
+      manuscriptFileSize: `${(manuscriptFile.size / 1024).toFixed(1)} KB`,
+      manuscriptFileUrl: manuscriptDataUrl,
+      manuscriptFileData: manuscriptDataUrl,
+      undertakingFileName: undertakingFile ? undertakingFile.name : undefined,
+      undertakingFileSize: undertakingFile ? `${(undertakingFile.size / 1024).toFixed(1)} KB` : undefined,
+      undertakingFileUrl: undertakingDataUrl || undefined,
+      undertakingFileData: undertakingDataUrl || undefined,
     });
 
     setTrackingId(generatedTracking);

@@ -21,9 +21,11 @@ export async function POST(req: NextRequest) {
     let manuscriptFileUrl = "";
     let manuscriptFileName = "";
     let manuscriptFileSize = "";
+    let manuscriptFileData = "";
     let undertakingFileUrl = "";
     let undertakingFileName = "";
     let undertakingFileSize = "";
+    let undertakingFileData = "";
 
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
@@ -34,7 +36,26 @@ export async function POST(req: NextRequest) {
         }
       });
 
-      // Save Manuscript File
+      if (formDataObj.manuscriptFileData) {
+        manuscriptFileData = formDataObj.manuscriptFileData;
+      }
+      if (formDataObj.manuscriptFileName) {
+        manuscriptFileName = formDataObj.manuscriptFileName;
+      }
+      if (formDataObj.manuscriptFileSize) {
+        manuscriptFileSize = formDataObj.manuscriptFileSize;
+      }
+      if (formDataObj.undertakingFileData) {
+        undertakingFileData = formDataObj.undertakingFileData;
+      }
+      if (formDataObj.undertakingFileName) {
+        undertakingFileName = formDataObj.undertakingFileName;
+      }
+      if (formDataObj.undertakingFileSize) {
+        undertakingFileSize = formDataObj.undertakingFileSize;
+      }
+
+      // Save Manuscript File to disk if available
       const manuscriptFile = formData.get("manuscriptFile") as File | null;
       if (manuscriptFile && manuscriptFile.size > 0) {
         try {
@@ -43,6 +64,10 @@ export async function POST(req: NextRequest) {
           const savedName = `manuscript-${timestamp}-${safeName}`;
           const filePath = path.join(UPLOADS_DIR, savedName);
           const bytes = await manuscriptFile.arrayBuffer();
+          const base64Str = Buffer.from(bytes).toString("base64");
+          if (!manuscriptFileData) {
+            manuscriptFileData = `data:${manuscriptFile.type || "application/pdf"};base64,${base64Str}`;
+          }
           await fs.promises.writeFile(filePath, Buffer.from(bytes));
           manuscriptFileUrl = `/uploads/manuscripts/${savedName}`;
           manuscriptFileName = manuscriptFile.name;
@@ -53,7 +78,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Save Undertaking File
+      // Save Undertaking File to disk if available
       const undertakingFile = formData.get("undertakingFile") as File | null;
       if (undertakingFile && undertakingFile.size > 0) {
         try {
@@ -62,6 +87,10 @@ export async function POST(req: NextRequest) {
           const savedName = `undertaking-${timestamp}-${safeName}`;
           const filePath = path.join(UPLOADS_DIR, savedName);
           const bytes = await undertakingFile.arrayBuffer();
+          const base64Str = Buffer.from(bytes).toString("base64");
+          if (!undertakingFileData) {
+            undertakingFileData = `data:${undertakingFile.type || "application/pdf"};base64,${base64Str}`;
+          }
           await fs.promises.writeFile(filePath, Buffer.from(bytes));
           undertakingFileUrl = `/uploads/manuscripts/${savedName}`;
           undertakingFileName = undertakingFile.name;
@@ -73,6 +102,12 @@ export async function POST(req: NextRequest) {
       }
     } else {
       formDataObj = await req.json();
+      manuscriptFileData = formDataObj.manuscriptFileData || "";
+      manuscriptFileName = formDataObj.manuscriptFileName || "";
+      manuscriptFileSize = formDataObj.manuscriptFileSize || "";
+      undertakingFileData = formDataObj.undertakingFileData || "";
+      undertakingFileName = formDataObj.undertakingFileName || "";
+      undertakingFileSize = formDataObj.undertakingFileSize || "";
     }
 
     const {
@@ -143,10 +178,16 @@ export async function POST(req: NextRequest) {
       content: contentLines.join("\n"),
       trackingId: trackingCode,
       submissionType,
-      manuscriptFileUrl,
+      manuscriptFileUrl: manuscriptFileUrl || manuscriptFileData,
       manuscriptFileName,
-      undertakingFileUrl,
+      manuscriptFileSize,
+      manuscriptFileData,
+      undertakingFileUrl: undertakingFileUrl || undertakingFileData,
       undertakingFileName,
+      undertakingFileSize,
+      undertakingFileData,
+      driveStatus: "pending",
+      googleDriveFileUrl: "",
     };
 
     // Read and update journal-storage.json
@@ -156,6 +197,41 @@ export async function POST(req: NextRequest) {
         const fileContent = await fs.promises.readFile(STORAGE_FILE_PATH, "utf-8");
         currentData = JSON.parse(fileContent);
       } catch {}
+    }
+
+    // Attempt Google Apps Script Webhook forwarding if configured
+    const webhookUrl = currentData?.settings?.googleDriveWebhookUrl || process.env.GOOGLE_DRIVE_WEBHOOK_URL;
+    if (webhookUrl) {
+      try {
+        const driveRes = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            trackingId: trackingCode,
+            authorName: fullName,
+            email,
+            whatsapp,
+            phone,
+            paperTitle: paperTitle || manuscriptFileName,
+            institute,
+            department,
+            position,
+            submissionDate: dateStr,
+            manuscriptFileName,
+            manuscriptFileData,
+            undertakingFileName,
+            undertakingFileData,
+            targetEmail: "manthaninternational2025@gmail.com",
+          }),
+        });
+        const driveJson = await driveRes.json().catch(() => ({}));
+        if (driveJson?.fileUrl) {
+          newMessage.googleDriveFileUrl = driveJson.fileUrl;
+          newMessage.driveStatus = "synced";
+        }
+      } catch (webhookErr) {
+        console.warn("Could not forward to Google Drive webhook:", webhookErr);
+      }
     }
 
     const existingMessages = Array.isArray(currentData.messages) ? currentData.messages : [];
@@ -192,3 +268,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
