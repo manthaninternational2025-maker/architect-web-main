@@ -54,7 +54,7 @@ export async function GET() {
     const data = readStoredData();
     if (data && Object.keys(data).length > 0) {
       return NextResponse.json(
-        { success: true, data, timestamp: data.timestamp || Date.now() },
+        { success: true, data, timestamp: data.timestamp || 0 },
         { headers: NO_CACHE_HEADERS }
       );
     }

@@ -260,7 +260,7 @@ const initialArticlesList: ArticleItem[] = [
     authors: "Ashish Giri Faculty in Sri Venkateswara College, University of Delhi",
     volume: "Volume 1",
     issue: "Issue 1",
-    date: "August 2026",
+    date: "October 2026",
     status: "Published",
     doi: "10.5281/imjsi.2026.01.06",
     abstract: "This study examines Gan Yang's intellectual contribution to contemporary Chinese political philosophy, analyzing the theoretical synthesis of Confucian tradition, socialist heritage, and constitutional modernity in shaping 21st-century Chinese governance debates.",
@@ -277,7 +277,7 @@ const initialArticlesList: ArticleItem[] = [
     authors: "Anchal Gautam Research Scholar, Department of East Asian Studies, University of Delhi",
     volume: "Volume 1",
     issue: "Issue 1",
-    date: "August 2026",
+    date: "October 2026",
     status: "Published",
     doi: "10.5281/imjsi.2026.01.05",
     abstract: "A comparative philosophical inquiry into the governing paradigms of Confucianism, Daoism, and Legalism in Classical China, evaluating their moral, structural, and legal foundations and their lasting imprint on East Asian statecraft.",
@@ -294,7 +294,7 @@ const initialArticlesList: ArticleItem[] = [
     authors: "Mr. Mohit Singh Research Scholar Department of Continuing Education & Extension, University of Delhi (DCEE, DU)",
     volume: "Volume 1",
     issue: "Issue 1",
-    date: "August 2026",
+    date: "October 2026",
     status: "Published",
     doi: "10.5281/imjsi.2026.01.04",
     abstract: "This research investigates the structural transformations, intergenerational dynamics, and demographic transitions characterizing modern Chinese family systems amidst rapid urbanization and social policy reforms.",
@@ -312,21 +312,11 @@ const initialIssues: IssueItem[] = [
     id: 1,
     volume: "Volume 1",
     issue: "Issue 1",
-    period: "August 2026",
-    publicationDate: "2026-08-01",
+    period: "October 2026",
+    publicationDate: "2026-11-01",
     status: "Published",
     articlesCount: 3,
     theme: "Inaugural Multidisciplinary Social Inquiry Issue",
-  },
-  {
-    id: 2,
-    volume: "Volume 1",
-    issue: "Issue 2",
-    period: "September 2026",
-    publicationDate: "2026-09-01",
-    status: "Open for Submissions",
-    articlesCount: 0,
-    theme: "Contemporary Perspectives in Social Governance & Economics",
   },
 ];
 
@@ -616,10 +606,17 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       if (iss) {
         try {
           const parsedIss = JSON.parse(iss);
-          setIssues(parsedIss);
+          if (Array.isArray(parsedIss) && parsedIss.length > 0) {
+            setIssues(parsedIss);
+          } else {
+            setIssues(initialIssues);
+          }
         } catch {
           setIssues(initialIssues);
         }
+      } else {
+        setIssues(initialIssues);
+        try { localStorage.setItem(K_ISSUES, JSON.stringify(initialIssues)); } catch {}
       }
 
       const m = localStorage.getItem(K_MEMBERS);
@@ -763,8 +760,18 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
               try { localStorage.setItem(K_HOMEPAGE, JSON.stringify(d.homepage)); } catch {}
             }
             if (d.issues && Array.isArray(d.issues)) {
-              setIssues(d.issues);
-              try { localStorage.setItem(K_ISSUES, JSON.stringify(d.issues)); } catch {}
+              const sanitizedIssues = d.issues.map((iss: IssueItem) => {
+                if (iss.id === 1 && (!iss.period || iss.period.toLowerCase().includes("august"))) {
+                  return {
+                    ...iss,
+                    period: "October 2026",
+                    publicationDate: "2026-11-01",
+                  };
+                }
+                return iss;
+              });
+              setIssues(sanitizedIssues);
+              try { localStorage.setItem(K_ISSUES, JSON.stringify(sanitizedIssues)); } catch {}
             }
             if (d.members && Array.isArray(d.members)) {
               const normalized = d.members.map(normalizeEditorialMember);
