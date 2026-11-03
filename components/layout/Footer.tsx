@@ -1,56 +1,27 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { useJournalData } from "@/context/JournalDataContext";
 import { companyInfo } from "@/data/companyInfo";
 
 export function Footer() {
   const { settings } = useJournalData();
 
-  const footerLinks = [
-    { label: "Home", href: "/" },
-    { label: "Editorial Board", href: "/editorial-board" },
-    { label: "Archive", href: "/archives" },
-    { label: "Instruction to Authors", href: "/instructions-to-authors" },
-    { label: "Submit Manuscript", href: "/submit" },
-    { label: "Publication Ethics", href: "/academic-integrity" },
-    { label: "Peer Review Process", href: "/peer-review-policy" },
-    { label: "Contact Us", href: "/contact" },
-  ];
-
   const title = settings?.journalTitle || companyInfo.journalTitle;
-  const issn = settings?.issn || companyInfo.issn;
-  const publisher = settings?.publisher || companyInfo.publisher;
-  const shortTitle = settings?.shortTitle || companyInfo.shortTitle;
+  const year = settings?.startingYear || "2026";
 
   return (
-    <footer className="bg-white border-t border-gray-300 text-xs text-gray-700 mt-8 py-6 px-4">
-      <div className="w-full space-y-4">
-        {/* Navigation Quick Links Bar */}
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 border-b border-gray-200 pb-3 text-xs font-semibold text-gray-800">
-          {footerLinks.map((item, idx) => (
-            <React.Fragment key={idx}>
-              <Link href={item.href} className="hover:text-[#700070] transition-colors">
-                {item.label}
-              </Link>
-              {idx < footerLinks.length - 1 && <span className="text-gray-400">|</span>}
-            </React.Fragment>
-          ))}
-        </div>
+    <footer className="bg-[#222222] text-white py-2 sm:py-2.5 px-3 sm:px-5 mt-6 border-t border-black">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-1.5 w-full text-xs sm:text-[13px]">
+        {/* Left: Journal Title & Copyright Year */}
+        <p className="font-bold text-white tracking-normal text-center sm:text-left">
+          {title} &copy; {year}
+        </p>
 
-        {/* Brand Licensing & Copyright */}
-        <div className="text-center text-[11px] text-gray-600 leading-relaxed space-y-1">
-          <p>
-            <strong>{title}</strong> • (ISSN: {issn})
-          </p>
-          <p>
-            Published by <strong>{publisher}</strong> • Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
-          </p>
-          <p className="font-semibold text-gray-800 pt-1">
-            Copyright &copy; 2026 {shortTitle} — All Rights Reserved.
-          </p>
-        </div>
+        {/* Right: Theme / Credit matching reference screenshot */}
+        <p className="text-gray-300 font-normal text-center sm:text-right text-[11px] sm:text-xs shrink-0">
+          Frontier Theme
+        </p>
       </div>
     </footer>
   );
