@@ -183,21 +183,6 @@ export default function EditorialBoardPage() {
               );
             })}
           </div>
-
-          {/* Join Callout Box */}
-          <div className="p-4 bg-purple-50 border border-purple-200 text-xs sm:text-sm text-gray-700 leading-relaxed">
-            <strong className="text-[#700070] block mb-1">
-              Join the Editorial Board / Review Panel:
-            </strong>
-            Academicians, university professors, and senior researchers interested in joining the peer review panel or editorial board of{" "}
-            <strong>{settings.journalTitle}</strong> are invited to send their curriculum vitae to{" "}
-            <a
-              href={`mailto:${settings.email}`}
-              className="font-mono text-[#700070] hover:underline font-bold"
-            >
-              {settings.email}
-            </a>.
-          </div>
         </div>
 
         {/* Sidebar */}
