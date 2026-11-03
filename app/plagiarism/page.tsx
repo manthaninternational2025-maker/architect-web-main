@@ -1,77 +1,38 @@
-import React from "react";
-import Link from "next/link";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { companyInfo } from "@/data/companyInfo";
-import { ShieldCheck } from "lucide-react";
+"use client";
 
-export const metadata = {
-  title: "Plagiarism & Similarity Policy | Impulse Research Work",
-  description: "Plagiarism threshold, similarity screening tools (Drillbit / Turnitin), and ethics protocol.",
-};
+import React from "react";
+import { useJournalData } from "@/context/JournalDataContext";
+import { Sidebar } from "@/components/layout/Sidebar";
 
 export default function PlagiarismPage() {
+  const { settings } = useJournalData();
+
+  const journalTitle = settings?.journalTitle || "Manthan: International Multidisciplinary Journal of Social Inquiry";
+
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="col-span-1 lg:col-span-8 text-xs sm:text-sm text-gray-800 space-y-4 sm:space-y-6 leading-relaxed">
-          <h1 className="text-xl sm:text-2xl font-editorial font-bold text-[#111111] border-b border-gray-200 pb-2">
-            Plagiarism &amp; Academic Originality Policy
-          </h1>
+        {/* Main Content: Plagiarism Box (Matching Reference Screenshot 2 Exactly) */}
+        <div className="col-span-1 lg:col-span-8">
+          <div className="border border-gray-400 bg-white p-5 sm:p-7 text-[#222222]">
+            {/* Heading */}
+            <h1 className="text-xl sm:text-2xl text-[#222222] font-normal mb-5">
+              plagiarism
+            </h1>
 
-          <div className="p-4 bg-gray-50 border border-gray-300 flex items-start gap-3">
-            <ShieldCheck className="w-5 h-5 text-[#700070] shrink-0 mt-0.5" />
-            <div>
-              <strong className="text-gray-900 block mb-1">
-                Zero Tolerance for Academic Dishonesty
-              </strong>
-              <p className="text-gray-700">
-                Impulse Research Work strictly adheres to international anti-plagiarism guidelines. All submitted manuscripts are screened using licensed academic software (Drillbit / Turnitin / PlagiarismCheckerX) prior to peer review.
-              </p>
-            </div>
-          </div>
-
-          <section className="space-y-2">
-            <h2 className="font-editorial text-sm sm:text-base font-bold text-[#700070]">
-              1. Plagiarism Screening Software
-            </h2>
-            <p className="text-gray-700">
-              We employ <strong>{companyInfo.plagiarismTool}</strong> for comprehensive diagnostic screening against billions of web pages, institutional dissertations, and academic publisher databases.
+            {/* Paragraph 1 */}
+            <p className="leading-relaxed text-[#222222] text-xs sm:text-[13px] mb-4">
+              Plagiarism is a serious issue now a day around the world in the arena of manuscript writing. Plagiarism means &ldquo;Use or close imitation of the language and thoughts of another author and the representation of them as one&rsquo;s own original work.&rdquo; It has been noticed that, authors are simply copying scientific data and information from the other published papers, which is unlawful practice in academic fraternity. Therefore, it is requested to the all authors to adopt the holistic &amp; pragmatic approach to design the manuscript of interest. <strong>{journalTitle}</strong> uses plagiarism software for the purpose.
             </p>
-          </section>
 
-          <section className="space-y-2">
-            <h2 className="font-editorial text-sm sm:text-base font-bold text-[#700070]">
-              2. Acceptable Similarity Threshold
-            </h2>
-            <ul className="list-disc pl-5 space-y-1 text-gray-700">
-              <li><strong>Overall Similarity Index:</strong> Must not exceed <strong>10%</strong> (excluding standard references, bibliography, and statutory quotes).</li>
-              <li><strong>Single-Source Limit:</strong> No individual source match should exceed <strong>2%</strong>.</li>
-              <li>Direct verbatim quotations must be enclosed in quotation marks and cited with exact page numbers.</li>
-            </ul>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="font-editorial text-sm sm:text-base font-bold text-[#700070]">
-              3. Types of Plagiarism Screened
-            </h2>
-            <ul className="list-disc pl-5 space-y-1 text-gray-700">
-              <li><strong>Direct / Verbatim Plagiarism:</strong> Transcribing portions of another work without quotation or attribution.</li>
-              <li><strong>Paraphrasing Without Citation:</strong> Restating another author&apos;s thoughts without citing the original source.</li>
-              <li><strong>Patchwriting:</strong> Superficial synonym replacement while retaining original sentence structures.</li>
-              <li><strong>Self-Plagiarism:</strong> Re-using one&apos;s own previously published work without explicit cross-referencing.</li>
-            </ul>
-          </section>
-
-          <div className="pt-4 border-t border-gray-200 flex items-center gap-4">
-            <Link
-              href="/submit"
-              className="text-xs font-bold text-[#700070] hover:underline uppercase tracking-wider"
-            >
-              Submit Your Paper for Screening &rarr;
-            </Link>
+            {/* Paragraph 2 */}
+            <p className="leading-relaxed text-[#222222] text-xs sm:text-[13px]">
+              <strong>{journalTitle}</strong> will not be responsible for further action on Plagiarism issue. The author will be solely responsible for plagiarism issue.
+            </p>
           </div>
         </div>
 
+        {/* Sidebar */}
         <div className="col-span-1 lg:col-span-4">
           <Sidebar />
         </div>
