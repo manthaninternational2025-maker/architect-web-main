@@ -39,6 +39,12 @@ export function Sidebar() {
               Peer Review Process
             </Link>
             <Link
+              href="/open-access"
+              className="text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-sm tracking-wide transition-colors leading-tight"
+            >
+              Open Access Policy
+            </Link>
+            <Link
               href="/plagiarism"
               className="text-[#700070] hover:text-[#550055] font-bold text-xs sm:text-sm tracking-wide transition-colors leading-tight"
             >

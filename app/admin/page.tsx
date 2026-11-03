@@ -2774,7 +2774,7 @@ export default function AdminPage() {
                     </label>
                   </div>
                   <p className="text-[11px] text-slate-500">
-                    Links to Publication Ethics, Peer Review Process, and Plagiarism.
+                    Links to Publication Ethics, Peer Review Process, Open Access Policy, and Plagiarism.
                   </p>
                 </div>
 
