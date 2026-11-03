@@ -171,6 +171,7 @@ interface JournalDataContextType {
   addArticle: (art: Omit<ArticleItem, "id" | "views" | "downloads">) => void;
   updateArticle: (art: ArticleItem) => void;
   deleteArticle: (id: number) => void;
+  reorderArticles: (newArticles: ArticleItem[]) => void;
   issues: IssueItem[];
   addIssue: (iss: Omit<IssueItem, "id" | "articlesCount">) => void;
   updateIssue: (iss: IssueItem) => void;
@@ -777,10 +778,20 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       const updated = prev.filter((p) => p.id !== id);
       try {
         localStorage.setItem(K_ARTICLES, JSON.stringify(updated));
+        localStorage.setItem(K_VERSION, String(Date.now()));
       } catch {}
       syncToServer({ articles: updated });
       return updated;
     });
+  };
+
+  const reorderArticles = (newArticles: ArticleItem[]) => {
+    setArticles(newArticles);
+    try {
+      localStorage.setItem(K_ARTICLES, JSON.stringify(newArticles));
+      localStorage.setItem(K_VERSION, String(Date.now()));
+    } catch {}
+    syncToServer({ articles: newArticles });
   };
 
   const addIssue = (iss: Omit<IssueItem, "id" | "articlesCount">) => {
@@ -1057,6 +1068,7 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
         addArticle,
         updateArticle,
         deleteArticle,
+        reorderArticles,
         issues,
         addIssue,
         updateIssue,

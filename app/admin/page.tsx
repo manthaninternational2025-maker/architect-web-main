@@ -107,6 +107,7 @@ export default function AdminPage() {
     addArticle,
     updateArticle,
     deleteArticle,
+    reorderArticles,
     issues: issuesList,
     addIssue,
     updateIssue,
@@ -447,6 +448,24 @@ export default function AdminPage() {
     await saveAllLive({ articles: updated });
     setEditingArticle(null);
     showToast(`✅ Article #${editingArticle.id} updated and saved live!`);
+  };
+
+  const moveArticle = async (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex || toIndex < 0 || toIndex >= articlesList.length) return;
+    const updated = [...articlesList];
+    const [movedItem] = updated.splice(fromIndex, 1);
+    updated.splice(toIndex, 0, movedItem);
+    reorderArticles(updated);
+    await saveAllLive({ articles: updated });
+    showToast(`Position updated (#${toIndex + 1}) live on website!`);
+  };
+
+  const moveArticleUp = (index: number) => {
+    if (index > 0) moveArticle(index, index - 1);
+  };
+
+  const moveArticleDown = (index: number) => {
+    if (index < articlesList.length - 1) moveArticle(index, index + 1);
   };
 
   const handleAddIssue = async (e: React.FormEvent) => {
@@ -1744,15 +1763,37 @@ export default function AdminPage() {
                         a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         a.authors.toLowerCase().includes(searchTerm.toLowerCase())
                     )
-                    .map((art) => (
+                    .map((art, idx) => (
                       <div
                         key={art.id}
                         className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg space-y-2 text-xs"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <span className="font-mono text-[10px] text-slate-500 font-bold bg-white px-1.5 py-0.5 rounded border border-slate-200">
-                            #{art.id}
-                          </span>
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-[11px] text-[#700070] font-bold bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                              #{idx + 1}
+                            </span>
+                            <div className="inline-flex items-center gap-0.5 bg-white border border-slate-200 rounded p-0.5">
+                              <button
+                                type="button"
+                                onClick={() => moveArticleUp(idx)}
+                                disabled={idx === 0}
+                                className="p-1 text-slate-600 hover:text-[#700070] rounded disabled:opacity-20 cursor-pointer transition-colors"
+                                title="Upar karein (Move Up)"
+                              >
+                                <ArrowUp className="w-3 h-3" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveArticleDown(idx)}
+                                disabled={idx === articlesList.length - 1}
+                                className="p-1 text-slate-600 hover:text-[#700070] rounded disabled:opacity-20 cursor-pointer transition-colors"
+                                title="Niche karein (Move Down)"
+                              >
+                                <ArrowDown className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
                           <span
                             className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                               art.status === "Published"
@@ -1825,7 +1866,8 @@ export default function AdminPage() {
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold uppercase text-[10px] tracking-wider">
                     <tr>
-                      <th className="py-2.5 px-3">#</th>
+                      <th className="py-2.5 px-3 w-12 text-center">#</th>
+                      <th className="py-2.5 px-2 w-20 text-center">Arrange</th>
                       <th className="py-2.5 px-3">Article Title</th>
                       <th className="py-2.5 px-3">Authors</th>
                       <th className="py-2.5 px-3">Issue</th>
@@ -1836,7 +1878,7 @@ export default function AdminPage() {
                   <tbody className="divide-y divide-slate-100">
                     {articlesList.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="py-12 text-center text-slate-400 text-xs">
+                        <td colSpan={7} className="py-12 text-center text-slate-400 text-xs">
                           <FileText className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                           <p className="font-semibold text-slate-700 text-sm">No articles published yet</p>
                           <p className="text-[11px] text-slate-400 mt-1">Click &quot;+ Add New Article&quot; above to publish your research papers.</p>
@@ -1849,10 +1891,32 @@ export default function AdminPage() {
                             a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             a.authors.toLowerCase().includes(searchTerm.toLowerCase())
                         )
-                        .map((art) => (
+                        .map((art, idx) => (
                           <tr key={art.id} className="hover:bg-slate-50/70 transition-colors">
-                            <td className="py-2.5 px-3 font-mono text-slate-400 text-[11px]">
-                              {art.id}
+                            <td className="py-2.5 px-3 font-mono text-slate-700 font-bold text-center text-xs">
+                              {idx + 1}
+                            </td>
+                            <td className="py-2.5 px-2 text-center whitespace-nowrap">
+                              <div className="inline-flex items-center gap-0.5 bg-slate-50 border border-slate-200 rounded p-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => moveArticleUp(idx)}
+                                  disabled={idx === 0}
+                                  className="p-1 text-slate-700 hover:text-[#700070] hover:bg-white rounded disabled:opacity-20 disabled:hover:bg-transparent transition-colors cursor-pointer"
+                                  title="Upar karein (Move Up)"
+                                >
+                                  <ArrowUp className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => moveArticleDown(idx)}
+                                  disabled={idx === articlesList.length - 1}
+                                  className="p-1 text-slate-700 hover:text-[#700070] hover:bg-white rounded disabled:opacity-20 disabled:hover:bg-transparent transition-colors cursor-pointer"
+                                  title="Niche karein (Move Down)"
+                                >
+                                  <ArrowDown className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </td>
                             <td className="py-2.5 px-3 font-medium text-slate-800 max-w-sm">
                               <div className="line-clamp-2 leading-snug font-semibold">{art.title}</div>
