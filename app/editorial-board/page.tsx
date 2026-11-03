@@ -52,15 +52,14 @@ export default function EditorialBoardPage() {
                   <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                     {/* Member Photo Avatar - Blur-free, properly aligned, no cropping */}
                     <div className="shrink-0">
-                      <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full border-2 border-purple-200 bg-white p-0.5 shadow-xs flex items-center justify-center overflow-hidden">
+                      <div className="w-24 h-24 sm:w-26 sm:h-26 rounded-full border-2 border-purple-200 bg-white p-0.5 shadow-xs flex items-center justify-center overflow-hidden">
                         {member.photoData || member.photoUrl ? (
                           <img
                             src={member.photoData || member.photoUrl}
                             alt={member.name}
-                            className="w-full h-full rounded-full object-cover block select-none"
-                            style={{
-                              imageRendering: "-webkit-optimize-contrast",
-                            }}
+                            className="w-full h-full rounded-full object-cover object-top block select-none"
+                            loading="eager"
+                            decoding="async"
                           />
                         ) : (
                           <div className="w-full h-full rounded-full bg-purple-100 text-[#700070] flex items-center justify-center font-bold text-lg sm:text-xl">

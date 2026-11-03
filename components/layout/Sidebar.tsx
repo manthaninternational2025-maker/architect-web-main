@@ -71,6 +71,8 @@ export function Sidebar() {
                 src={sidebarConfig.coverImageUrl || "/images/manthan-cover-page.png"}
                 alt={`${settings.journalTitle} - Cover Page`}
                 className="w-full h-auto object-contain block select-none pointer-events-none"
+                loading="eager"
+                decoding="async"
                 onError={(e) => {
                   const target = e.currentTarget;
                   if (!target.src.includes("manthan-cover-page.png")) {

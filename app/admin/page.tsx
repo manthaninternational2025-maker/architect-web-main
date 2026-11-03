@@ -499,37 +499,98 @@ export default function AdminPage() {
     showToast(`✅ Issue "${editingIssue.volume}, ${editingIssue.issue}" updated live!`);
   };
 
-  const handleMemberPhotoUpload = (
+  const handleMemberPhotoUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
     isEdit: boolean = false
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      showToast("Photo is too large! Maximum allowed size is 5MB.");
+    // Reset input value so selecting the same file triggers onChange
+    e.target.value = "";
+
+    if (file.size > 20 * 1024 * 1024) {
+      showToast("Photo is too large! Maximum allowed size is 20MB.");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64Data = reader.result as string;
-      if (isEdit) {
-        setEditingMember((prev: any) =>
-          prev ? { ...prev, photoData: base64Data } : prev
-        );
-      } else {
-        setNewMemberForm((prev) => ({
-          ...prev,
-          photoData: base64Data,
-        }));
+    showToast("Uploading member photo in full original quality...");
+
+    // 1. Instant local preview
+    const previewUrl = URL.createObjectURL(file);
+    if (isEdit) {
+      setEditingMember((prev: any) =>
+        prev ? { ...prev, photoUrl: previewUrl } : prev
+      );
+    } else {
+      setNewMemberForm((prev) => ({
+        ...prev,
+        photoUrl: previewUrl,
+      }));
+    }
+
+    // 2. Upload original uncompressed file to server for permanent storage
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const targetId = isEdit && editingMember?.id ? editingMember.id : undefined;
+      if (targetId) {
+        formData.append("memberId", String(targetId));
       }
-      showToast("Member profile photo attached successfully!");
-    };
-    reader.onerror = () => {
-      showToast("Failed to read image file.");
-    };
-    reader.readAsDataURL(file);
+
+      const res = await fetch("/api/upload-member-photo", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        if (isEdit) {
+          setEditingMember((prev: any) =>
+            prev ? { ...prev, photoUrl: data.url, photoData: "" } : prev
+          );
+        } else {
+          setNewMemberForm((prev) => ({
+            ...prev,
+            photoUrl: data.url,
+            photoData: "",
+          }));
+        }
+        showToast("✅ Real photo saved permanently in original resolution!");
+      } else {
+        // Fallback to base64
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64Data = reader.result as string;
+          if (isEdit) {
+            setEditingMember((prev: any) =>
+              prev ? { ...prev, photoData: base64Data } : prev
+            );
+          } else {
+            setNewMemberForm((prev) => ({
+              ...prev,
+              photoData: base64Data,
+            }));
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    } catch {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64Data = reader.result as string;
+        if (isEdit) {
+          setEditingMember((prev: any) =>
+            prev ? { ...prev, photoData: base64Data } : prev
+          );
+        } else {
+          setNewMemberForm((prev) => ({
+            ...prev,
+            photoData: base64Data,
+          }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleRemoveMemberPhoto = (isEdit: boolean = false) => {
@@ -548,7 +609,7 @@ export default function AdminPage() {
   };
 
   // Helper for fast, client-side canvas optimization (< 90KB) to prevent storage quota issues
-  const compressImageToDataUrl = (file: File, maxWidth = 1000, quality = 0.88): Promise<string> => {
+  const compressImageToDataUrl = (file: File, maxWidth = 1600, quality = 0.95): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -568,7 +629,7 @@ export default function AdminPage() {
             return;
           }
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL("image/jpeg", quality));
+          resolve(canvas.toDataURL(file.type === "image/png" ? "image/png" : "image/jpeg", quality));
         };
         img.onerror = () => resolve(e.target?.result as string);
         img.src = e.target?.result as string;
@@ -585,56 +646,50 @@ export default function AdminPage() {
     // Reset input value so selecting the same file again triggers onChange
     e.target.value = "";
 
-    if (file.size > 20 * 1024 * 1024) {
-      showToast("Cover image is too large! Maximum allowed size is 20MB.");
+    if (file.size > 30 * 1024 * 1024) {
+      showToast("Cover image is too large! Maximum allowed size is 30MB.");
       return;
     }
 
-    showToast("Processing and updating cover page...");
+    showToast("Uploading cover page in full original quality...");
 
+    // 1. Instant local preview
+    const previewUrl = URL.createObjectURL(file);
+    const instantState = {
+      ...sidebarMenuState,
+      coverImageUrl: previewUrl,
+    };
+    setSidebarMenuState(instantState);
+
+    // 2. Direct server upload of original uncompressed file (NO blur, NO downsampling!)
     try {
-      // 1. Instant client-side compression for 0ms lag
-      const optimizedDataUrl = await compressImageToDataUrl(file);
-
-      const instantState = {
-        ...sidebarMenuState,
-        coverImageUrl: optimizedDataUrl,
-      };
-      setSidebarMenuState(instantState);
-      updateSidebarConfig(instantState);
-      saveAllLive({ sidebarConfig: instantState });
-
-      // 2. Server upload for persistent file storage across all devices
       const formData = new FormData();
       formData.append("file", file);
 
-      fetch("/api/upload-cover", {
+      const res = await fetch("/api/upload-cover", {
         method: "POST",
         body: formData,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success && data.url) {
-            const serverUpdated = {
-              ...sidebarMenuState,
-              coverImageUrl: data.url,
-            };
-            setSidebarMenuState(serverUpdated);
-            updateSidebarConfig(serverUpdated);
-            saveAllLive({ sidebarConfig: serverUpdated });
-            showToast("Cover page updated and synced across all devices!");
-          }
-        })
-        .catch(() => {
-          // If server multipart fails, attempt JSON sync with optimized image
-          fetch("/api/upload-cover", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ dataUrl: optimizedDataUrl }),
-          }).catch(() => {});
-        });
-
-      showToast("Cover page updated successfully!");
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        const serverUpdated = {
+          ...sidebarMenuState,
+          coverImageUrl: data.url,
+        };
+        setSidebarMenuState(serverUpdated);
+        updateSidebarConfig(serverUpdated);
+        await saveAllLive({ sidebarConfig: serverUpdated });
+        showToast("✅ Real cover page saved permanently in crystal-clear resolution!");
+      } else {
+        const fallbackData = await compressImageToDataUrl(file, 1600, 0.95);
+        const fallbackState = {
+          ...sidebarMenuState,
+          coverImageUrl: fallbackData,
+        };
+        setSidebarMenuState(fallbackState);
+        updateSidebarConfig(fallbackState);
+        await saveAllLive({ sidebarConfig: fallbackState });
+      }
     } catch (err) {
       console.error("Cover upload error:", err);
       showToast("Error updating cover page. Please try another image.");
