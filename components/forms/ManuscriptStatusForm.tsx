@@ -114,6 +114,20 @@ export function ManuscriptStatusForm() {
       return;
     }
 
+    try {
+      fetch("/api/submit-manuscript", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          whatsapp,
+          manuscriptNo,
+          paperTitle: title,
+          email,
+          submissionType: "status_check",
+        }),
+      }).catch(() => {});
+    } catch {}
+
     addMessage({
       sender: title ? `${title} (Author)` : (email || whatsapp),
       email: email,

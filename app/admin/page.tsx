@@ -837,7 +837,7 @@ export default function AdminPage() {
     { id: "instructions", label: "Author Instructions", icon: BookOpen },
     { id: "ethics", label: "Publication Ethics", icon: Shield },
     { id: "contact", label: "Contact", icon: Phone },
-    { id: "messages", label: "Messages", icon: Mail, badge: messagesList.filter((m) => !m.isRead).length },
+    { id: "messages", label: "Inbox / Submissions", icon: Mail, badge: messagesList.filter((m) => !m.isRead).length },
     { id: "sidebar-menu", label: "Sidebar Menu", icon: Menu },
     { id: "announcement", label: "Announcement Bar", icon: Megaphone },
   ];
@@ -2807,10 +2807,10 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="font-editorial italic font-bold text-2xl text-slate-900">
-                    Scholar Inquiries &amp; Messages ({messagesList.length})
+                    Inbox / Submissions & Scholar Inquiries ({messagesList.length})
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Messages received from authors, reviewers, and institutions.
+                    Submissions, manuscript uploads, and inquiries received from authors and scholars.
                   </p>
                 </div>
                 <button
@@ -2831,68 +2831,153 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              <div className="space-y-3">
-                {messagesList.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`p-4 border rounded-lg transition-colors ${
-                      msg.isRead
-                        ? "border-slate-200 bg-slate-50/50"
-                        : "border-purple-300 bg-purple-50/40 shadow-xs"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-slate-900">{msg.sender}</span>
-                        {!msg.isRead && (
-                          <span className="bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase">
-                            New
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-slate-400 text-[11px]">{msg.date}</span>
-                    </div>
-
-                    <div className="text-slate-500 text-[11px] font-mono mt-0.5">
-                      {msg.email}
-                    </div>
-
-                    <div className="font-semibold text-xs text-purple-950 mt-2">
-                      {msg.subject}
-                    </div>
-
-                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                      {msg.content}
-                    </p>
-
-                    <div className="pt-3 mt-2 border-t border-slate-200 flex items-center justify-end gap-3 text-xs">
-                      <a
-                        href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject)}`}
-                        className="text-[#700070] hover:underline font-semibold flex items-center gap-1"
-                      >
-                        <Send className="w-3 h-3" />
-                        <span>Reply via Email</span>
-                      </a>
-                      <button
-                        type="button"
-                        onClick={() => toggleMessageRead(msg.id)}
-                        className="text-slate-600 hover:text-slate-900"
-                      >
-                        {msg.isRead ? "Mark Unread" : "Mark Read"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          deleteMessage(msg.id);
-                          showToast("Message deleted.");
-                        }}
-                        className="text-rose-500 hover:text-rose-700"
-                      >
-                        Delete
-                      </button>
-                    </div>
+              <div className="space-y-4">
+                {messagesList.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400 bg-slate-50 rounded-lg border border-dashed border-slate-200">
+                    <Mail className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                    <p className="font-semibold text-sm">No submissions or inquiries in Inbox</p>
+                    <p className="text-xs text-slate-400 mt-1">Form submissions from authors will automatically appear here.</p>
                   </div>
-                ))}
+                ) : (
+                  messagesList.map((msg) => {
+                    const cleanPhone = (msg.whatsapp || msg.phone || "").replace(/[^0-9]/g, "");
+                    const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}` : "";
+                    return (
+                      <div
+                        key={msg.id}
+                        className={`p-5 border rounded-xl transition-all shadow-xs ${
+                          msg.isRead
+                            ? "border-slate-200 bg-slate-50/60"
+                            : "border-purple-300 bg-purple-50/30 ring-1 ring-purple-200/50"
+                        }`}
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs mb-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-bold text-slate-900 text-sm">{msg.sender}</span>
+                            {msg.trackingId && (
+                              <span className="bg-purple-100 text-[#700070] font-mono font-bold text-[10px] px-2 py-0.5 rounded border border-purple-200">
+                                #{msg.trackingId}
+                              </span>
+                            )}
+                            {msg.submissionType && (
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
+                                msg.submissionType === "status_check"
+                                  ? "bg-amber-100 text-amber-800 border border-amber-200"
+                                  : "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                              }`}>
+                                {msg.submissionType === "status_check" ? "Status Inquiry" : "Manuscript Submission"}
+                              </span>
+                            )}
+                            {!msg.isRead && (
+                              <span className="bg-rose-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+                                New
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-slate-400 text-xs font-mono">{msg.date}</span>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 mb-3">
+                          {msg.email && (
+                            <span className="flex items-center gap-1 font-mono text-slate-700 bg-white px-2 py-1 rounded border border-slate-200">
+                              <Mail className="w-3.5 h-3.5 text-[#700070]" />
+                              {msg.email}
+                            </span>
+                          )}
+                          {msg.whatsapp && (
+                            <a
+                              href={waUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 font-mono text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded border border-emerald-200 font-semibold transition-colors"
+                            >
+                              <span>WhatsApp: {msg.whatsapp}</span>
+                            </a>
+                          )}
+                        </div>
+
+                        <div className="font-semibold text-sm text-purple-950 mb-2">
+                          {msg.subject}
+                        </div>
+
+                        <div className="bg-white p-3.5 rounded-lg border border-slate-200/80 text-xs text-slate-700 whitespace-pre-line leading-relaxed font-sans">
+                          {msg.content}
+                        </div>
+
+                        {/* Uploaded File Attachments if present */}
+                        {(msg.manuscriptFileUrl || msg.undertakingFileUrl) && (
+                          <div className="mt-3 pt-3 border-t border-slate-200/60 flex flex-wrap gap-2">
+                            {msg.manuscriptFileUrl && (
+                              <a
+                                href={msg.manuscriptFileUrl}
+                                download={msg.manuscriptFileName || "manuscript"}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#700070] hover:bg-[#5a005a] text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                <span>Download Manuscript ({msg.manuscriptFileName || "File"})</span>
+                              </a>
+                            )}
+                            {msg.undertakingFileUrl && (
+                              <a
+                                href={msg.undertakingFileUrl}
+                                download={msg.undertakingFileName || "undertaking"}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-md shadow-xs transition-colors"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                <span>Download Undertaking ({msg.undertakingFileName || "File"})</span>
+                              </a>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="pt-3 mt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                          <div className="flex items-center gap-2">
+                            {waUrl && (
+                              <a
+                                href={waUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-emerald-700 hover:underline font-semibold flex items-center gap-1"
+                              >
+                                <span>Chat on WhatsApp</span>
+                              </a>
+                            )}
+                            <a
+                              href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject)}`}
+                              className="text-[#700070] hover:underline font-semibold flex items-center gap-1 ml-2"
+                            >
+                              <Send className="w-3 h-3" />
+                              <span>Reply via Email</span>
+                            </a>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => toggleMessageRead(msg.id)}
+                              className="text-slate-600 hover:text-slate-900 font-medium"
+                            >
+                              {msg.isRead ? "Mark Unread" : "Mark Read"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                deleteMessage(msg.id);
+                                showToast("Submission deleted from inbox.");
+                              }}
+                              className="text-rose-500 hover:text-rose-700 font-semibold"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
           )}

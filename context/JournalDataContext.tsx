@@ -158,6 +158,14 @@ export interface MessageItem {
   date: string;
   isRead: boolean;
   content: string;
+  whatsapp?: string;
+  phone?: string;
+  trackingId?: string;
+  submissionType?: string;
+  manuscriptFileUrl?: string;
+  manuscriptFileName?: string;
+  undertakingFileUrl?: string;
+  undertakingFileName?: string;
 }
 
 interface JournalDataContextType {

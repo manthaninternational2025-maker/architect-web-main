@@ -34,6 +34,8 @@ export function JournalSubmitForm() {
   const [manuscriptFile, setManuscriptFile] = useState<File | null>(null);
   const [undertakingFile, setUndertakingFile] = useState<File | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [trackingId, setTrackingId] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -122,7 +124,7 @@ export function JournalSubmitForm() {
     generateCaptcha();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
@@ -138,12 +140,17 @@ export function JournalSubmitForm() {
       setErrorMsg("Please attach your manuscript file (DOC, DOCX, or PDF).");
       return;
     }
-    if (formData.captchaInput.trim().toLowerCase() !== captchaCode.toLowerCase()) {
+
+    const cleanInput = formData.captchaInput.trim().toLowerCase().replace(/\s+/g, "");
+    const cleanExpected = captchaCode.trim().toLowerCase().replace(/\s+/g, "");
+    if (cleanInput !== cleanExpected) {
       setErrorMsg("Incorrect security code! Please enter the lowercase characters shown in the security box.");
       generateCaptcha();
       setFormData((prev) => ({ ...prev, captchaInput: "" }));
       return;
     }
+
+    setIsSubmitting(true);
 
     const fullName = `${formData.title} ${formData.firstName} ${formData.middleName ? formData.middleName + " " : ""}${formData.lastName}`.trim();
     const submissionDetails = `Candidate: ${fullName}
@@ -159,13 +166,60 @@ Available as Reviewer: ${formData.availableAsReviewer}
 Attached Manuscript: ${manuscriptFile.name} (${(manuscriptFile.size / 1024).toFixed(1)} KB)
 ${undertakingFile ? `Attached Undertaking: ${undertakingFile.name}` : ""}`;
 
+    let generatedTracking = `IMJSI-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    try {
+      // 1. Send multipart payload with attached files to server API
+      const multiData = new FormData();
+      multiData.append("whatsapp", formData.whatsapp);
+      multiData.append("title", formData.title);
+      multiData.append("firstName", formData.firstName);
+      multiData.append("middleName", formData.middleName);
+      multiData.append("lastName", formData.lastName);
+      multiData.append("degree", formData.degree);
+      multiData.append("email", formData.email);
+      multiData.append("phone", formData.phone);
+      multiData.append("position", formData.position);
+      multiData.append("department", formData.department);
+      multiData.append("institute", formData.institute);
+      multiData.append("address", formData.address);
+      multiData.append("city", formData.city);
+      multiData.append("state", formData.state);
+      multiData.append("country", formData.country);
+      multiData.append("availableAsReviewer", formData.availableAsReviewer);
+      multiData.append("submissionType", "manuscript");
+      multiData.append("paperTitle", manuscriptFile.name);
+
+      if (manuscriptFile) {
+        multiData.append("manuscriptFile", manuscriptFile);
+      }
+      if (undertakingFile) {
+        multiData.append("undertakingFile", undertakingFile);
+      }
+
+      const res = await fetch("/api/submit-manuscript", {
+        method: "POST",
+        body: multiData,
+      });
+
+      const jsonRes = await res.json();
+      if (jsonRes.success && jsonRes.trackingId) {
+        generatedTracking = jsonRes.trackingId;
+      }
+    } catch (apiErr) {
+      console.warn("Could not post to /api/submit-manuscript, falling back to local context:", apiErr);
+    }
+
+    // 2. Also register in local context for 0ms reactivity
     addMessage({
       sender: fullName || formData.email,
       email: formData.email,
-      subject: `Manuscript Submission: ${manuscriptFile.name}`,
+      subject: `Manuscript Submission: ${manuscriptFile.name} (${generatedTracking})`,
       content: submissionDetails,
     });
 
+    setTrackingId(generatedTracking);
+    setIsSubmitting(false);
     setSubmitted(true);
   };
 
@@ -210,11 +264,6 @@ ${undertakingFile ? `Attached Undertaking: ${undertakingFile.name}` : ""}`;
               Copyright Form
             </a>
           </div>
-          <div>
-            <a href="/forms/manuscript-template.docx" download className="hover:underline">
-              Template of Manuscript
-            </a>
-          </div>
         </div>
       </div>
 
@@ -233,7 +282,7 @@ ${undertakingFile ? `Attached Undertaking: ${undertakingFile.name}` : ""}`;
             Thank you, <strong>{formData.title} {formData.firstName} {formData.lastName}</strong>. Your manuscript file <strong>{manuscriptFile?.name}</strong> has been received by our editorial intake office.
           </p>
           <div className="bg-white border border-green-200 p-3 text-xs text-gray-700 space-y-1">
-            <p><strong>Tracking Number:</strong> IMJSI-{Math.floor(100000 + Math.random() * 900000)}</p>
+            <p><strong>Tracking Number:</strong> {trackingId || `IMJSI-${new Date().getFullYear()}-1088`}</p>
             <p><strong>Primary Contact:</strong> {formData.email} | {formData.whatsapp}</p>
             <p><strong>Status:</strong> Under Initial Editorial Review</p>
           </div>
@@ -644,13 +693,23 @@ ${undertakingFile ? `Attached Undertaking: ${undertakingFile.name}` : ""}`;
           </div>
 
           {/* 22. Submit Button */}
-          <div className="pt-2 sm:pt-3">
+          <div className="pt-2 sm:pt-3 flex items-center gap-3">
             <button
               type="submit"
-              className="bg-[#c4c4c4] hover:bg-[#b5b5b5] active:bg-[#a6a6a6] text-black text-xs sm:text-sm font-medium px-7 py-1 border border-gray-400 rounded-none cursor-pointer transition-colors"
+              disabled={isSubmitting}
+              className={`text-black text-xs sm:text-sm font-medium px-7 py-1 border border-gray-400 rounded-none transition-colors ${
+                isSubmitting
+                  ? "bg-gray-200 cursor-not-allowed opacity-70"
+                  : "bg-[#c4c4c4] hover:bg-[#b5b5b5] active:bg-[#a6a6a6] cursor-pointer"
+              }`}
             >
-              Submit
+              {isSubmitting ? "Uploading Manuscript..." : "Submit"}
             </button>
+            {isSubmitting && (
+              <span className="text-xs text-[#700070] font-semibold animate-pulse">
+                Sending submission to Editorial Inbox...
+              </span>
+            )}
           </div>
         </form>
       )}
