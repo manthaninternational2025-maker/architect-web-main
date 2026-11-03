@@ -252,53 +252,7 @@ const initialHomepage: HomepageData = {
   policyText: "The journal publishes original research papers, review articles, case studies, and book reviews adhering to rigorous peer-review and ethical publishing standards. Authors must ensure all cited works are acknowledged properly.",
 };
 
-const initialArticlesList: ArticleItem[] = [
-  {
-    id: 1,
-    title: "A Critical Analysis of Legal and Human Rights of Undertrial Female Prisoners in India",
-    authors: "Anchal Gautam",
-    volume: "Vol. 1",
-    issue: "Issue 1",
-    date: "August 2026",
-    status: "Published",
-    doi: "10.5281/imjsi.2026.01.01",
-    abstract: "An empirical socio-legal analysis reviewing statutory protections, prison conditions, judicial precedents, and systemic vulnerabilities confronting female undertrial detainees.",
-    pages: "pp. 1-12",
-    category: "Law & Human Rights",
-    views: 220,
-    downloads: 6,
-  },
-  {
-    id: 2,
-    title: "Decline and Fall: Factors Contributing to the Downfall of the Mughal Empire",
-    authors: "Aastha Rani",
-    volume: "Vol. 1",
-    issue: "Issue 1",
-    date: "August 2026",
-    status: "Published",
-    doi: "10.5281/imjsi.2026.01.02",
-    abstract: "A historiographical reassessment of the fiscal strains, agrarian distress, regional rebellions, and administrative fragmentation that precipitated the decline of the Mughal Empire in 18th-century South Asia.",
-    pages: "pp. 13-24",
-    category: "Historical Inquiries",
-    views: 165,
-    downloads: 3,
-  },
-  {
-    id: 3,
-    title: "The Dynamics of Indian Nationalism: A Historical Analysis Age",
-    authors: "Geetanshu",
-    volume: "Vol. 1",
-    issue: "Issue 1",
-    date: "August 2026",
-    status: "Published",
-    doi: "10.5281/imjsi.2026.01.03",
-    abstract: "A critical historical investigation exploring the multifaceted evolutionary trajectories, subaltern voices, and ideological currents that shaped the anti-colonial nationalist movement in India.",
-    pages: "pp. 25-36",
-    category: "Modern Indian History",
-    views: 184,
-    downloads: 2,
-  },
-];
+const initialArticlesList: ArticleItem[] = [];
 
 const initialIssues: IssueItem[] = [
   {
@@ -308,7 +262,7 @@ const initialIssues: IssueItem[] = [
     period: "August 2026",
     publicationDate: "2026-08-01",
     status: "Published",
-    articlesCount: 3,
+    articlesCount: 0,
     theme: "Inaugural Multidisciplinary Social Inquiry Issue",
   },
   {
@@ -582,58 +536,26 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
       const h = localStorage.getItem(K_HOMEPAGE);
       if (h) setHomepage(JSON.parse(h));
 
-      const isMockFaltuArticle = (item: any) => {
-        const author = (item.authors || "").toLowerCase();
-        const title = (item.title || "").toLowerCase();
-        return (
-          author.includes("khem chand") ||
-          author.includes("chanden kumar jha") ||
-          author.includes("sakshi sharma") ||
-          author.includes("rahul sharma") ||
-          author.includes("neha verma") ||
-          author.includes("pooja malhotra") ||
-          (author.includes("deepak setia") && title.includes("sustainable development"))
-        );
-      };
-
       const art = localStorage.getItem(K_ARTICLES);
       if (art !== null) {
         try {
           const parsed = JSON.parse(art);
           if (Array.isArray(parsed)) {
-            const filtered = parsed.filter((item: any) => !isMockFaltuArticle(item));
-            const seenIds = new Set<number>();
-            let maxId = 0;
-            const sanitized = filtered.map((item: any, idx: number) => {
-              let id = typeof item.id === "number" && !isNaN(item.id) && item.id > 0 ? item.id : idx + 1;
-              if (seenIds.has(id)) {
-                id = maxId + 1;
-              }
-              seenIds.add(id);
-              if (id > maxId) maxId = id;
-              let doi = item.doi;
-              if (!doi) {
-                doi = `10.5281/imjsi.2026.01.${id < 10 ? `0${id}` : id}`;
-              }
-              return { ...item, id, doi };
-            });
-            setArticles(sanitized);
+            setArticles(parsed);
           }
         } catch {}
       } else {
-        try { localStorage.setItem(K_ARTICLES, JSON.stringify(initialArticlesList)); } catch {}
+        setArticles([]);
+        try { localStorage.setItem(K_ARTICLES, JSON.stringify([])); } catch {}
       }
 
       const iss = localStorage.getItem(K_ISSUES);
       if (iss) {
         try {
           const parsedIss = JSON.parse(iss);
-          const normalizedIss = parsedIss.map((it: any) =>
-            it.id === 1 && it.articlesCount > 3 ? { ...it, articlesCount: 3 } : it
-          );
-          setIssues(normalizedIss);
+          setIssues(parsedIss);
         } catch {
-          setIssues(JSON.parse(iss));
+          setIssues(initialIssues);
         }
       }
 
@@ -704,21 +626,31 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
             const localVersion = localVersionStr ? parseInt(localVersionStr, 10) : 0;
             const serverVersion = json.timestamp || d.timestamp || 0;
 
-            // If the client has newer edits than server, don't let stale server overwrite it!
-            if (localVersion && serverVersion && localVersion > serverVersion) {
-              const localArticles = localStorage.getItem(K_ARTICLES);
-              const pushPayload: Record<string, any> = {
-                timestamp: localVersion,
-              };
-              if (localArticles !== null) {
-                try { pushPayload.articles = JSON.parse(localArticles); } catch {}
-              }
+            // Check local articles
+            const localArtStr = localStorage.getItem(K_ARTICLES);
+            let localArticles: ArticleItem[] = [];
+            let hasLocalArticles = false;
+            if (localArtStr !== null) {
+              try {
+                const parsed = JSON.parse(localArtStr);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                  localArticles = parsed;
+                  hasLocalArticles = true;
+                }
+              } catch {}
+            }
+
+            // If the client has published articles locally, but server returned empty/older,
+            // never let server erase user's articles! Instead sync client articles to server!
+            if (hasLocalArticles && (!d.articles || d.articles.length === 0 || (localVersion && serverVersion && localVersion > serverVersion))) {
               fetch("/api/journal-data", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(pushPayload),
+                body: JSON.stringify({ articles: localArticles, timestamp: localVersion || Date.now() }),
               }).catch(() => {});
-              return;
+            } else if (d.articles && Array.isArray(d.articles)) {
+              setArticles(d.articles);
+              try { localStorage.setItem(K_ARTICLES, JSON.stringify(d.articles)); } catch {}
             }
 
             if (d.settings) {
@@ -732,11 +664,6 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
             if (d.homepage) {
               setHomepage(d.homepage);
               try { localStorage.setItem(K_HOMEPAGE, JSON.stringify(d.homepage)); } catch {}
-            }
-            if (d.articles && Array.isArray(d.articles)) {
-              const cleanArticles = d.articles.filter((item: any) => !isMockFaltuArticle(item));
-              setArticles(cleanArticles);
-              try { localStorage.setItem(K_ARTICLES, JSON.stringify(cleanArticles)); } catch {}
             }
             if (d.issues && Array.isArray(d.issues)) {
               setIssues(d.issues);

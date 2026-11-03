@@ -48,41 +48,47 @@ export default function CurrentPage() {
             Articles in this Issue
           </h2>
 
-          <div className="divide-y divide-gray-200">
-            {publishedArticles.map((art) => (
-              <div key={art.id} className="py-3.5 first:pt-0 last:pb-0">
-                <h3 className="font-editorial text-sm sm:text-base font-bold text-gray-900 hover:text-[#700070] mb-1 leading-snug">
-                  <Link href={getArticleUrl(art)}>
-                    {art.title}
-                  </Link>
-                </h3>
-
-                <div className="text-xs text-gray-600 flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-gray-400" />
-                    <span className="font-semibold text-gray-800">{art.authors}</span>
-                    <span className="text-gray-400">•</span>
-                    <span className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded text-[11px] font-mono">
-                      {art.volume} {art.issue}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2.5">
-                    {art.pages && (
-                      <span className="font-mono text-[11px] text-gray-500">{art.pages}</span>
-                    )}
-                    <Link
-                      href={getArticleUrl(art)}
-                      className="px-2 py-0.5 border border-gray-300 text-gray-700 hover:border-[#700070] hover:text-[#700070] text-[11px] font-medium transition-colors"
-                    >
-                      Abstract
+          {publishedArticles.length === 0 ? (
+            <div className="py-8 px-4 text-center text-gray-500 text-xs italic bg-gray-50 border border-dashed border-gray-200 rounded">
+              No articles published in this issue yet. Newly published research articles will appear here automatically.
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-200">
+              {publishedArticles.map((art) => (
+                <div key={art.id} className="py-3.5 first:pt-0 last:pb-0">
+                  <h3 className="font-editorial text-sm sm:text-base font-bold text-gray-900 hover:text-[#700070] mb-1 leading-snug">
+                    <Link href={getArticleUrl(art)}>
+                      {art.title}
                     </Link>
-                    <ArticlePdfButton article={art} settings={settings} />
+                  </h3>
+
+                  <div className="text-xs text-gray-600 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-gray-400" />
+                      <span className="font-semibold text-gray-800">{art.authors}</span>
+                      <span className="text-gray-400">•</span>
+                      <span className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded text-[11px] font-mono">
+                        {art.volume} {art.issue}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      {art.pages && (
+                        <span className="font-mono text-[11px] text-gray-500">{art.pages}</span>
+                      )}
+                      <Link
+                        href={getArticleUrl(art)}
+                        className="px-2 py-0.5 border border-gray-300 text-gray-700 hover:border-[#700070] hover:text-[#700070] text-[11px] font-medium transition-colors"
+                      >
+                        Abstract
+                      </Link>
+                      <ArticlePdfButton article={art} settings={settings} />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           <div className="mt-6 pt-3 border-t border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <Link

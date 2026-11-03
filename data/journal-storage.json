@@ -35,53 +35,7 @@
     "aboutText": "Manthan: International Multidisciplinary Journal of Social Inquiry, refereed, peer reviewed, open access journal. Researches in the field of humanities, social science, Community and Consumer Sciences, Economics, Political Science, Geography, Philosophy, History, Humanity and Languages concerning with social science, Anthropological, Behavioral Sciences, Sociology, Journalism and Role of Media in social science. Educational Sciences: For School Students, Women, Village and Society, Commerce, Law and Management related with humanities and social science.",
     "policyText": "Manthan: International Multidisciplinary Journal of Social Inquiry (ISSN: Under Process), an open access peer reviewed refereed online journal, presents original research articles and rapid communications, covering all areas of Social Sciences and Humanities. The primary mission of the journal is to become the premier source of high quality research from whole of the world. Manthan considers all manuscripts on the strict condition that they have not been published already, under review elsewhere, nor are they under consideration for publication or in press elsewhere."
   },
-  "articles": [
-    {
-      "id": 1,
-      "title": "A Critical Analysis of Legal and Human Rights of Undertrial Female Prisoners in India",
-      "authors": "Anchal Gautam",
-      "volume": "Vol. 1",
-      "issue": "Issue 1",
-      "date": "August 2026",
-      "status": "Published",
-      "doi": "10.5281/imjsi.2026.01.01",
-      "abstract": "An empirical socio-legal analysis reviewing statutory protections, prison conditions, judicial precedents, and systemic vulnerabilities confronting female undertrial detainees.",
-      "pages": "pp. 1-12",
-      "category": "Law & Human Rights",
-      "views": 220,
-      "downloads": 6
-    },
-    {
-      "id": 2,
-      "title": "Decline and Fall: Factors Contributing to the Downfall of the Mughal Empire",
-      "authors": "Aastha Rani",
-      "volume": "Vol. 1",
-      "issue": "Issue 1",
-      "date": "August 2026",
-      "status": "Published",
-      "doi": "10.5281/imjsi.2026.01.02",
-      "abstract": "A historiographical reassessment of the fiscal strains, agrarian distress, regional rebellions, and administrative fragmentation that precipitated the decline of the Mughal Empire in 18th-century South Asia.",
-      "pages": "pp. 13-24",
-      "category": "Historical Inquiries",
-      "views": 165,
-      "downloads": 3
-    },
-    {
-      "id": 3,
-      "title": "The Dynamics of Indian Nationalism: A Historical Analysis Age",
-      "authors": "Geetanshu",
-      "volume": "Vol. 1",
-      "issue": "Issue 1",
-      "date": "August 2026",
-      "status": "Published",
-      "doi": "10.5281/imjsi.2026.01.03",
-      "abstract": "A critical historical investigation exploring the multifaceted evolutionary trajectories, subaltern voices, and ideological currents that shaped the anti-colonial nationalist movement in India.",
-      "pages": "pp. 25-36",
-      "category": "Modern Indian History",
-      "views": 184,
-      "downloads": 2
-    }
-  ],
+  "articles": [],
   "issues": [
     {
       "id": 1,
@@ -90,7 +44,7 @@
       "period": "August 2026",
       "publicationDate": "2026-08-01",
       "status": "Published",
-      "articlesCount": 3,
+      "articlesCount": 0,
       "theme": "Inaugural Multidisciplinary Social Inquiry Issue"
     },
     {
