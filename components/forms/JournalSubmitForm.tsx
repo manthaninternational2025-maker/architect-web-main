@@ -200,7 +200,13 @@ ${undertakingFile ? `Attached Undertaking: ${undertakingFile.name}` : ""}`;
             </Link>
           </div>
           <div>
-            <a href="/forms/copyright-form.pdf" download className="hover:underline">
+            <a
+              href="/forms/copyright-form.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              download="Manthan-Copyright-Form.pdf"
+              className="hover:underline"
+            >
               Copyright Form
             </a>
           </div>
