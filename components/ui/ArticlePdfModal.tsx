@@ -81,7 +81,7 @@ export function ArticlePdfModal({
                   {article.fileData ? "Uploaded Document" : "Official Galley PDF"}
                 </span>
                 <span className="text-xs text-purple-200 font-mono hidden sm:inline">
-                  {article.volume} {article.issue} • DOI: {article.doi}
+                  {article.volume} {article.issue}
                 </span>
               </div>
               <h3 className="font-editorial text-sm sm:text-base font-bold text-white truncate max-w-2xl mt-0.5">

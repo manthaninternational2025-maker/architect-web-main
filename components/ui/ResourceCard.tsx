@@ -37,7 +37,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
         {/* Citation & Read Time Bar */}
         <div className="pt-2.5 border-t border-sand-100 flex items-center justify-between text-[11px] text-academic-muted mb-4">
           <span className="font-mono text-[10px] truncate max-w-[200px]">
-            DOI: {resource.doi}
+            {resource.volume} {resource.issue}
           </span>
           <span className="flex items-center gap-1 text-[11px]">
             <Clock className="w-3 h-3 text-orange-600" />

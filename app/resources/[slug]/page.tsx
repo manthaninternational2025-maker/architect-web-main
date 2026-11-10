@@ -244,7 +244,6 @@ function ResourceDetailContent() {
 
                 <div className="flex flex-wrap items-center gap-3">
                   {matchedArticle.pages && <span>Pages: {matchedArticle.pages}</span>}
-                  <span>DOI: {matchedArticle.doi}</span>
                   <ArticlePdfButton article={matchedArticle} settings={settings} />
                 </div>
               </div>

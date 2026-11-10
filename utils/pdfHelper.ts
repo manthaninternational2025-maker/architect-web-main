@@ -68,7 +68,6 @@ export function generateAcademicPdfBlob(
   stream += `BT /F2 8 Tf 0.3 0.3 0.3 rg 40 778 Td (ISSN: ${escapePdfText(
     issn
   )} | ${escapePdfText(volIssue)} | Refereed & Peer-Reviewed Open Access) Tj ET\n`;
-  stream += `BT /F2 8 Tf 0.44 0 0.44 rg 435 778 Td (DOI: ${escapePdfText(doi)}) Tj ET\n`;
 
   // Thin separator line
   stream += `q 0.8 0.8 0.8 RG 1 w 40 768 m 555 768 l S Q\n`;
