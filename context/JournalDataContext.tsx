@@ -276,7 +276,7 @@ const initialArticlesList: ArticleItem[] = [
     authors: "Ashish Giri Faculty in Sri Venkateswara College, University of Delhi",
     volume: "Volume 1",
     issue: "Issue 1",
-    date: "October 2026",
+    date: "November 2026",
     status: "Published",
     doi: "10.5281/imjsi.2026.01.06",
     abstract: "This study examines Gan Yang's intellectual contribution to contemporary Chinese political philosophy, analyzing the theoretical synthesis of Confucian tradition, socialist heritage, and constitutional modernity in shaping 21st-century Chinese governance debates.",
@@ -293,7 +293,7 @@ const initialArticlesList: ArticleItem[] = [
     authors: "Anchal Gautam Research Scholar, Department of East Asian Studies, University of Delhi",
     volume: "Volume 1",
     issue: "Issue 1",
-    date: "October 2026",
+    date: "November 2026",
     status: "Published",
     doi: "10.5281/imjsi.2026.01.05",
     abstract: "A comparative philosophical inquiry into the governing paradigms of Confucianism, Daoism, and Legalism in Classical China, evaluating their moral, structural, and legal foundations and their lasting imprint on East Asian statecraft.",
@@ -310,7 +310,7 @@ const initialArticlesList: ArticleItem[] = [
     authors: "Mr. Mohit Singh Research Scholar Department of Continuing Education & Extension, University of Delhi (DCEE, DU)",
     volume: "Volume 1",
     issue: "Issue 1",
-    date: "October 2026",
+    date: "November 2026",
     status: "Published",
     doi: "10.5281/imjsi.2026.01.04",
     abstract: "This research investigates the structural transformations, intergenerational dynamics, and demographic transitions characterizing modern Chinese family systems amidst rapid urbanization and social policy reforms.",
@@ -328,7 +328,7 @@ const initialIssues: IssueItem[] = [
     id: 1,
     volume: "Volume 1",
     issue: "Issue 1",
-    period: "October 2026",
+    period: "November 2026",
     publicationDate: "2026-11-01",
     status: "Published",
     articlesCount: 3,
@@ -607,7 +607,14 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
         try {
           const parsed = JSON.parse(art);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            setArticles(parsed);
+            const sanitizedArt = parsed.map((a: ArticleItem) => {
+              if (a.date === "October 2026" || a.date === "August 2026") {
+                return { ...a, date: "November 2026" };
+              }
+              return a;
+            });
+            setArticles(sanitizedArt);
+            try { localStorage.setItem(K_ARTICLES, JSON.stringify(sanitizedArt)); } catch {}
           } else {
             setArticles(initialArticlesList);
           }
@@ -624,7 +631,14 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
         try {
           const parsedIss = JSON.parse(iss);
           if (Array.isArray(parsedIss) && parsedIss.length > 0) {
-            setIssues(parsedIss);
+            const sanitizedIss = parsedIss.map((issue: IssueItem) => {
+              if (issue.id === 1 && (issue.period?.toLowerCase().includes("october") || issue.period?.toLowerCase().includes("august"))) {
+                return { ...issue, period: "November 2026", publicationDate: "2026-11-01" };
+              }
+              return issue;
+            });
+            setIssues(sanitizedIss);
+            try { localStorage.setItem(K_ISSUES, JSON.stringify(sanitizedIss)); } catch {}
           } else {
             setIssues(initialIssues);
           }
@@ -746,8 +760,14 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
 
             // Server state adoption with sanitization against outdated legacy strings
             if (d.articles && Array.isArray(d.articles) && d.articles.length > 0) {
-              setArticles(d.articles);
-              try { localStorage.setItem(K_ARTICLES, JSON.stringify(d.articles)); } catch {}
+              const sanitizedArt = d.articles.map((a: ArticleItem) => {
+                if (a.date === "October 2026" || a.date === "August 2026") {
+                  return { ...a, date: "November 2026" };
+                }
+                return a;
+              });
+              setArticles(sanitizedArt);
+              try { localStorage.setItem(K_ARTICLES, JSON.stringify(sanitizedArt)); } catch {}
             } else if (hasLocalArticles) {
               setArticles(localArticles);
               fetch("/api/journal-data", {
@@ -778,10 +798,10 @@ export function JournalDataProvider({ children }: { children: React.ReactNode })
             }
             if (d.issues && Array.isArray(d.issues)) {
               const sanitizedIssues = d.issues.map((iss: IssueItem) => {
-                if (iss.id === 1 && (!iss.period || iss.period.toLowerCase().includes("august"))) {
+                if (iss.id === 1 && (!iss.period || iss.period.toLowerCase().includes("august") || iss.period.toLowerCase().includes("october"))) {
                   return {
                     ...iss,
-                    period: "October 2026",
+                    period: "November 2026",
                     publicationDate: "2026-11-01",
                   };
                 }

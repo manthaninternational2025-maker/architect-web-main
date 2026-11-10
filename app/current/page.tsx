@@ -34,7 +34,7 @@ export default function CurrentPage() {
           <div className="text-sm font-editorial font-bold text-gray-900 mb-1">
             {currentIssue
               ? `${currentIssue.volume}, ${currentIssue.issue} (${currentIssue.period})`
-              : "Volume 1, Issue 1 (October 2026)"}
+              : "Volume 1, Issue 1 (November 2026)"}
           </div>
 
           <div className="flex items-center gap-2 text-xs text-gray-500 font-mono mb-4 pb-2 border-b border-gray-200">

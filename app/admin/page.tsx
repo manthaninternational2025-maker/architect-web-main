@@ -219,7 +219,7 @@ export default function AdminPage() {
     pages: "pp. 1-12",
     keywords: "",
     category: "Social Sciences",
-    date: "August 2026",
+    date: "November 2026",
     fileName: "",
     fileSize: "",
     fileData: "",
@@ -403,7 +403,7 @@ export default function AdminPage() {
       authors: newArticleForm.authors,
       volume: newArticleForm.volume || "Volume 1",
       issue: newArticleForm.issue || "Issue 1",
-      date: newArticleForm.date || "October 2026",
+      date: newArticleForm.date || "November 2026",
       status: newArticleForm.status || "Published",
       doi: newArticleForm.doi || `10.5281/imjsi.2026.01.${nextId < 10 ? `0${nextId}` : nextId}`,
       abstract: newArticleForm.abstract || "Abstract submitted.",
@@ -433,7 +433,7 @@ export default function AdminPage() {
       pages: "pp. 1-12",
       keywords: "",
       category: "Social Sciences",
-      date: "October 2026",
+      date: "November 2026",
       fileName: "",
       fileSize: "",
       fileData: "",
@@ -1777,7 +1777,7 @@ export default function AdminPage() {
                         pages: "pp. 1-12",
                         keywords: "",
                         category: "Social Sciences",
-                        date: "August 2026",
+                        date: "November 2026",
                         fileName: "",
                         fileSize: "",
                         fileData: "",
@@ -3902,7 +3902,7 @@ export default function AdminPage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. August 2026"
+                    placeholder="e.g. November 2026"
                     value={newArticleForm.date}
                     onChange={(e) =>
                       setNewArticleForm({ ...newArticleForm, date: e.target.value })
@@ -4253,7 +4253,7 @@ export default function AdminPage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. August 2026"
+                    placeholder="e.g. November 2026"
                     value={editingArticle.date || ""}
                     onChange={(e) =>
                       setEditingArticle({ ...editingArticle, date: e.target.value })
