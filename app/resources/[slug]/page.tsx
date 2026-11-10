@@ -13,12 +13,7 @@ import {
   Calendar,
   FileText,
   User,
-  ArrowRight,
-  Copy,
-  CheckCircle2,
-  Paperclip,
   ExternalLink,
-  BookOpen,
   Search,
   Download,
 } from "lucide-react";
@@ -27,7 +22,6 @@ function ResourceDetailContent() {
   const params = useParams();
   const rawSlug = (params?.slug as string) || "";
   const { articles, settings } = useJournalData();
-  const [copied, setCopied] = useState(false);
   const [pdfInfo, setPdfInfo] = useState<{
     url: string;
     isBlob: boolean;
@@ -130,27 +124,6 @@ function ResourceDetailContent() {
     matchedArticle?.pdfUrl,
     settings,
   ]);
-
-  // Construct citation
-  const authorsText = matchedArticle?.authors || "Editorial Staff";
-  const pubYear = "2026";
-  const journalTitle =
-    settings.journalTitle ||
-    "Manthan: International Multidisciplinary Journal of Social Inquiry";
-  const citationText = matchedArticle
-    ? `${authorsText} (${pubYear}). ${matchedArticle.title}. ${journalTitle}, ${
-        matchedArticle.volume || "1"
-      }(${(matchedArticle.issue || "1").replace(/[^0-9]/g, "") || "1"}), ${
-        matchedArticle.doi || "10.5281/imjsi"
-      }.`
-    : "";
-
-  const handleCopyCitation = () => {
-    if (!citationText) return;
-    navigator.clipboard.writeText(citationText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   // If article not found, show elegant fallback reader rather than 404
   if (!matchedArticle) {
@@ -277,86 +250,77 @@ function ResourceDetailContent() {
               </div>
             </header>
 
-            {/* Attached Manuscript Document Card if Uploaded */}
-            {(matchedArticle.fileData || matchedArticle.pdfUrl || matchedArticle.fileName) && (
-              <div className="mb-6 p-3.5 bg-purple-50/60 border border-purple-200 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5 overflow-hidden">
-                  <Paperclip className="w-4 h-4 text-[#700070] shrink-0" />
-                  <div className="truncate">
-                    <p className="font-bold text-slate-800 text-xs truncate">
-                      {matchedArticle.fileName || "Uploaded Manuscript PDF"}
-                    </p>
-                    <p className="text-[10px] text-slate-500 font-mono">
-                      {matchedArticle.fileSize || "Original Manuscript"} • Peer-Reviewed Galley
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => openArticlePdf(matchedArticle, settings)}
-                  className="px-3 py-1.5 bg-[#700070] text-white hover:bg-[#5a005a] text-xs font-bold rounded inline-flex items-center gap-1.5 cursor-pointer shrink-0 shadow-xs"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Open &amp; View PDF</span>
-                </button>
-              </div>
-            )}
-
-            {/* Abstract Callout */}
-            <div className="p-4 bg-gray-50 border border-gray-300 mb-6">
-              <h2 className="font-editorial text-xs font-bold text-[#700070] uppercase tracking-wider mb-1">
+            {/* Abstract */}
+            <div className="p-5 bg-gray-50 border border-gray-300 rounded mb-6">
+              <h2 className="font-editorial text-xs sm:text-sm font-bold text-[#700070] uppercase tracking-wider mb-2">
                 Abstract
               </h2>
-              <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic">
+              <p className="text-xs sm:text-sm text-gray-800 leading-relaxed font-sans">
                 {matchedArticle.abstract}
               </p>
-            </div>
 
-            {/* Article Content / Scholarly Inquiry Sections */}
-            <div className="space-y-6 text-xs sm:text-sm text-gray-800 leading-relaxed font-sans">
-              {staticResource && matchedArticle.title?.toLowerCase().trim() === staticResource.title?.toLowerCase().trim() && staticResource.sections ? (
-                staticResource.sections.map((section, idx) => (
-                  <section key={idx} className="space-y-2">
-                    <h2 className="font-editorial text-base sm:text-lg font-bold text-gray-900">
-                      {section.heading}
-                    </h2>
-                    <p className="text-gray-700 leading-relaxed">{section.content}</p>
-                  </section>
-                ))
-              ) : (
-                <>
-                  <section className="space-y-2">
-                    <h2 className="font-editorial text-base sm:text-lg font-bold text-gray-900">
-                      1. Introduction &amp; Theoretical Context
-                    </h2>
-                    <p className="text-gray-700 leading-relaxed">
-                      {matchedArticle.abstract} This empirical investigation examines foundational inquiries within {matchedArticle.category || "the discipline"}, analyzing institutional frameworks, socio-historical dimensions, and theoretical debates that shape contemporary discourse.
-                    </p>
-                  </section>
-
-                  <section className="space-y-2">
-                    <h2 className="font-editorial text-base sm:text-lg font-bold text-gray-900">
-                      2. Methodology &amp; Analytical Framework
-                    </h2>
-                    <p className="text-gray-700 leading-relaxed">
-                      Adopting rigorous multidisciplinary methodologies, this paper combines qualitative textual analysis, empirical archival synthesis, and structured inquiry into the underlying socio-economic and cultural factors. The author systematically addresses key research questions while evaluating institutional dynamics.
-                    </p>
-                  </section>
-
-                  <section className="space-y-2">
-                    <h2 className="font-editorial text-base sm:text-lg font-bold text-gray-900">
-                      3. Scholarly Discussion &amp; Conclusion
-                    </h2>
-                    <p className="text-gray-700 leading-relaxed">
-                      The findings contribute significantly to the ongoing scholarly conversation by highlighting regional nuances, policy implications, and future avenues for interdisciplinary inquiry. Complete methodological details, figures, tables, and full reference citations are available in the official published PDF document.
-                    </p>
-                  </section>
-                </>
+              {matchedArticle.keywords && (
+                <div className="mt-3.5 pt-2.5 border-t border-gray-200 text-xs">
+                  <strong className="text-gray-900 font-editorial">Keywords: </strong>
+                  <span className="text-gray-600 font-mono text-[11px]">
+                    {matchedArticle.keywords}
+                  </span>
+                </div>
               )}
             </div>
 
+            {/* Open and View PDF Action Bar */}
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3 p-4 bg-purple-50/70 border border-purple-200 rounded">
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <FileText className="w-5 h-5 text-[#700070] shrink-0" />
+                <div className="truncate">
+                  <h3 className="font-editorial text-sm font-bold text-gray-900 truncate">
+                    {matchedArticle.fileName || "Full Published Manuscript Document"}
+                  </h3>
+                  <p className="text-[11px] text-gray-600 font-mono">
+                    {matchedArticle.fileSize || "Official Galley PDF"} • Refereed &amp; Peer-Reviewed Open Access
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => openArticlePdf(matchedArticle, settings)}
+                  className="px-5 py-2.5 bg-[#700070] text-white hover:bg-[#5a005a] text-xs sm:text-sm font-bold rounded inline-flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
+                  title="Open and view PDF in full browser window"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>Open and View PDF</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (pdfInfo?.url) {
+                      const a = document.createElement("a");
+                      a.href = pdfInfo.url;
+                      a.download =
+                        matchedArticle.fileName ||
+                        `${matchedArticle.title?.replace(/[^a-zA-Z0-9]/g, "-").slice(0, 40) || "article"}.pdf`;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                    } else {
+                      openArticlePdf(matchedArticle, settings);
+                    }
+                  }}
+                  className="px-4 py-2.5 border border-[#700070] text-[#700070] hover:bg-purple-100 text-xs sm:text-sm font-bold rounded inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                  title="Download manuscript PDF file"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download PDF</span>
+                </button>
+              </div>
+            </div>
+
             {/* Embedded Live PDF Document Reader */}
-            <div className="mt-8 border border-gray-300 rounded overflow-hidden shadow-xs">
+            <div className="border border-gray-300 rounded overflow-hidden shadow-xs">
               <div className="bg-[#700070] text-white px-4 py-2.5 flex items-center justify-between text-xs font-bold">
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-purple-200" />
@@ -366,19 +330,17 @@ function ResourceDetailContent() {
                       : "Official Academic Galley Publication"}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => openArticlePdf(matchedArticle, settings)}
-                    className="px-2.5 py-1 bg-white/20 hover:bg-white/30 rounded text-[11px] font-semibold transition-colors cursor-pointer inline-flex items-center gap-1"
-                  >
-                    <span>Open in Full Tab</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => openArticlePdf(matchedArticle, settings)}
+                  className="px-2.5 py-1 bg-white/20 hover:bg-white/30 rounded text-[11px] font-semibold transition-colors cursor-pointer inline-flex items-center gap-1"
+                >
+                  <span>Open in Full Tab</span>
+                  <ExternalLink className="w-3 h-3" />
+                </button>
               </div>
 
-              <div className="w-full h-[650px] bg-slate-100">
+              <div className="w-full h-[750px] bg-slate-100">
                 {pdfInfo?.isDocx ? (
                   <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-white">
                     <FileText className="w-16 h-16 text-[#700070] mb-4" />
@@ -410,65 +372,6 @@ function ResourceDetailContent() {
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* Keywords */}
-            {matchedArticle.keywords && (
-              <div className="mt-6 pt-4 border-t border-gray-200 text-xs">
-                <strong className="text-gray-900 font-editorial">Keywords: </strong>
-                <span className="text-gray-600 font-mono text-[11px]">
-                  {matchedArticle.keywords}
-                </span>
-              </div>
-            )}
-
-            {/* Academic Citation Block (APA 7th Format) */}
-            <div className="mt-8 p-4 rounded bg-purple-50/50 border border-purple-200 text-xs">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-editorial font-bold text-[#700070] text-xs uppercase tracking-wider">
-                  How to Cite This Paper (APA 7th Format)
-                </span>
-                <button
-                  type="button"
-                  onClick={handleCopyCitation}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-[#700070] hover:underline cursor-pointer"
-                >
-                  {copied ? (
-                    <>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-emerald-600">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy Citation</span>
-                    </>
-                  )}
-                </button>
-              </div>
-              <div className="p-2.5 bg-white rounded border border-purple-100 font-mono text-[11px] text-gray-800 leading-relaxed select-all">
-                {citationText}
-              </div>
-            </div>
-
-            {/* Bottom Actions */}
-            <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <button
-                type="button"
-                onClick={() => openArticlePdf(matchedArticle, settings)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded bg-[#700070] hover:bg-[#5a005a] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-              >
-                <FileText className="w-4 h-4" />
-                <span>Open Full Published PDF</span>
-              </button>
-
-              <Link
-                href="/submit"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded border border-[#700070] text-[#700070] hover:bg-[#700070] hover:text-white text-xs font-semibold transition-colors"
-              >
-                <span>Submit Your Manuscript for Review</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
             </div>
           </article>
         </div>
